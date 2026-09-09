@@ -397,6 +397,7 @@
         <div class="navbar-nav">
             <a class="nav-link active" onclick="showPage('home'); return false;">홈</a>
             <a class="nav-link" onclick="showPage('search'); return false;">검색</a>
+            <a class="nav-link" onclick="showPage('recipeBook'); return false;">📖 레시피 북</a>
             <a class="nav-link" onclick="showPage('profile'); return false;">내 정보</a>
         </div>
     </nav>
@@ -537,6 +538,99 @@
                 </div>
             </div>
         </div>
+
+        <!-- 레시피 북 페이지 -->
+        <div id="recipeBook" class="page">
+            <div class="search-section">
+                <div class="search-title">📖 우리의 모든 레시피</div>
+
+                <!-- 검색창 -->
+                <div class="search-container" style="margin-bottom: 20px;">
+                    <input type="text" id="recipeBookSearch" placeholder="음식 찾기..." 
+                        oninput="filterRecipeBook()"
+                        style="flex: 1; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                </div>
+
+                <!-- 카테고리 탭 -->
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+                    <button class="category-tab active" onclick="filterRecipeBookByCategory('all')" style="
+                        padding: 8px 16px;
+                        background: #378ADD;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">전체</button>
+                    <button class="category-tab" onclick="filterRecipeBookByCategory('한식')" style="
+                        padding: 8px 16px;
+                        background: #f0f0f0;
+                        color: #666;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">한식</button>
+                    <button class="category-tab" onclick="filterRecipeBookByCategory('양식')" style="
+                        padding: 8px 16px;
+                        background: #f0f0f0;
+                        color: #666;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">양식</button>
+                    <button class="category-tab" onclick="filterRecipeBookByCategory('일식')" style="
+                        padding: 8px 16px;
+                        background: #f0f0f0;
+                        color: #666;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">일식</button>
+                    <button class="category-tab" onclick="filterRecipeBookByCategory('중식')" style="
+                        padding: 8px 16px;
+                        background: #f0f0f0;
+                        color: #666;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">중식</button>
+                    
+                    <div style="margin-left: auto;">
+                        <button id="safetyToggleBtn" onclick="toggleSafetyFilter()" style="
+                            padding: 8px 16px;
+                            background: #378ADD;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-weight: 500;
+                            font-size: 13px;
+                            transition: all 0.2s;
+                        " onmouseover="this.style.background='#2a5fa3'" onmouseout="this.style.background='#378ADD'">
+                            🛡️ 안전한 것만
+                        </button>
+                    </div>
+                </div>
+
+                <div class="recipe-grid" id="recipeBookGrid">
+                    <!-- 레시피 카드들이 여기 들어옴 -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 레시피 상세 모달 -->
@@ -643,6 +737,7 @@
         // 3. 레시피 DB
         const recipes = {
             '우동': {
+                category: '일식',
                 keywords: ['우동'],
                 description: '따뜻하고 쫄깃한 기본 우동',
                 ingredients: [
@@ -663,6 +758,7 @@
                 ]
             },
             '크림 파스타': {
+                category: '양식',
                 keywords: ['크림파스타', '크림 파스타'],
                 description: '부드럽고 풍미 있는 크림 파스타',
                 ingredients: [
@@ -687,6 +783,7 @@
                 ]
             },
             '김치찌개': {
+                category: '한식',
                 keywords: ['김치찌개', '김치 찌개'],
                 description: '밥도둑 국민 찌개',
                 ingredients: [
@@ -713,6 +810,7 @@
                 ]
             },
             '된장찌개': {
+                category: '한식',
                 keywords: ['된장찌개', '된장 찌개'],
                 description: '깊고 구수한 전통 찌개',
                 ingredients: [
@@ -738,6 +836,7 @@
                 ]
             },
             '계란국': {
+                category: '한식',
                 keywords: ['계란국', '계란 국'],
                 description: '담백하고 부드러운 아침 국',
                 ingredients: [
@@ -760,6 +859,7 @@
                 ]
             },
             '미역국': {
+                category: '한식',
                 keywords: ['미역국', '미역 국'],
                 description: '풍미 깊은 소고기 미역국',
                 ingredients: [
@@ -791,6 +891,11 @@
         function showPage(pageName) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageName).classList.add('active');
+            
+            // 레시피 북 페이지 초기화
+            if (pageName === 'recipeBook') {
+                initializeRecipeBook();
+            }
         }
 
         function handleSearch() {
@@ -1169,6 +1274,112 @@
             });
             
             return mappedAllergies;
+        }
+
+        // 레시피 북 관련 변수
+        let safetyFilterOn = false;
+        let selectedCategory = 'all';
+
+        function initializeRecipeBook() {
+            filterRecipeBook();
+        }
+
+        function filterRecipeBook() {
+            const userAllergies = getUserAllergies();
+            const searchQuery = document.getElementById('recipeBookSearch').value.toLowerCase().trim();
+            const recipeBookGrid = document.getElementById('recipeBookGrid');
+            let html = '';
+
+            Object.entries(recipes).forEach(([name, recipe]) => {
+                // 카테고리 필터
+                if (selectedCategory !== 'all' && recipe.category !== selectedCategory) {
+                    return;
+                }
+
+                // 검색어 필터
+                if (searchQuery && !name.toLowerCase().includes(searchQuery) && 
+                    !recipe.description.toLowerCase().includes(searchQuery)) {
+                    return;
+                }
+
+                // 알레르기 확인
+                const hasAllergy = recipe.ingredients.some(ing =>
+                    userAllergies.some(allergy => 
+                        ing.name.toLowerCase().includes(allergy) || allergy.includes(ing.name.toLowerCase())
+                    )
+                );
+
+                // 스타일 적용
+                const style = safetyFilterOn && hasAllergy ? 'opacity: 0.4; filter: grayscale(50%);' : '';
+                const warningIcon = hasAllergy && userAllergies.length > 0 ? '🚨 ' : '';
+
+                html += `<div class="recipe-card" style="${style}" onclick="showRecipeModal('${name}')">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">${warningIcon}${name}</div>
+                    </div>
+                    <div class="recipe-card-body">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 6px;">${recipe.category}</div>
+                        <div style="font-size: 13px; color: #666;">
+                            ${recipe.description}
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            if (html === '') {
+                recipeBookGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px;">검색 결과가 없습니다.</div>';
+            } else {
+                recipeBookGrid.innerHTML = html;
+            }
+
+            // 버튼 상태 업데이트
+            const btn = document.getElementById('safetyToggleBtn');
+            if (safetyFilterOn) {
+                btn.style.background = '#28a745';
+            } else {
+                btn.style.background = '#378ADD';
+            }
+        }
+
+        function filterRecipeBookByCategory(category) {
+            selectedCategory = category;
+            
+            // 탭 스타일 업데이트
+            document.querySelectorAll('.category-tab').forEach(btn => {
+                if (category === 'all' && btn.textContent === '전체') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                    btn.classList.add('active');
+                } else if (category === '한식' && btn.textContent === '한식') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                } else if (category === '양식' && btn.textContent === '양식') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                } else if (category === '일식' && btn.textContent === '일식') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                } else if (category === '중식' && btn.textContent === '중식') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                } else {
+                    btn.style.background = '#f0f0f0';
+                    btn.style.color = '#666';
+                    btn.style.borderColor = '#e0e0e0';
+                }
+            });
+            
+            filterRecipeBook();
+        }
+
+        function toggleSafetyFilter() {
+            safetyFilterOn = !safetyFilterOn;
+            filterRecipeBook();
         }
 
         function analyzeIngredients() {
