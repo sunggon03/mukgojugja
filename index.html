@@ -550,6 +550,18 @@
     <script>
         // ===== 데이터 정의 =====
 
+        // 0. 재료 기본 정보 DB
+        const ingredientInfo = {
+            '우유': { description: '동물성 우유, 칼슘과 단백질 풍부', where: '🥛 마트, 편의점, 카페', price: '2,500~4,000원', tip: '냉장 보관, 개봉 후 3-5일 이내 섭취' },
+            '계란': { description: '단백질과 영양가 높음', where: '🥚 모든 마트', price: '4,000~6,000원', tip: '냉장 보관, 상온 1달 가능' },
+            '파스타': { description: '정제 탄수화물', where: '🍝 마트, 마켓컬리', price: '2,000~4,000원', tip: '알 덴테로 삶으면 쫄깃함' },
+            '버터': { description: '유제품, 고소한 풍미', where: '🧈 마트, 편의점', price: '4,000~6,000원', tip: '냉동 보관 권장' },
+            '마늘': { description: '향신료, 항균 작용', where: '🧄 마트, 시장', price: '3,000~5,000원', tip: '서늘한 곳에 보관' },
+            '올리브유': { description: '식용유, 건강한 지방산', where: '🫒 마켓컬리, 마트', price: '8,000~15,000원', tip: '고열 조리는 피하기' },
+            '소금': { description: '간 맛, 미네랄', where: '🧂 모든 마트', price: '2,000~3,000원', tip: '습기 차단 보관' },
+            '파마산 치즈': { description: '경질 치즈, 풍미 강함', where: '🧀 마켓컬리, 수입 마트', price: '5,000~8,000원', tip: '냉장 보관' }
+        };
+
         // 1. 대체식품 DB
         const substitutes = {
             '우유': {
@@ -617,44 +629,64 @@
         const recipes = {
             '우동': {
                 keywords: ['우동'],
-                description: '기본 우동',
+                description: '따뜻하고 쫄깃한 기본 우동',
                 ingredients: [
-                    { name: '우동면', amount: '200g' },
-                    { name: '물', amount: '600ml' }
+                    { name: '우동면', amount: '200g', required: true },
+                    { name: '국물(국간장)', amount: '500ml', required: true },
+                    { name: '파', amount: '1줄기', required: true },
+                    { name: '계란', amount: '1개', required: false },
+                    { name: '미나리', amount: '한 줌', required: false },
+                    { name: '튀김(천우라)', amount: '2개', required: false }
                 ],
                 steps: [
-                    { step: 1, instruction: '물을 끓인다' },
-                    { step: 2, instruction: '우동면을 넣고 3-4분 끓인다' }
+                    { step: 1, instruction: '냄비에 물을 팍팍 끓이고 우동면을 넣는다. 3-4분 정도 끓인다.' },
+                    { step: 2, instruction: '우동면이 하얀색에서 투명해질 때까지 끓인 후 찬물에 헹궈 물기를 뺀다.' },
+                    { step: 3, instruction: '다른 냄비에 국물을 끓이고 국간장 1큰술로 간을 맞춘다.' },
+                    { step: 4, instruction: '국물이 끓어오르면 준비한 우동면을 담는다.' },
+                    { step: 5, instruction: '위에 계란, 파, 미나리를 얹고 튀김을 올린다.' },
+                    { step: 6, instruction: '뜨거울 때 바로 먹는다.' }
                 ]
             },
             '크림 파스타': {
                 keywords: ['크림파스타', '크림 파스타'],
-                description: '유당프리 크림파스타',
+                description: '부드럽고 풍미 있는 크림 파스타',
                 ingredients: [
-                    { name: '파스타', amount: '200g' },
-                    { name: '코코넛 밀크', amount: '200ml' }
+                    { name: '파스타', amount: '200g', required: true },
+                    { name: '우유', amount: '300ml', required: true },
+                    { name: '버터', amount: '30g', required: true },
+                    { name: '마늘', amount: '2쪽', required: true },
+                    { name: '올리브유', amount: '2큰술', required: true },
+                    { name: '소금', amount: '한 꼬집', required: true },
+                    { name: '파마산 치즈', amount: '50g', required: false },
+                    { name: '검은 후추', amount: '약간', required: false },
+                    { name: '파슬리', amount: '한 줌', required: false }
                 ],
                 steps: [
-                    { step: 1, instruction: '파스타를 삶는다' },
-                    { step: 2, instruction: '코코넛 밀크로 소스를 만든다' }
+                    { step: 1, instruction: '큰 냄비에 물을 끓이고 소금 한 스푼을 넣는다.' },
+                    { step: 2, instruction: '파스타를 넣고 패키지 표시보다 1분 덜 삶는다 (알 덴테). 그 후 체에 건진다.' },
+                    { step: 3, instruction: '팬에 올리브유를 두르고 다진 마늘을 넣어 중약불에서 향을 낸다.' },
+                    { step: 4, instruction: '버터를 넣고 녹인 후 우유를 천천히 부으며 섞는다. 약 3-4분 데운다.' },
+                    { step: 5, instruction: '삶은 파스타를 팬에 넣고 소스와 잘 섞는다.' },
+                    { step: 6, instruction: '파마산 치즈를 뿌리고 검은 후추로 마무리한 후 접시에 담는다.' },
+                    { step: 7, instruction: '파슬리로 장식해 서빙한다.' }
                 ]
             },
             '김치찌개': {
                 keywords: ['김치찌개', '김치 찌개'],
                 description: '밥도둑 국민 찌개',
                 ingredients: [
-                    { name: '신김치', amount: '2컵 (300g)' },
-                    { name: '돼지고기', amount: '150g' },
-                    { name: '물 또는 멸치육수', amount: '500ml' },
-                    { name: '양파', amount: '1/2개' },
-                    { name: '대파', amount: '2/3대' },
-                    { name: '두부', amount: '1/2모' },
-                    { name: '다진 마늘', amount: '1큰술' },
-                    { name: '국간장', amount: '1큰술' },
-                    { name: '고춧가루', amount: '1큰술' },
-                    { name: '참기름', amount: '1작은술' },
-                    { name: '청양고추', amount: '1-2개' },
-                    { name: '감자', amount: '1/2개' }
+                    { name: '신김치', amount: '2컵 (300g)', required: true },
+                    { name: '돼지고기', amount: '150g', required: true },
+                    { name: '물 또는 멸치육수', amount: '500ml', required: true },
+                    { name: '양파', amount: '1/2개', required: true },
+                    { name: '대파', amount: '2/3대', required: true },
+                    { name: '두부', amount: '1/2모', required: true },
+                    { name: '다진 마늘', amount: '1큰술', required: true },
+                    { name: '국간장', amount: '1큰술', required: true },
+                    { name: '고춧가루', amount: '1큰술', required: true },
+                    { name: '참기름', amount: '1작은술', required: true },
+                    { name: '청양고추', amount: '1-2개', required: false },
+                    { name: '감자', amount: '1/2개', required: false }
                 ],
                 steps: [
                     { step: 1, instruction: '넓은 냄비에 참기름을 두르고 돼지고기를 중강불에서 볶는다.' },
@@ -669,17 +701,17 @@
                 keywords: ['된장찌개', '된장 찌개'],
                 description: '깊고 구수한 전통 찌개',
                 ingredients: [
-                    { name: '된장', amount: '2큰술' },
-                    { name: '돼지고기 또는 소고기', amount: '200g' },
-                    { name: '쌀뜨물 또는 물', amount: '400ml' },
-                    { name: '양파', amount: '1/2개' },
-                    { name: '애호박', amount: '1/4개' },
-                    { name: '두부', amount: '1/2모' },
-                    { name: '대파', amount: '1/2대' },
-                    { name: '다진 마늘', amount: '1큰술' },
-                    { name: '참기름', amount: '1큰술' },
-                    { name: '고춧가루', amount: '1/2큰술' },
-                    { name: '청양고추', amount: '1개' }
+                    { name: '된장', amount: '2큰술', required: true },
+                    { name: '돼지고기 또는 소고기', amount: '200g', required: true },
+                    { name: '쌀뜨물 또는 물', amount: '400ml', required: true },
+                    { name: '양파', amount: '1/2개', required: true },
+                    { name: '애호박', amount: '1/4개', required: true },
+                    { name: '두부', amount: '1/2모', required: true },
+                    { name: '대파', amount: '1/2대', required: true },
+                    { name: '다진 마늘', amount: '1큰술', required: true },
+                    { name: '참기름', amount: '1큰술', required: true },
+                    { name: '고춧가루', amount: '1/2큰술', required: false },
+                    { name: '청양고추', amount: '1개', required: false }
                 ],
                 steps: [
                     { step: 1, instruction: '냄비에 참기름을 두르고 고기를 중강불에서 먼저 볶는다.' },
@@ -694,14 +726,14 @@
                 keywords: ['계란국', '계란 국'],
                 description: '담백하고 부드러운 아침 국',
                 ingredients: [
-                    { name: '물 또는 멸치육수', amount: '500ml' },
-                    { name: '계란', amount: '2개' },
-                    { name: '대파 또는 부추', amount: '1줌' },
-                    { name: '국간장', amount: '1작은술' },
-                    { name: '소금', amount: '1/2작은술' },
-                    { name: '다진 마늘', amount: '1/2큰술' },
-                    { name: '애호박', amount: '1/4개' },
-                    { name: '콩나물', amount: '1줌' }
+                    { name: '물 또는 멸치육수', amount: '500ml', required: true },
+                    { name: '계란', amount: '2개', required: true },
+                    { name: '대파 또는 부추', amount: '1줌', required: true },
+                    { name: '국간장', amount: '1작은술', required: true },
+                    { name: '소금', amount: '1/2작은술', required: true },
+                    { name: '다진 마늘', amount: '1/2큰술', required: false },
+                    { name: '애호박', amount: '1/4개', required: false },
+                    { name: '콩나물', amount: '1줌', required: false }
                 ],
                 steps: [
                     { step: 1, instruction: '냄비에 물을 붓고 센 불에서 끓인다.' },
@@ -716,16 +748,16 @@
                 keywords: ['미역국', '미역 국'],
                 description: '풍미 깊은 소고기 미역국',
                 ingredients: [
-                    { name: '건미역', amount: '20g' },
-                    { name: '소고기 양지 또는 사태', amount: '200g' },
-                    { name: '쌀뜨물 또는 물', amount: '1.5리터' },
-                    { name: '참기름', amount: '2큰술' },
-                    { name: '국간장', amount: '2큰술' },
-                    { name: '다진 마늘', amount: '1큰술' },
-                    { name: '참치액젓 또는 멸치액젓', amount: '2큰술' },
-                    { name: '소금', amount: '약간' },
-                    { name: '후추', amount: '약간' },
-                    { name: '대파', amount: '1/2대' }
+                    { name: '건미역', amount: '20g', required: true },
+                    { name: '소고기 양지 또는 사태', amount: '200g', required: true },
+                    { name: '쌀뜨물 또는 물', amount: '1.5리터', required: true },
+                    { name: '참기름', amount: '2큰술', required: true },
+                    { name: '국간장', amount: '2큰술', required: true },
+                    { name: '다진 마늘', amount: '1큰술', required: true },
+                    { name: '참치액젓 또는 멸치액젓', amount: '2큰술', required: true },
+                    { name: '소금', amount: '약간', required: true },
+                    { name: '후추', amount: '약간', required: true },
+                    { name: '대파', amount: '1/2대', required: false }
                 ],
                 steps: [
                     { step: 1, instruction: '건미역을 20~30분 불린 후 3~4번 헹궈 물기를 제거한다.' },
@@ -837,57 +869,134 @@
             let html = `<div class="modal-title">${recipeName}</div>`;
             html += `<div class="section-title">재료</div>`;
             
-            recipe.ingredients.forEach(ing => {
+            recipe.ingredients.forEach((ing, index) => {
                 // 사용자의 알레르기와 재료 이름 비교
                 const hasAllergy = userAllergies.some(allergy => 
                     ing.name.toLowerCase().includes(allergy) || allergy.includes(ing.name.toLowerCase())
                 );
 
                 let warningText = '';
-                let substitueText = '';
+                let requiredMark = ing.required ? '✓' : '▲';
+                let requiredColor = ing.required ? '#378ADD' : '#ff9800';
                 
                 if (hasAllergy) {
                     warningText = ' ⚠️';
-                    
-                    // 해당 재료의 대체식품 찾기
-                    for (const [category, categoryData] of Object.entries(substitutes)) {
-                        if (ing.name.toLowerCase().includes(category.toLowerCase()) || category.toLowerCase().includes(ing.name.toLowerCase())) {
-                            substitueText = `<div style="margin-top: 8px; padding: 8px; background: #fff3cd; border-radius: 6px; font-size: 12px;">
-                                <div style="font-weight: 500; color: #856404; margin-bottom: 4px;">🔄 대체식품:</div>
-                                <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                                    ${categoryData.items.map(item => `
-                                        <span style="background: white; border: 1px solid #ffc107; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer;" onclick="showTipMenu('${item.name}', event, true)">
-                                            ${item.name}
-                                        </span>
-                                    `).join('')}
-                                </div>
-                            </div>`;
-                            break;
-                        }
+                }
+
+                // 대체식품 찾기
+                let substituteInfo = null;
+                for (const [category, categoryData] of Object.entries(substitutes)) {
+                    if (ing.name.toLowerCase().includes(category.toLowerCase()) || category.toLowerCase().includes(ing.name.toLowerCase())) {
+                        substituteInfo = categoryData.items;
+                        break;
                     }
                 }
 
-                html += `<div class="ingredient-item ${ing.substitute ? 'substitute' : ''}">
-                    <div style="flex: 1;">
-                        <div>${ing.name}${warningText}</div>
-                        <div style="color: #888; font-size: 12px;">${ing.amount}</div>
-                        ${substitueText}
+                const tipId = `tip-${recipeName}-${index}`;
+
+                html += `<div class="ingredient-item" style="border-left: 3px solid ${requiredColor};">
+                    <div style="display: flex; align-items: flex-start; gap: 12px;">
+                        <div style="background: ${requiredColor}; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; flex-shrink: 0; margin-top: 2px;">${requiredMark}</div>
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div>
+                                    <div style="font-weight: 500;">
+                                        ${ing.name}${warningText}
+                                        <span style="font-size: 13px; color: #666;">${ing.amount}</span>
+                                    </div>
+                                    <div style="font-size: 12px; color: #999; margin-top: 2px;">
+                                        ${ing.required ? '필수 재료' : '선택 사항'}
+                                    </div>
+                                </div>
+                                ${substituteInfo ? `<span style="cursor: pointer; font-size: 16px; flex-shrink: 0; user-select: none;" onclick="toggleSubstituteInfo('${tipId}')">ℹ️</span>` : ''}
+                            </div>
+                            ${substituteInfo ? `
+                                <div id="${tipId}" style="display: none; margin-top: 8px; padding: 10px; background: #f0f8ff; border-left: 3px solid #378ADD; border-radius: 4px; font-size: 12px;">
+                                    <div style="font-weight: 500; color: #378ADD; margin-bottom: 6px;">🔄 대체식품:</div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                        ${substituteInfo.map(item => `
+                                            <span style="background: white; border: 1px solid #378ADD; color: #378ADD; padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; transition: all 0.2s;" onclick="showTipMenu('${item.name}', event, true)" onmouseover="this.style.backgroundColor='#378ADD'; this.style.color='white';" onmouseout="this.style.backgroundColor='white'; this.style.color='#378ADD';">
+                                                ${item.name}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>
                 </div>`;
             });
 
-            html += `<div class="section-title">조리 방법</div>`;
+            html += `<div class="section-title" style="margin-top: 20px;">조리 방법</div>`;
             recipe.steps.forEach(step => {
                 html += `<div class="ingredient-item">
                     <div style="display: flex; gap: 12px; width: 100%;">
-                        <div style="background: #378ADD; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">${step.step}</div>
-                        <div style="padding-top: 4px;">${step.instruction}</div>
+                        <div style="background: #378ADD; color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">${step.step}</div>
+                        <div style="padding-top: 4px; line-height: 1.6;">${step.instruction}</div>
                     </div>
                 </div>`;
             });
 
             modalBody.innerHTML = html;
             modal.classList.add('show');
+        }
+
+        function toggleSubstituteInfo(tipId) {
+            const element = document.getElementById(tipId);
+            if (element) {
+                if (element.style.display === 'none') {
+                    element.style.display = 'block';
+                } else {
+                    element.style.display = 'none';
+                }
+            }
+        }
+
+        function showIngredientTip(ingredientName, event) {
+            event.stopPropagation();
+            
+            // 해당 재료의 기본 정보 찾기
+            const info = ingredientInfo[ingredientName];
+            
+            if (!info) return;
+
+            const existing = document.querySelector('.tip-menu.show');
+            if (existing) existing.remove();
+
+            const tipMenu = document.createElement('div');
+            tipMenu.className = 'tip-menu show';
+            tipMenu.innerHTML = `
+                <div class="tip-menu-title">📌 재료 정보</div>
+                <div style="font-weight: 600; color: #378ADD; margin-bottom: 8px;">${ingredientName}</div>
+                <div class="tip-section">
+                    <div class="tip-label">📝 설명</div>
+                    <div class="tip-value">${info.description}</div>
+                </div>
+                <div class="tip-section">
+                    <div class="tip-label">🏪 구매처</div>
+                    <div class="tip-value">${info.where}</div>
+                </div>
+                <div class="tip-section">
+                    <div class="tip-label">💰 가격</div>
+                    <div class="tip-value">${info.price}</div>
+                </div>
+                <div class="tip-section">
+                    <div class="tip-label">💡 팁</div>
+                    <div class="tip-value">${info.tip}</div>
+                </div>
+            `;
+
+            document.body.appendChild(tipMenu);
+            const rect = event.target.getBoundingClientRect();
+            tipMenu.style.top = (rect.bottom + 8) + 'px';
+            tipMenu.style.left = Math.max(10, rect.left - 120) + 'px';
+
+            document.addEventListener('click', function closeTip(e) {
+                if (!tipMenu.contains(e.target)) {
+                    tipMenu.remove();
+                    document.removeEventListener('click', closeTip);
+                }
+            });
         }
 
         function closeModal() {
