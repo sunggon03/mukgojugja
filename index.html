@@ -826,11 +826,20 @@
             const seenNames = [];
             
             items.forEach(item => {
-                if (allergyMapping[item]) {
-                    const allergyObj = allergyMapping[item];
-                    if (!seenNames.includes(allergyObj.name)) {
-                        allergyObjects.push(allergyObj);
-                        seenNames.push(allergyObj.name);
+                // 입력값의 공백 제거
+                const normalizedItem = item.replace(/\s/g, '');
+                
+                // allergyMapping의 모든 키 확인
+                for (const key in allergyMapping) {
+                    // 매핑 키의 공백 제거해서 비교
+                    const normalizedKey = key.replace(/\s/g, '');
+                    if (normalizedKey === normalizedItem) {
+                        const allergyObj = allergyMapping[key];
+                        if (!seenNames.includes(allergyObj.name)) {
+                            allergyObjects.push(allergyObj);
+                            seenNames.push(allergyObj.name);
+                        }
+                        break;
                     }
                 }
             });
@@ -852,8 +861,17 @@
             const diseases = [];
             
             items.forEach(item => {
-                if (diseaseMapping[item]) {
-                    diseases.push(item);
+                // 입력값의 공백 제거
+                const normalizedItem = item.replace(/\s/g, '');
+                
+                // diseaseMapping의 모든 키 확인
+                for (const key in diseaseMapping) {
+                    // 매핑 키의 공백 제거해서 비교
+                    const normalizedKey = key.replace(/\s/g, '');
+                    if (normalizedKey === normalizedItem) {
+                        diseases.push(key);
+                        break;
+                    }
                 }
             });
             
@@ -867,6 +885,7 @@
             
             const avoidList = [];
             
+            // 알레르기 피해야할 음식
             allergyObjects.forEach(allergyObj => {
                 const avoidFoods = allergyObj.avoidFoods || [];
                 avoidFoods.forEach(food => {
@@ -876,6 +895,7 @@
                 });
             });
             
+            // 기저질환 피해야할 음식
             diseases.forEach(disease => {
                 if (diseaseMapping[disease]) {
                     const avoidIngredients = diseaseMapping[disease].avoidIngredients || [];
@@ -946,10 +966,20 @@
 
         // 레시피 필터링
         function filterRecipeBook() {
-            const userAllergyNames = getAllergyNames();
+            const allergyObjects = getUserAllergies();
             const searchQuery = document.getElementById('recipeBookSearch').value.toLowerCase().trim();
             const recipeBookGrid = document.getElementById('recipeBookGrid');
             let html = '';
+
+            // 모든 피해야할 음식 수집
+            const allAvoidFoods = [];
+            allergyObjects.forEach(allergyObj => {
+                allergyObj.avoidFoods.forEach(food => {
+                    if (!allAvoidFoods.includes(food)) {
+                        allAvoidFoods.push(food);
+                    }
+                });
+            });
 
             Object.entries(recipes).forEach(([name, recipe]) => {
                 if (selectedCategory !== 'all' && recipe.category !== selectedCategory) {
@@ -961,14 +991,16 @@
                     return;
                 }
 
+                // avoidFoods와 직접 비교
                 const hasAllergy = recipe.ingredients.some(ing =>
-                    userAllergyNames.some(allergyName => 
-                        ing.name.toLowerCase().includes(allergyName) || allergyName.includes(ing.name.toLowerCase())
+                    allAvoidFoods.some(avoidFood => 
+                        ing.name.toLowerCase().includes(avoidFood.toLowerCase()) || 
+                        avoidFood.toLowerCase().includes(ing.name.toLowerCase())
                     )
                 );
 
                 const style = safetyFilterOn && hasAllergy ? 'opacity: 0.4; filter: grayscale(50%);' : '';
-                const warningIcon = hasAllergy && userAllergyNames.length > 0 ? '🚨 ' : '';
+                const warningIcon = hasAllergy && allergyObjects.length > 0 ? '🚨 ' : '';
 
                 html += `<div class="recipe-card" style="${style}" onclick="showRecipeModal('${name}')">
                     <div class="recipe-card-header">
@@ -991,16 +1023,27 @@
             const recipe = recipes[recipeName];
             const modal = document.getElementById('recipeModal');
             const modalBody = document.getElementById('modalBody');
-            const userAllergyNames = getAllergyNames();
+            const allergyObjects = getUserAllergies();
+
+            // 모든 피해야할 음식 수집
+            const allAvoidFoods = [];
+            allergyObjects.forEach(allergyObj => {
+                allergyObj.avoidFoods.forEach(food => {
+                    if (!allAvoidFoods.includes(food)) {
+                        allAvoidFoods.push(food);
+                    }
+                });
+            });
 
             const hasAnyAllergy = recipe.ingredients.some(ing =>
-                userAllergyNames.some(allergyName => 
-                    ing.name.toLowerCase().includes(allergyName) || allergyName.includes(ing.name.toLowerCase())
+                allAvoidFoods.some(avoidFood => 
+                    ing.name.toLowerCase().includes(avoidFood.toLowerCase()) || 
+                    avoidFood.toLowerCase().includes(ing.name.toLowerCase())
                 )
             );
 
             let html = '';
-            if (hasAnyAllergy && userAllergyNames.length > 0) {
+            if (hasAnyAllergy && allergyObjects.length > 0) {
                 html += `<div style="background: #ffebee; border-left: 4px solid #dc3545; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
                     <div style="font-weight: 600; color: #dc3545; font-size: 14px; display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 18px;">🚨</span>
@@ -1016,13 +1059,14 @@
             html += `<div class="section-title">재료</div>`;
             
             recipe.ingredients.forEach(ing => {
-                const hasAllergy = userAllergyNames.some(allergyName => 
-                    ing.name.toLowerCase().includes(allergyName) || allergyName.includes(ing.name.toLowerCase())
+                const hasAllergy = allAvoidFoods.some(avoidFood => 
+                    ing.name.toLowerCase().includes(avoidFood.toLowerCase()) || 
+                    avoidFood.toLowerCase().includes(ing.name.toLowerCase())
                 );
 
                 const className = hasAllergy ? 'ingredient-warning' : 'ingredient-normal';
                 const requiredText = ing.required ? '' : '(선택)';
-                const warningMark = hasAllergy && userAllergyNames.length > 0 ? '⚠️ ' : '';
+                const warningMark = hasAllergy && allergyObjects.length > 0 ? '⚠️ ' : '';
 
                 html += `<div class="ingredient-item ${className}">
                     <div>${warningMark}${ing.name} ${requiredText}</div>
