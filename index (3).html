@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>먹고죽자! - 식이제약 레시피 플랫폼</title>
     <style>
         * {
@@ -388,6 +391,72 @@
             .recipe-grid {
                 grid-template-columns: 1fr;
             }
+            
+            /* 검색 페이지 반응형 */
+            .search-section {
+                flex-direction: column !important;
+                gap: 0 !important;
+            }
+            
+            #avoidFoodsDesktop {
+                display: none !important;
+            }
+            
+            #avoidFoodsMobile {
+                display: block !important;
+            }
+            
+            /* 내 정보 페이지 */
+            textarea {
+                font-size: 16px !important; /* iOS 줌 방지 */
+            }
+            
+            /* 네비게이션 */
+            .navbar {
+                padding: 0 12px;
+            }
+            
+            .navbar-brand {
+                font-size: 16px;
+            }
+            
+            .navbar-nav {
+                gap: 15px;
+            }
+            
+            .nav-link {
+                font-size: 12px;
+            }
+            
+            /* 버튼 크기 조정 */
+            .btn-search {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            /* 텍스트 크기 */
+            .search-title {
+                font-size: 18px;
+            }
+            
+            .recipe-card {
+                padding: 12px;
+            }
+            
+            .recipe-card-title {
+                font-size: 14px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            /* 데스크톱: 사이드바 표시 */
+            #avoidFoodsDesktop {
+                display: block !important;
+            }
+            
+            #avoidFoodsMobile {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -397,6 +466,7 @@
         <div class="navbar-nav">
             <a class="nav-link active" onclick="showPage('home'); return false;">홈</a>
             <a class="nav-link" onclick="showPage('search'); return false;">검색</a>
+            <a class="nav-link" onclick="showPage('recipeBook'); return false;">📖 레시피 북</a>
             <a class="nav-link" onclick="showPage('profile'); return false;">내 정보</a>
         </div>
     </nav>
@@ -433,53 +503,62 @@
 
         <!-- 검색 페이지 -->
         <div id="search" class="page">
-            <!-- 레시피 검색 섹션 -->
-            <div class="search-section">
-                <div class="search-title">🍽️ 레시피 검색</div>
-                <div class="search-container">
-                    <input type="text" id="recipeSearch" placeholder="우동, 파스타, 크림파스타..." onkeyup="handleSearch()">
-                    <button class="btn-search" onclick="handleSearch()">검색</button>
+            <!-- 대체식품 찾기 섹션 -->
+            <div class="search-section" style="display: flex; gap: 20px;">
+                <!-- 왼쪽: 대체식품 검색 (메인) -->
+                <div style="flex: 1; min-width: 0;">
+                    <div class="search-title">🛡️ 대체식품 찾기</div>
+                    <div style="margin-bottom: 20px; padding: 16px; background: #e8f4f8; border-radius: 8px; color: #0c447c; font-size: 13px; line-height: 1.6;">
+                        <div style="font-weight: 500; margin-bottom: 8px;">📋 사용 방법:</div>
+                        <div>1. 음식의 재료를 텍스트로 입력 (복붙 가능)</div>
+                        <div>2. "분석하기" 버튼 클릭</div>
+                        <div>3. 우리 DB에 있는 재료의 대체식품 확인</div>
+                        <div style="margin-top: 8px; font-size: 12px; opacity: 0.8;">💡 예: "우유 200ml, 버터 30g"</div>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <textarea id="ingredientInput" placeholder="재료를 입력하세요:&#10;우유 200ml&#10;버터 30g&#10;계란 2개" 
+                            style="width: 100%; height: 120px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: inherit;">
+                        </textarea>
+                    </div>
+
+                    <button class="btn-search" onclick="analyzeIngredients()" style="width: 100%; margin-bottom: 20px;">분석하기</button>
+
+                    <div id="analysisResults" style="display: none;">
+                        <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">📊 분석 결과:</div>
+                        <div id="resultsContent" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;"></div>
+                    </div>
+
+                    <div id="noAnalysisResults" style="display: none; text-align: center; padding: 40px; color: #888;">
+                        <div style="font-size: 48px; margin-bottom: 12px;">🔎</div>
+                        <div style="font-size: 16px; font-weight: 500;">분석 결과가 없습니다</div>
+                        <div style="font-size: 13px; margin-top: 8px;">재료를 입력하고 분석해보세요</div>
+                    </div>
                 </div>
 
-                <div id="searchResults" style="display: none;">
-                    <div id="resultContent"></div>
-                </div>
-
-                <div id="noResults" style="display: none; text-align: center; padding: 40px; color: #888;">
-                    <div style="font-size: 48px; margin-bottom: 12px;">🔎</div>
-                    <div style="font-size: 16px; font-weight: 500;">검색 결과가 없습니다</div>
-                    <div style="font-size: 13px; margin-top: 8px;">다른 검색어를 시도해보세요</div>
+                <!-- 오른쪽: 피해야할 음식 (데스크톱에서만) -->
+                <div id="avoidFoodsDesktop" style="width: 250px; display: none;">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #dc3545;">
+                        🚨 피해야할 음식
+                    </div>
+                    <div id="avoidFoodsList" style="font-size: 13px; line-height: 1.8; color: #666;">
+                        <div style="color: #999;">입력한 건강 정보가 없습니다</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- 대체식품 찾기 섹션 -->
-            <div class="search-section">
-                <div class="search-title">🔄 대체식품 찾기</div>
-                <div style="margin-bottom: 20px; padding: 16px; background: #e8f4f8; border-radius: 8px; color: #0c447c; font-size: 13px; line-height: 1.6;">
-                    <div style="font-weight: 500; margin-bottom: 8px;">📋 사용 방법:</div>
-                    <div>1. 음식의 재료를 텍스트로 입력 (복붙 가능)</div>
-                    <div>2. "분석하기" 버튼 클릭</div>
-                    <div>3. 우리 DB에 있는 재료의 대체식품 확인</div>
-                    <div style="margin-top: 8px; font-size: 12px; opacity: 0.8;">💡 예: "우유 200ml, 버터 30g, 계란 2개"</div>
-                </div>
-
-                <div style="margin-bottom: 20px;">
-                    <textarea id="ingredientInput" placeholder="재료를 입력하세요:&#10;우유 200ml&#10;버터 30g&#10;계란 2개" 
-                        style="width: 100%; height: 120px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: inherit;">
-                    </textarea>
-                </div>
-
-                <button class="btn-search" onclick="analyzeIngredients()" style="width: 100%; margin-bottom: 20px;">분석하기</button>
-
-                <div id="analysisResults" style="display: none;">
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">📊 분석 결과:</div>
-                    <div id="resultsContent" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;"></div>
-                </div>
-
-                <div id="noAnalysisResults" style="display: none; text-align: center; padding: 40px; color: #888;">
-                    <div style="font-size: 48px; margin-bottom: 12px;">🔎</div>
-                    <div style="font-size: 16px; font-weight: 500;">분석 결과가 없습니다</div>
-                    <div style="font-size: 13px; margin-top: 8px;">재료를 입력하고 분석해보세요</div>
+            <!-- 모바일: 피해야할 음식 아코디언 -->
+            <div id="avoidFoodsMobile" style="display: none; margin-top: 20px;">
+                <div style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                    <div onclick="toggleAvoidFoods()" style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                        <div style="font-weight: 600; color: #333;">🚨 피해야할 음식</div>
+                        <div id="avoidFoodsToggle" style="font-size: 20px;">▼</div>
+                    </div>
+                    <div id="avoidFoodsContent" style="display: none; padding: 16px; border-top: 1px solid #e0e0e0; background: #fff; font-size: 13px; line-height: 1.8;">
+                        <div id="avoidFoodsListMobile" style="color: #666;">
+                            <div style="color: #999;">입력한 건강 정보가 없습니다</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -491,49 +570,123 @@
                 
                 <div style="margin-bottom: 24px;">
                     <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">
-                        🚫 알레르기/불내증
+                        🩺 건강 정보 (알레르기 + 기저질환)
                         <span style="font-size: 12px; font-weight: 400; color: #e74c3c;"> (!) 정확한 이름을 입력해주세요</span>
                     </div>
                     
                     <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; color: #856404; line-height: 1.6;">
                         <div style="font-weight: 500; margin-bottom: 6px;">📝 입력 예시 (쉼표로 구분):</div>
-                        <div>유당불내증, 글루텐 불내증, 계란 알레르기</div>
-                        <div style="margin-top: 6px; font-size: 11px; opacity: 0.8;">❌ 우유, 버터 → ✅ 유당불내증</div>
-                        <div style="font-size: 11px; opacity: 0.8;">❌ 계란 → ✅ 계란 알레르기</div>
-                        <div style="font-size: 11px; opacity: 0.8;">❌ 글루텐 → ✅ 글루텐 불내증</div>
+                        <div>유당불내증, 계란 알레르기, 당뇨병, 고혈압</div>
+                        <div style="margin-top: 6px; font-size: 11px; opacity: 0.8;">💡 알레르기와 기저질환을 함께 입력하세요</div>
+                        <div style="font-size: 11px; opacity: 0.8;">시스템이 자동으로 구분하여 관리합니다</div>
                     </div>
 
-                    <textarea id="allergyInput" placeholder="예: 유당불내증, 글루텐 불내증, 계란 알레르기" 
+                    <textarea id="healthInput" placeholder="예: 유당불내증, 계란 알레르기, 당뇨병, 고혈압" 
                         onchange="saveHealthInfo()"
-                        style="width: 100%; height: 80px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical;">
-                    </textarea>
-                </div>
-
-                <div style="margin-bottom: 24px;">
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">
-                        ⚕️ 기저질환
-                        <span style="font-size: 12px; font-weight: 400; color: #e74c3c;"> (!) 정확한 이름을 입력해주세요</span>
-                    </div>
-                    
-                    <div style="background: #e8f4f8; border: 1px solid #378ADD; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; color: #0c447c; line-height: 1.6;">
-                        <div style="font-weight: 500; margin-bottom: 6px;">📝 입력 예시 (쉼표로 구분):</div>
-                        <div>당뇨병, 고혈압, 신장질환</div>
-                        <div style="margin-top: 6px; font-size: 11px; opacity: 0.8;">❌ 당뇨, 혈압 → ✅ 당뇨병, 고혈압</div>
-                    </div>
-
-                    <textarea id="conditionInput" placeholder="예: 당뇨병, 고혈압, 신장질환"
-                        onchange="saveHealthInfo()"
-                        style="width: 100%; height: 80px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical;">
+                        style="width: 100%; height: 100px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: inherit; resize: vertical;">
                     </textarea>
                 </div>
 
                 <div style="padding: 12px; background: #f0f8ff; border-left: 4px solid #378ADD; border-radius: 4px; font-size: 13px; color: #0c447c;">
-                    💡 입력한 조건에 맞는 재료는 레시피에 ⚠️ 표시되고, 대체식품이 제안됩니다.
+                    💡 입력한 조건에 맞는 재료는 레시피에 ⚠️ 표시되고, 대체식품과 피해야할 음식이 제안됩니다.
                 </div>
 
                 <div style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px; font-size: 12px; color: #666;">
                     <div style="font-weight: 500; margin-bottom: 6px;">💾 자동 저장</div>
                     <div>입력한 정보는 자동으로 저장되며, 언제든 수정할 수 있습니다.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 레시피 북 페이지 -->
+        <div id="recipeBook" class="page">
+            <div class="search-section">
+                <div class="search-title">📖 우리의 모든 레시피</div>
+
+                <!-- 검색창 -->
+                <div class="search-container" style="margin-bottom: 20px;">
+                    <input type="text" id="recipeBookSearch" placeholder="음식 찾기..." 
+                        oninput="filterRecipeBook()"
+                        style="flex: 1; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+                </div>
+
+                <!-- 카테고리 탭 -->
+                <div style="display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;">
+                    <button class="category-tab active" onclick="filterRecipeBookByCategory('all')" style="
+                        padding: 8px 16px;
+                        background: #378ADD;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">전체</button>
+                    <button class="category-tab" onclick="filterRecipeBookByCategory('한식')" style="
+                        padding: 8px 16px;
+                        background: #f0f0f0;
+                        color: #666;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">한식</button>
+                    <button class="category-tab" onclick="filterRecipeBookByCategory('양식')" style="
+                        padding: 8px 16px;
+                        background: #f0f0f0;
+                        color: #666;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">양식</button>
+                    <button class="category-tab" onclick="filterRecipeBookByCategory('일식')" style="
+                        padding: 8px 16px;
+                        background: #f0f0f0;
+                        color: #666;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">일식</button>
+                    <button class="category-tab" onclick="filterRecipeBookByCategory('중식')" style="
+                        padding: 8px 16px;
+                        background: #f0f0f0;
+                        color: #666;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: 500;
+                        font-size: 13px;
+                        transition: all 0.2s;
+                    ">중식</button>
+                    
+                    <div style="margin-left: auto;">
+                        <button id="safetyToggleBtn" onclick="toggleSafetyFilter()" style="
+                            padding: 8px 16px;
+                            background: #378ADD;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-weight: 500;
+                            font-size: 13px;
+                            transition: all 0.2s;
+                        " onmouseover="this.style.background='#2a5fa3'" onmouseout="this.style.background='#378ADD'">
+                            🛡️ 안전한 것만
+                        </button>
+                    </div>
+                </div>
+
+                <div class="recipe-grid" id="recipeBookGrid">
+                    <!-- 레시피 카드들이 여기 들어옴 -->
                 </div>
             </div>
         </div>
@@ -552,17 +705,165 @@
 
         // 0. 알레르기 → 재료 매핑
         const allergyMapping = {
-            '유당': '우유',
-            '유당불내증': '우유',
-            '유제품': '우유',
-            '버터': '버터',
-            '치즈': '치즈',
-            '계란': '계란',
-            '계란 알레르기': '계란',
-            '밀가루': '밀',
-            '글루텐': '밀',
-            '글루텐 불내증': '밀',
-            '우유 알레르기': '우유'
+            '유당불내증': {
+                name: '유당불내증',
+                type: 'intolerance',
+                avoidFoods: ['우유', '버터', '치즈', '크림', '우유초콜릿'],
+                safeFoods: ['락토스프리 우유', '저유당 우유', '두유', '귀리 밀크', '코코넛 밀크', '요구르트(소량)'],
+                tips: '유당 함량이 낮은 제품 선택 권장. 무가당 유제품은 더 안전합니다.'
+            },
+            '유당': {
+                name: '유당불내증',
+                type: 'intolerance',
+                avoidFoods: ['우유', '버터', '치즈', '크림'],
+                safeFoods: ['락토스프리 우유', '저유당 우유', '두유'],
+                tips: '유당 함량이 낮은 제품 선택 권장'
+            },
+            '유제품': {
+                name: '유제품 불내증',
+                type: 'intolerance',
+                avoidFoods: ['우유', '버터', '치즈', '크림', '요구르트'],
+                safeFoods: ['두유', '귀리 밀크', '아몬드 밀크'],
+                tips: '모든 유제품 피하기'
+            },
+            '우유 알레르기': {
+                name: '우유 알레르기',
+                type: 'allergy',
+                avoidFoods: ['우유', '버터', '치즈', '크림', '요구르트', '밀크파우더', '유제품'],
+                safeFoods: ['두유', '귀리 밀크', '아몬드 밀크', '코코넛 밀크', '쌀 음료'],
+                tips: '모든 유제품 완전히 피하기. 가공식품의 유제품 함유 여부 확인 필수'
+            },
+            '버터': {
+                name: '유제품 불내증',
+                type: 'intolerance',
+                avoidFoods: ['버터', '크림', '우유'],
+                safeFoods: ['올리브유', '포도씨유', '참기름'],
+                tips: '식물성 기름으로 대체'
+            },
+            '치즈': {
+                name: '유제품 불내증',
+                type: 'intolerance',
+                avoidFoods: ['치즈', '우유'],
+                safeFoods: ['영양 효모(대체 치즈 맛)', '통곡물'],
+                tips: '영양 효모로 풍미 보충'
+            },
+            '계란': {
+                name: '계란 알레르기',
+                type: 'allergy',
+                avoidFoods: ['계란', '계란 함유 음식', '달걀'],
+                safeFoods: ['아쿠아파바(계란 대체)', '바나나(베이킹)', '요구르트(베이킹)'],
+                tips: '계란이 들어간 모든 음식 피하기. 성분표 확인 필수'
+            },
+            '계란 알레르기': {
+                name: '계란 알레르기',
+                type: 'allergy',
+                avoidFoods: ['계란', '계란 함유 음식'],
+                safeFoods: ['아쿠아파바', '바나나', '요구르트'],
+                tips: '계란 완전 피하기'
+            },
+            '밀가루': {
+                name: '글루텐 불내증',
+                type: 'intolerance',
+                avoidFoods: ['밀가루', '밀', '보리', '호밀', '일반 파스타', '일반 빵'],
+                safeFoods: ['글루텐프리 밀가루', '글루텐프리 파스타', '쌀가루', '옥수수가루'],
+                tips: '교차오염 주의. 조리기구 별도 사용'
+            },
+            '글루텐': {
+                name: '글루텐 불내증',
+                type: 'intolerance',
+                avoidFoods: ['밀', '보리', '호밀', '글루텐 함유 식품'],
+                safeFoods: ['글루텐프리 밀가루', '쌀', '옥수수', '감자'],
+                tips: '교차오염 주의'
+            },
+            '글루텐 불내증': {
+                name: '글루텐 불내증',
+                type: 'intolerance',
+                avoidFoods: ['밀', '보리', '호밀', '밀가루', '일반 파스타', '일반 빵'],
+                safeFoods: ['글루텐프리 밀가루', '글루텐프리 파스타', '글루텐프리 빵', '쌀가루', '옥수수가루'],
+                tips: '글루텐프리 마크 확인. 교차오염 주의'
+            }
+        };
+
+        // 기저질환 맵핑 DB
+        const diseaseMapping = {
+            '당뇨': {
+                name: '당뇨병',
+                warning: '높은 혈당 주의',
+                avoidIngredients: ['설탕', '흰쌀', '포도당'],
+                substitutes: {
+                    '설탕': ['에리스톨', '스테비아', '자일리톨'],
+                    '흰쌀': ['현미', '귀리', '퀴노아']
+                },
+                tips: ['혈당지수(GI) 낮은 음식 선택', '식이섬유 충분히', '천천히 섭취']
+            },
+            '고혈압': {
+                name: '고혈압',
+                warning: '나트륨 섭취 주의',
+                avoidIngredients: ['소금', '나트륨', '간장'],
+                substitutes: {
+                    '소금': ['저염 소금', '허브', '향신료'],
+                    '간장': ['저염 간장', '다시마육수']
+                },
+                tips: ['하루 2g 이하 염분', 'MSG 피하기', '신선한 재료 사용']
+            },
+            '고콜레스테롤': {
+                name: '고콜레스테롤혈증',
+                warning: '포화지방 섭취 주의',
+                avoidIngredients: ['버터', '육지방', '전지우유'],
+                substitutes: {
+                    '버터': ['올리브유', '코코넛오일', '아보카도오일'],
+                    '전지우유': ['저지방우유', '무지방우유']
+                },
+                tips: ['기름 적게 사용', '구우기/삶기 선호', '불포화지방 충분히']
+            },
+            '신장질환': {
+                name: '신장질환',
+                warning: '칼륨, 인, 나트륨 주의',
+                avoidIngredients: ['높은칼륨채소', '가공식품'],
+                substitutes: {
+                    '높은칼륨식품': ['낮은칼륨채소', '감자 삶기']
+                },
+                tips: ['칼륨 음식 삶아서 물 버리기', '나트륨 제한', '의사 상담']
+            },
+            '위산역류': {
+                name: '위산역류질환(GERD)',
+                warning: '자극적인 음식 주의',
+                avoidIngredients: ['카페인', '산성음식', '기름진음식'],
+                substitutes: {
+                    '커피': ['디카페인 커피', '허브차'],
+                    '토마토': ['크림 소스', '야채국물']
+                },
+                tips: ['자극적이지 않은 음식', '적은 양 여러 번', '자기 2-3시간 전 식사 금지']
+            },
+            '글루텐불내증': {
+                name: '글루텐 불내증',
+                warning: '글루텐 함유 식품 피해야 함',
+                avoidIngredients: ['밀가루', '보리', '호밀'],
+                substitutes: {
+                    '밀가루': ['글루텐프리 밀가루', '쌀가루', '옥수수 전분'],
+                    '파스타': ['글루텐프리 파스타', '쌀국수']
+                },
+                tips: ['교차오염 주의', '글루텐프리 인증 제품 선택']
+            },
+            '통풍': {
+                name: '통풍',
+                warning: '고퓨린 음식 피해야 함',
+                avoidIngredients: ['내장류', '조개류', '맥주'],
+                substitutes: {
+                    '내장류': ['저퓨린 단백질', '생선', '두부']
+                },
+                tips: ['수분 충분히 (2L 이상)', '저지방 유제품', '체중 관리']
+            },
+            '소화기질환': {
+                name: '궤양성 대장염/크론병',
+                warning: '소화가 쉬운 음식 선택',
+                avoidIngredients: ['기름진음식', '자극적향신료'],
+                substitutes: {
+                    '고지방': ['저지방 조리', '흰살 생선'],
+                    '자극적향신료': ['순한향신료', '소금']
+                },
+                tips: ['소화하기 쉬운 음식', '발작 중 섬유질 제한', '온화한 온도 음식']
+            }
         };
 
         // 0. 재료 기본 정보 DB
@@ -643,7 +944,9 @@
         // 3. 레시피 DB
         const recipes = {
             '우동': {
+                category: '일식',
                 keywords: ['우동'],
+                baseIngredient: '국수',
                 description: '따뜻하고 쫄깃한 기본 우동',
                 ingredients: [
                     { name: '우동면', amount: '200g', required: true },
@@ -663,7 +966,9 @@
                 ]
             },
             '크림 파스타': {
+                category: '양식',
                 keywords: ['크림파스타', '크림 파스타'],
+                baseIngredient: '파스타',
                 description: '부드럽고 풍미 있는 크림 파스타',
                 ingredients: [
                     { name: '파스타', amount: '200g', required: true },
@@ -687,7 +992,9 @@
                 ]
             },
             '김치찌개': {
+                category: '한식',
                 keywords: ['김치찌개', '김치 찌개'],
+                baseIngredient: '찌개',
                 description: '밥도둑 국민 찌개',
                 ingredients: [
                     { name: '신김치', amount: '2컵 (300g)', required: true },
@@ -713,7 +1020,9 @@
                 ]
             },
             '된장찌개': {
+                category: '한식',
                 keywords: ['된장찌개', '된장 찌개'],
+                baseIngredient: '찌개',
                 description: '깊고 구수한 전통 찌개',
                 ingredients: [
                     { name: '된장', amount: '2큰술', required: true },
@@ -738,7 +1047,9 @@
                 ]
             },
             '계란국': {
+                category: '한식',
                 keywords: ['계란국', '계란 국'],
+                baseIngredient: '국',
                 description: '담백하고 부드러운 아침 국',
                 ingredients: [
                     { name: '물 또는 멸치육수', amount: '500ml', required: true },
@@ -760,7 +1071,9 @@
                 ]
             },
             '미역국': {
+                category: '한식',
                 keywords: ['미역국', '미역 국'],
+                baseIngredient: '국',
                 description: '풍미 깊은 소고기 미역국',
                 ingredients: [
                     { name: '건미역', amount: '20g', required: true },
@@ -791,6 +1104,70 @@
         function showPage(pageName) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageName).classList.add('active');
+            
+            // 레시피 북 페이지 초기화
+            if (pageName === 'recipeBook') {
+                initializeRecipeBook();
+            }
+            
+            // 검색 페이지 초기화
+            if (pageName === 'search') {
+                loadAvoidFoods();
+            }
+        }
+
+        function loadAvoidFoods() {
+            const allergyObjects = getUserAllergies();
+            const diseases = getHealthDiseases();
+            
+            const avoidList = [];
+            
+            // 알레르기별 피해야할 음식
+            allergyObjects.forEach(allergyObj => {
+                const avoidFoods = allergyObj.avoidFoods || [];
+                avoidFoods.forEach(food => {
+                    if (!avoidList.includes(food)) {
+                        avoidList.push(food);
+                    }
+                });
+            });
+            
+            // 기저질환별 피해야할 음식
+            diseases.forEach(disease => {
+                if (diseaseMapping[disease]) {
+                    const avoidIngredients = diseaseMapping[disease].avoidIngredients || [];
+                    avoidIngredients.forEach(ing => {
+                        if (!avoidList.includes(ing)) {
+                            avoidList.push(ing);
+                        }
+                    });
+                }
+            });
+            
+            // 피해야할 음식이 없으면
+            if (avoidList.length === 0) {
+                document.getElementById('avoidFoodsList').innerHTML = '<div style="color: #999;">입력한 건강 정보가 없습니다</div>';
+                document.getElementById('avoidFoodsListMobile').innerHTML = '<div style="color: #999;">입력한 건강 정보가 없습니다</div>';
+                return;
+            }
+            
+            // 리스트 표시
+            const listHTML = avoidList.map(item => `<div>• ${item}</div>`).join('');
+            document.getElementById('avoidFoodsList').innerHTML = listHTML;
+            document.getElementById('avoidFoodsListMobile').innerHTML = listHTML;
+        }
+
+        function toggleAvoidFoods() {
+            const content = document.getElementById('avoidFoodsContent');
+            const toggle = document.getElementById('avoidFoodsToggle');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.style.transform = 'rotate(180deg)';
+            } else {
+                content.style.display = 'none';
+                toggle.style.transform = 'rotate(0deg)';
+            }
         }
 
         function handleSearch() {
@@ -807,44 +1184,6 @@
 
             let hasResults = false;
             let html = '';
-
-            // 레시피 검색
-            const recipeMatches = Object.entries(recipes).filter(([name, data]) =>
-                data.keywords.some(k => k.toLowerCase().replace(/\s/g, '') === query.replace(/\s/g, ''))
-            );
-
-            if (recipeMatches.length > 0) {
-                hasResults = true;
-                const userAllergies = getUserAllergies();
-                html += '<div class="search-title">✅ 우리의 레시피</div>';
-                html += '<div class="recipe-grid">';
-                recipeMatches.forEach(([name, data]) => {
-                    // 이 레시피에 알레르기 재료가 있는지 확인
-                    const hasAnyAllergy = data.ingredients.some(ing =>
-                        userAllergies.some(allergy => 
-                            ing.name.toLowerCase().includes(allergy) || allergy.includes(ing.name.toLowerCase())
-                        )
-                    );
-
-                    const borderStyle = hasAnyAllergy && userAllergies.length > 0 ? 
-                        '2px solid #dc3545' : '1px solid #e0e0e0';
-                    
-                    const warningBanner = hasAnyAllergy && userAllergies.length > 0 ?
-                        `<div style="background: #ffebee; color: #dc3545; padding: 8px; border-radius: 4px; font-size: 12px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                            <span>🚨</span>
-                            알레르기 재료 포함
-                        </div>` : '';
-
-                    html += `<div class="recipe-card" style="border: ${borderStyle};" onclick="showRecipeModal('${name}')">
-                        <div class="recipe-card-header"><div class="recipe-card-title">${name}</div></div>
-                        <div class="recipe-card-body">
-                            ${warningBanner}
-                            <div>${data.description}</div>
-                        </div>
-                    </div>`;
-                });
-                html += '</div>';
-            }
 
             // 대체식품 검색
             if (substitutes[query]) {
@@ -899,18 +1238,18 @@
             const recipe = recipes[recipeName];
             const modal = document.getElementById('recipeModal');
             const modalBody = document.getElementById('modalBody');
-            const userAllergies = getUserAllergies();
+            const userAllergyNames = getAllergyNames();
 
             // 알레르기 재료가 포함되었는지 확인
             const hasAnyAllergy = recipe.ingredients.some(ing =>
-                userAllergies.some(allergy => 
-                    ing.name.toLowerCase().includes(allergy) || allergy.includes(ing.name.toLowerCase())
+                userAllergyNames.some(allergyName => 
+                    ing.name.toLowerCase().includes(allergyName) || allergyName.includes(ing.name.toLowerCase())
                 )
             );
 
             // 경고 배너
             let html = '';
-            if (hasAnyAllergy && userAllergies.length > 0) {
+            if (hasAnyAllergy && userAllergyNames.length > 0) {
                 html += `<div style="background: #ffebee; border-left: 4px solid #dc3545; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
                     <div style="font-weight: 600; color: #dc3545; font-size: 14px; display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 18px;">🚨</span>
@@ -927,8 +1266,8 @@
             
             recipe.ingredients.forEach((ing, index) => {
                 // 사용자의 알레르기와 재료 이름 비교
-                const hasAllergy = userAllergies.some(allergy => 
-                    ing.name.toLowerCase().includes(allergy) || allergy.includes(ing.name.toLowerCase())
+                const hasAllergy = userAllergyNames.some(allergyName => 
+                    ing.name.toLowerCase().includes(allergyName) || allergyName.includes(ing.name.toLowerCase())
                 );
 
                 let borderColor, bgColor, markColor, markText;
@@ -1133,42 +1472,166 @@
         }
 
         function saveHealthInfo() {
-            const healthInfo = {
-                allergies: document.getElementById('allergyInput').value,
-                conditions: document.getElementById('conditionInput').value
-            };
-            
-            localStorage.setItem('userHealthInfo', JSON.stringify(healthInfo));
+            const healthText = document.getElementById('healthInput').value;
+            localStorage.setItem('userHealthInfo', healthText);
         }
 
         function loadHealthInfo() {
             const saved = localStorage.getItem('userHealthInfo');
-            
             if (saved) {
-                const healthInfo = JSON.parse(saved);
-                document.getElementById('allergyInput').value = healthInfo.allergies || '';
-                document.getElementById('conditionInput').value = healthInfo.conditions || '';
+                document.getElementById('healthInput').value = saved;
             }
         }
 
         function getUserAllergies() {
-            const allergyText = document.getElementById('allergyInput').value.toLowerCase();
-            if (!allergyText.trim()) return [];
+            const healthText = document.getElementById('healthInput').value.toLowerCase();
+            if (!healthText.trim()) return [];
             
-            const allergies = allergyText.split(',').map(a => a.trim()).filter(a => a);
-            const mappedAllergies = [];
+            const items = healthText.split(',').map(a => a.trim()).filter(a => a);
+            const allergyObjects = [];
+            const seenNames = [];
             
-            allergies.forEach(allergy => {
-                // 매핑에서 찾기
-                if (allergyMapping[allergy]) {
-                    mappedAllergies.push(allergyMapping[allergy]);
-                } else {
-                    // 매핑이 없으면 원본 입력 사용
-                    mappedAllergies.push(allergy);
+            items.forEach(item => {
+                // allergyMapping에서 찾기
+                if (allergyMapping[item]) {
+                    const allergyObj = allergyMapping[item];
+                    // 중복 제거 (name 기준)
+                    if (!seenNames.includes(allergyObj.name)) {
+                        allergyObjects.push(allergyObj);
+                        seenNames.push(allergyObj.name);
+                    }
                 }
             });
             
-            return mappedAllergies;
+            return allergyObjects;
+        }
+        
+        function getAllergyNames() {
+            const allergyObjects = getUserAllergies();
+            return allergyObjects.map(obj => obj.name);
+        }
+
+        function getHealthDiseases() {
+            const healthText = document.getElementById('healthInput').value.toLowerCase();
+            if (!healthText.trim()) return [];
+            
+            const items = healthText.split(',').map(a => a.trim()).filter(a => a);
+            const diseases = [];
+            
+            items.forEach(item => {
+                // diseaseMapping에서 찾기
+                if (diseaseMapping[item]) {
+                    diseases.push(item);
+                }
+            });
+            
+            return diseases;
+        }
+
+        // 레시피 북 관련 변수
+        let safetyFilterOn = false;
+        let selectedCategory = 'all';
+
+        function initializeRecipeBook() {
+            filterRecipeBook();
+        }
+
+        function filterRecipeBook() {
+            const userAllergyNames = getAllergyNames();
+            const searchQuery = document.getElementById('recipeBookSearch').value.toLowerCase().trim();
+            const recipeBookGrid = document.getElementById('recipeBookGrid');
+            let html = '';
+
+            Object.entries(recipes).forEach(([name, recipe]) => {
+                // 카테고리 필터
+                if (selectedCategory !== 'all' && recipe.category !== selectedCategory) {
+                    return;
+                }
+
+                // 검색어 필터
+                if (searchQuery && !name.toLowerCase().includes(searchQuery) && 
+                    !recipe.description.toLowerCase().includes(searchQuery)) {
+                    return;
+                }
+
+                // 알레르기 확인
+                const hasAllergy = recipe.ingredients.some(ing =>
+                    userAllergyNames.some(allergyName => 
+                        ing.name.toLowerCase().includes(allergyName) || allergyName.includes(ing.name.toLowerCase())
+                    )
+                );
+
+                // 스타일 적용
+                const style = safetyFilterOn && hasAllergy ? 'opacity: 0.4; filter: grayscale(50%);' : '';
+                const warningIcon = hasAllergy && userAllergyNames.length > 0 ? '🚨 ' : '';
+
+                html += `<div class="recipe-card" style="${style}" onclick="showRecipeModal('${name}')">
+                    <div class="recipe-card-header">
+                        <div class="recipe-card-title">${warningIcon}${name}</div>
+                    </div>
+                    <div class="recipe-card-body">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 6px;">${recipe.category}</div>
+                        <div style="font-size: 13px; color: #666;">
+                            ${recipe.description}
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            if (html === '') {
+                recipeBookGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: #999; padding: 40px;">검색 결과가 없습니다.</div>';
+            } else {
+                recipeBookGrid.innerHTML = html;
+            }
+
+            // 버튼 상태 업데이트
+            const btn = document.getElementById('safetyToggleBtn');
+            if (safetyFilterOn) {
+                btn.style.background = '#28a745';
+            } else {
+                btn.style.background = '#378ADD';
+            }
+        }
+
+        function filterRecipeBookByCategory(category) {
+            selectedCategory = category;
+            
+            // 탭 스타일 업데이트
+            document.querySelectorAll('.category-tab').forEach(btn => {
+                if (category === 'all' && btn.textContent === '전체') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                    btn.classList.add('active');
+                } else if (category === '한식' && btn.textContent === '한식') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                } else if (category === '양식' && btn.textContent === '양식') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                } else if (category === '일식' && btn.textContent === '일식') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                } else if (category === '중식' && btn.textContent === '중식') {
+                    btn.style.background = '#378ADD';
+                    btn.style.color = 'white';
+                    btn.style.borderColor = '#378ADD';
+                } else {
+                    btn.style.background = '#f0f0f0';
+                    btn.style.color = '#666';
+                    btn.style.borderColor = '#e0e0e0';
+                }
+            });
+            
+            filterRecipeBook();
+        }
+
+        function toggleSafetyFilter() {
+            safetyFilterOn = !safetyFilterOn;
+            filterRecipeBook();
         }
 
         function analyzeIngredients() {
