@@ -549,7 +549,22 @@
     <div id="profile" class="page">
         <div class="search-section">
             <div class="search-title">👤 내 건강 정보</div>
-            
+
+            <!-- 로그인 영역 -->
+            <div style="margin-bottom: 20px; padding: 14px 16px; background: #f8f9fa; border-radius: 8px; border: 1px solid #eee;">
+                <div id="authLoggedOut" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                    <div style="font-size: 12px; color: #666;">로그인하면 건강정보가 계정에 저장되어 다른 기기에서도 이어서 쓸 수 있어요.</div>
+                    <button onclick="signInWithGoogle()" style="display: flex; align-items: center; gap: 6px; background: #fff; color: #3c4043; border: 1px solid #dadce0; padding: 8px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; font-weight: 500; white-space: nowrap;">
+                        <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg>
+                        Google로 로그인
+                    </button>
+                </div>
+                <div id="authLoggedIn" style="display: none; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                    <div style="font-size: 13px; color: #333;">✅ <span id="authUserName" style="font-weight: 600;"></span>님으로 로그인됨</div>
+                    <button onclick="signOutUser()" style="background: #f5f5f5; color: #333; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; cursor: pointer;">로그아웃</button>
+                </div>
+            </div>
+
             <div style="margin-bottom: 24px;">
                 <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">
                     🩺 건강 정보 (알레르기 + 기저질환)
@@ -855,6 +870,13 @@
                 name: '당뇨병',
                 avoidIngredients: ['설탕', '흰쌀', '흰빵', '과일주스', '단음료'],
                 safeIngredients: ['현미', '귀리', '통곡물', '채소', '콩류', '견과류'],
+                substitutes: {
+                    '설탕': ['스테비아', '알룰로스', '에리스리톨'],
+                    '흰쌀': ['현미', '귀리', '통곡물'],
+                    '흰빵': ['통밀빵', '호밀빵'],
+                    '과일주스': ['생과일(통째로)', '무가당 차'],
+                    '단음료': ['물', '무가당 탄산수', '무가당 차']
+                },
                 tips: '정제 탄수화물과 단 음료는 줄이고, 혈당지수(GI)가 낮은 통곡물·채소 위주로 섭취 권장',
                 source: "https://mountsinai.org/health-library/report/diabetes-diet"
             },
@@ -862,6 +884,13 @@
                 name: '당뇨병',
                 avoidIngredients: ['설탕', '흰쌀', '흰빵', '과일주스', '단음료'],
                 safeIngredients: ['현미', '귀리', '통곡물', '채소', '콩류', '견과류'],
+                substitutes: {
+                    '설탕': ['스테비아', '알룰로스', '에리스리톨'],
+                    '흰쌀': ['현미', '귀리', '통곡물'],
+                    '흰빵': ['통밀빵', '호밀빵'],
+                    '과일주스': ['생과일(통째로)', '무가당 차'],
+                    '단음료': ['물', '무가당 탄산수', '무가당 차']
+                },
                 tips: '정제 탄수화물과 단 음료는 줄이고, 혈당지수(GI)가 낮은 통곡물·채소 위주로 섭취 권장',
                 source: "https://mountsinai.org/health-library/report/diabetes-diet"
             },
@@ -869,6 +898,13 @@
                 name: '고혈압',
                 avoidIngredients: ['소금', '나트륨', '가공식품', '젓갈', '라면'],
                 safeIngredients: ['채소', '과일', '저지방 유제품', '통곡물', '견과류'],
+                substitutes: {
+                    '소금': ['허브', '레몬즙', '식초'],
+                    '나트륨': ['저염 조미료', '허브'],
+                    '가공식품': ['신선식품'],
+                    '젓갈': ['저염 젓갈', '허브양념'],
+                    '라면': ['저염 국수(직접 육수)']
+                },
                 tips: '나트륨 섭취를 하루 2,300mg 이하로 제한 (DASH 식단 기준). 칼륨이 풍부한 채소·과일과 함께 섭취',
                 source: "https://www.mayoclinic.org/dash-diet/art-20048456"
             },
@@ -876,6 +912,13 @@
                 name: '고콜레스테롤',
                 avoidIngredients: ['삼겹살', '가공육', '튀긴음식', '전지우유', '버터'],
                 safeIngredients: ['올리브유', '생선', '귀리', '저지방 유제품', '견과류'],
+                substitutes: {
+                    '삼겹살': ['닭가슴살', '흰살생선'],
+                    '가공육': ['신선육(닭가슴살 등)'],
+                    '튀긴음식': ['구운 음식', '찐 음식'],
+                    '전지우유': ['저지방 우유', '무지방 우유'],
+                    '버터': ['올리브유']
+                },
                 tips: '포화지방·트랜스지방 섭취를 줄이고 불포화지방(올리브유, 생선 등)으로 대체 (미국심장협회 AHA 가이드라인 기준)',
                 source: "https://www.goodoc.co.kr/goodbot/10007"
             },
@@ -883,6 +926,14 @@
                 name: '신장질환',
                 avoidIngredients: ['바나나', '토마토', '감자', '시금치', '가공식품', '짠음식'],
                 safeIngredients: ['사과', '포도', '양배추', '흰쌀'],
+                substitutes: {
+                    '바나나': ['사과', '블루베리'],
+                    '토마토': ['오이', '양배추'],
+                    '감자': ['흰쌀밥(소량)'],
+                    '시금치': ['양배추', '콜리플라워'],
+                    '가공식품': ['신선식품'],
+                    '짠음식': ['저염식']
+                },
                 tips: '칼륨·나트륨·인 제한이 핵심이며, 신장 기능 단계와 검사 수치에 따라 제한 정도가 달라지므로 반드시 의료진·영양사와 상담 필요 (서울아산병원 식사요법 기준)',
                 source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=55"
             },
@@ -890,6 +941,14 @@
                 name: '위산역류',
                 avoidIngredients: ['커피', '탄산음료', '기름진 음식', '매운 음식', '초콜릿', '술'],
                 safeIngredients: ['오트밀', '바나나', '채소', '현미'],
+                substitutes: {
+                    '커피': ['무카페인 차', '보리차'],
+                    '탄산음료': ['물', '무가당 차'],
+                    '기름진 음식': ['찜 요리', '구이 요리'],
+                    '매운 음식': ['순한 양념(저자극)'],
+                    '초콜릿': ['바나나'],
+                    '술': ['물', '무가당 음료']
+                },
                 tips: '자극적인 음식과 야식을 피하고, 식사 후 바로 눕지 않는 것이 증상 관리에 중요',
                 source: "https://www.hyunmyoung.co.kr/general-medicine/gerd-foods-good-and-bad"
             },
@@ -897,6 +956,14 @@
                 name: '글루텐 불내증(셀리악병)',
                 avoidIngredients: ['밀', '보리', '호밀', '밀가루', '일반 파스타', '일반 빵'],
                 safeIngredients: ['쌀', '옥수수', '감자', '글루텐프리 제품'],
+                substitutes: {
+                    '밀': ['쌀', '옥수수'],
+                    '보리': ['쌀'],
+                    '호밀': ['쌀'],
+                    '밀가루': ['쌀가루', '글루텐프리 밀가루'],
+                    '일반 파스타': ['글루텐프리 파스타'],
+                    '일반 빵': ['글루텐프리 빵']
+                },
                 tips: '평생 글루텐(밀·보리·호밀)을 완전히 제거하는 식이가 핵심. 가공식품 속 숨은 글루텐 성분표 확인 필수',
                 source: "https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"
             },
@@ -904,10 +971,111 @@
                 name: '통풍',
                 avoidIngredients: ['맥주', '내장류', '멸치', '고등어', '정어리', '조개류'],
                 safeIngredients: ['저지방 유제품', '채소', '두부', '달걀'],
+                substitutes: {
+                    '맥주': ['물', '무알코올 음료'],
+                    '내장류': ['두부', '달걀'],
+                    '멸치': ['다시마 육수'],
+                    '고등어': ['흰살생선(저퓨린)'],
+                    '정어리': ['흰살생선(저퓨린)'],
+                    '조개류': ['두부']
+                },
                 tips: '고퓨린 식품(내장류, 등푸른 생선)과 술(특히 맥주) 섭취를 제한하고 물을 충분히 마시는 것이 도움',
                 source: "https://www.hyunmyoung.co.kr/general-medicine/통풍에-좋은-음식과-피해야-할-음식-총정리"
             }
         };
+
+        // 대체 음식별 짧은 설명/특징 (괄호 부가정보 제거 후 이름으로 매칭)
+        const substituteInfo = {
+            '감자': '탄수화물 공급원, 삶거나 쪄서 조리하면 좋음',
+            '고기류': '동물성 단백질 공급원',
+            '구운 음식': '기름을 적게 써서 지방 섭취를 줄일 수 있음',
+            '구이 요리': '기름을 적게 써서 지방 섭취를 줄일 수 있음',
+            '귀리': '식이섬유가 풍부해 혈당을 천천히 올림',
+            '귀리 밀크': '유당이 없고 식이섬유가 있는 식물성 음료',
+            '글루텐프리 밀가루': '쌀가루·옥수수가루 등으로 만든 밀가루 대체품',
+            '글루텐프리 빵': '밀 대신 쌀 등으로 만들어 글루텐이 없는 빵',
+            '글루텐프리 파스타': '쌀이나 옥수수 등으로 만든 글루텐 없는 면',
+            '다시마 육수': '멸치 대신 감칠맛을 내는 저퓨린 육수',
+            '달걀': '단백질이 풍부한 대체 단백질원',
+            '닭가슴살': '지방이 적은 고단백 부위',
+            '닭고기': '돼지고기보다 지방 함량이 낮은 육류',
+            '두부': '식물성 단백질원, 지방과 퓨린 함량이 낮음',
+            '두유': '콩으로 만든 유당 없는 대체 음료',
+            '락토스프리 우유': '유당을 제거해 소화가 편한 우유',
+            '레몬즙': '소금 대신 신맛으로 감칠맛을 더함',
+            '무가당 음료': '당 첨가 없이 갈증을 해소하는 음료',
+            '무가당 차': '당 첨가 없이 갈증을 해소하는 음료',
+            '무가당 탄산수': '당 첨가 없이 갈증을 해소하는 음료',
+            '무알코올 음료': '알코올 없이 술 대신 마실 수 있는 음료',
+            '무지방 우유': '지방을 제거해 포화지방 섭취를 줄인 우유',
+            '무카페인 차': '카페인이 없어 위 자극이 적은 차',
+            '물': '가장 기본적인 무가당·무카페인 수분 공급원',
+            '밀면': '밀로 만든 일반 면 (밀 알레르기가 없는 경우만 대체 가능)',
+            '바나나': '칼륨이 풍부하고 위벽을 보호하는 알칼리성 과일',
+            '배': '칼륨 함량이 비교적 낮은 과일',
+            '보리차': '카페인 없이 구수하게 즐기는 대체 차',
+            '블루베리': '항산화 성분이 풍부한 저칼륨 과일',
+            '사과': '칼륨 함량이 낮은 편이라 신장질환에 비교적 안전',
+            '생과일(통째로)': '가공 없이 통째로 먹어 당 흡수 속도를 늦춤',
+            '소고기(알레르기 없는 경우)': '돼지고기 대신 선택 가능한 육류 (개인차 확인 필요)',
+            '순한 양념(저자극)': '자극이 적어 위벽에 부담을 덜 주는 조리법',
+            '스테비아': '설탕 대신 쓰는 천연 감미료, 혈당에 영향이 적음',
+            '식초': '소금 대신 산미로 풍미를 더하는 조미료',
+            '신선식품': '가공을 거치지 않아 나트륨 함량이 낮은 식품',
+            '신선육(닭가슴살 등)': '가공육보다 나트륨·첨가물이 적은 육류',
+            '쌀': '밀 대신 사용하는 글루텐 없는 곡물',
+            '쌀 음료': '쌀로 만든 유당 없는 대체 음료',
+            '쌀가루': '밀가루 대신 쓰는 글루텐 없는 가루',
+            '쌀국수': '밀 대신 쌀로 만들어 글루텐이 없는 면',
+            '씨앗류': '견과류 대신 즐길 수 있는 고소한 간식',
+            '아몬드 밀크': '아몬드로 만든 유당 없는 식물성 음료',
+            '아쿠아파바': '병아리콩 삶은 물로, 계란 흰자 대신 거품을 낼 수 있음',
+            '아쿠아파바(계란 대체)': '병아리콩 삶은 물로, 계란 흰자 대신 거품을 낼 수 있음',
+            '알룰로스': '설탕과 단맛이 비슷하지만 혈당에 거의 영향이 없는 감미료',
+            '양배추': '칼륨이 낮은 편이라 신장식이에 활용하기 좋은 채소',
+            '에리스리톨': '당알코올의 일종으로 혈당을 거의 올리지 않는 감미료',
+            '영양 효모(대체 치즈 맛)': '치즈와 비슷한 고소한 풍미를 내는 비유제품 재료',
+            '오이': '수분이 많고 칼륨이 비교적 낮은 채소',
+            '옥수수': '밀 대신 사용 가능한 글루텐 없는 곡물',
+            '옥수수가루': '밀가루 대신 쓰는 글루텐 없는 가루',
+            '올리브유': '불포화지방이 풍부해 포화지방인 버터를 대체',
+            '요구르트': '발효 유제품으로 유당이 일부 분해되어 있음',
+            '요구르트(베이킹)': '발효 유제품으로 유당이 일부 분해되어 있음',
+            '요구르트(소량)': '발효 유제품으로 유당이 일부 분해되어 있음',
+            '저염 국수(직접 육수)': '직접 육수를 내어 나트륨을 줄인 면 요리',
+            '저염 젓갈': '나트륨 함량을 낮춘 젓갈 제품',
+            '저염 조미료': '나트륨 함량을 낮춘 대체 조미료',
+            '저염식': '나트륨 섭취를 줄인 조리법 전반',
+            '저유당 우유': '유당 함량을 낮춰 소화 부담을 줄인 우유',
+            '저지방 우유': '지방을 줄여 포화지방 섭취를 낮춘 우유',
+            '찐 음식': '기름을 쓰지 않아 지방 섭취를 줄이는 조리법',
+            '찜 요리': '기름 없이 쪄서 지방 섭취를 줄이는 조리법',
+            '참기름': '버터 대신 쓸 수 있는 식물성 기름',
+            '코코넛 밀크': '코코넛으로 만든 유당 없는 식물성 음료',
+            '콜리플라워': '칼륨이 낮은 편인 십자화과 채소',
+            '통곡물': '식이섬유가 풍부해 혈당을 천천히 올리는 곡물',
+            '통밀빵': '흰빵보다 식이섬유가 많아 혈당 상승이 완만함',
+            '포도': '간편하게 먹을 수 있는 저칼륨 과일 대안',
+            '포도씨유': '버터 대신 쓸 수 있는 식물성 기름',
+            '해바라기씨': '견과류 대신 즐길 수 있는 씨앗류 간식',
+            '해바라기씨버터': '땅콩버터 대신 쓸 수 있는 씨앗 기반 스프레드',
+            '허브': '소금 대신 향으로 맛을 내는 향신재료',
+            '허브양념': '소금 대신 향신료로 맛을 낸 양념',
+            '현미': '흰쌀보다 식이섬유가 많아 혈당을 천천히 올림',
+            '호밀빵': '흰빵보다 식이섬유가 많은 대체 빵',
+            '호박씨': '견과류 대신 즐길 수 있는 씨앗류 간식',
+            '흰살생선': '붉은 육류보다 지방이 적은 단백질원',
+            '흰살생선(알레르기 없는 경우)': '붉은 육류보다 지방이 적은 단백질원',
+            '흰살생선(저퓨린)': '붉은 육류보다 지방이 적은 단백질원',
+            '흰쌀밥(소량)': '감자보다 칼륨 함량이 낮은 편인 주식'
+        };
+
+        // 대체 음식 이름으로 설명 찾기 (괄호 부가정보 무시하고 매칭)
+        function getSubstituteInfo(foodName) {
+            if (substituteInfo[foodName]) return substituteInfo[foodName];
+            const stripped = foodName.replace(/\([^)]*\)/g, '').trim();
+            return substituteInfo[stripped] || null;
+        }
 
         // 레시피 데이터
         const recipes = {
@@ -1428,9 +1596,18 @@
         let safetyFilterOn = false;
 
         // 건강정보 저장/로드
+        let currentUser = null; // Firebase 로그인 사용자 (로그인 안 했으면 null)
+
         function saveHealthInfo() {
             const healthText = document.getElementById('healthInput').value;
+            // 로그인 여부와 상관없이 항상 로컬에도 저장 (오프라인/미로그인 대비 폴백)
             localStorage.setItem('userHealthInfo', healthText);
+            // 로그인한 경우 Firestore에도 저장 (기기 상관없이 동기화됨)
+            if (currentUser && window.saveHealthInfoToFirestore) {
+                window.saveHealthInfoToFirestore(currentUser.uid, healthText).catch(err => {
+                    console.error('Firestore 저장 실패:', err);
+                });
+            }
         }
 
         function loadHealthInfo() {
@@ -1439,6 +1616,42 @@
                 document.getElementById('healthInput').value = saved;
             }
         }
+
+        // Firebase 인증 상태가 바뀔 때마다 호출됨 (module 스크립트 쪽에서 호출)
+        window.onAuthChanged = function(user) {
+            currentUser = user;
+            const loggedOutEl = document.getElementById('authLoggedOut');
+            const loggedInEl = document.getElementById('authLoggedIn');
+            const nameEl = document.getElementById('authUserName');
+
+            if (user) {
+                loggedOutEl.style.display = 'none';
+                loggedInEl.style.display = 'flex';
+                nameEl.textContent = user.displayName || user.email || '사용자';
+
+                // 로그인 시 Firestore에 저장된 건강정보를 우선 불러옴
+                if (window.loadHealthInfoFromFirestore) {
+                    window.loadHealthInfoFromFirestore(user.uid).then(text => {
+                        if (text !== null && text !== undefined) {
+                            document.getElementById('healthInput').value = text;
+                            localStorage.setItem('userHealthInfo', text);
+                        } else {
+                            // Firestore에 저장된 게 없으면(첫 로그인) 로컬에 있던 정보를 올려줌
+                            const local = localStorage.getItem('userHealthInfo');
+                            if (local) {
+                                window.saveHealthInfoToFirestore(user.uid, local);
+                            }
+                        }
+                        // 현재 보고 있는 페이지에 맞춰 화면 갱신
+                        if (document.getElementById('recipeBook').classList.contains('active')) filterRecipeBook();
+                        if (document.getElementById('search').classList.contains('active')) loadAvoidFoods();
+                    }).catch(err => console.error('Firestore 불러오기 실패:', err));
+                }
+            } else {
+                loggedOutEl.style.display = 'flex';
+                loggedInEl.style.display = 'none';
+            }
+        };
 
         // 알레르기 정보 조회
         // 재료명과 알레르기 회피 식품명을 정확하게 비교 (괄호 부가정보 제거 후 단어 단위 비교)
@@ -1609,14 +1822,24 @@
         // 레시피 필터링
         function filterRecipeBook() {
             const allergyObjects = getUserAllergies();
+            const diseases = getHealthDiseases();
             const searchQuery = document.getElementById('recipeBookSearch').value.toLowerCase().trim();
             const recipeBookGrid = document.getElementById('recipeBookGrid');
             let html = '';
 
-            // 모든 피해야할 음식 수집
+            // 알레르기 + 기저질환을 하나의 목록으로 합침
+            const avoidSources = [
+                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods, safeFoods: a.safeFoods, tips: a.tips })),
+                ...diseases.map(d => {
+                    const dObj = diseaseMapping[d];
+                    return { avoidFoods: dObj.avoidIngredients || [], safeFoods: dObj.safeIngredients || [], tips: dObj.tips };
+                })
+            ];
+
+            // 모든 피해야할 음식 수집 (알레르기 + 기저질환)
             const allAvoidFoods = [];
-            allergyObjects.forEach(allergyObj => {
-                allergyObj.avoidFoods.forEach(food => {
+            avoidSources.forEach(source => {
+                source.avoidFoods.forEach(food => {
                     if (!allAvoidFoods.includes(food)) {
                         allAvoidFoods.push(food);
                     }
@@ -1639,7 +1862,7 @@
                 );
 
                 const style = safetyFilterOn && hasAllergy ? 'opacity: 0.4; filter: grayscale(50%);' : '';
-                const warningIcon = hasAllergy && allergyObjects.length > 0 ? '🚨 ' : '';
+                const warningIcon = hasAllergy && avoidSources.length > 0 ? '🚨 ' : '';
 
                 html += `<div class="recipe-card" style="${style}" onclick="showRecipeModal('${name}')">
                     <div class="recipe-card-header">
@@ -1663,11 +1886,21 @@
             const modal = document.getElementById('recipeModal');
             const modalBody = document.getElementById('modalBody');
             const allergyObjects = getUserAllergies();
+            const diseases = getHealthDiseases();
 
-            // 모든 피해야할 음식 수집
+            // 알레르기 + 기저질환을 하나의 목록으로 합침
+            const avoidSources = [
+                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods, safeFoods: a.safeFoods, tips: a.tips, substitutes: null })),
+                ...diseases.map(d => {
+                    const dObj = diseaseMapping[d];
+                    return { avoidFoods: dObj.avoidIngredients || [], safeFoods: dObj.safeIngredients || [], tips: dObj.tips, substitutes: dObj.substitutes || null };
+                })
+            ];
+
+            // 모든 피해야할 음식 수집 (알레르기 + 기저질환)
             const allAvoidFoods = [];
-            allergyObjects.forEach(allergyObj => {
-                allergyObj.avoidFoods.forEach(food => {
+            avoidSources.forEach(source => {
+                source.avoidFoods.forEach(food => {
                     if (!allAvoidFoods.includes(food)) {
                         allAvoidFoods.push(food);
                     }
@@ -1680,11 +1913,11 @@
             );
 
             let html = '';
-            if (hasAnyAllergy && allergyObjects.length > 0) {
+            if (hasAnyAllergy && avoidSources.length > 0) {
                 html += `<div style="background: #ffebee; border-left: 4px solid #dc3545; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
                     <div style="font-weight: 600; color: #dc3545; font-size: 14px; display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 18px;">🚨</span>
-                        주의! 당신의 알레르기 재료가 포함되어 있습니다
+                        주의! 당신의 알레르기/기저질환에 해당하는 재료가 포함되어 있습니다
                     </div>
                     <div style="color: #c5192d; font-size: 12px; margin-top: 6px;">
                         아래 표시된 재료를 피하고 대체식품을 사용하세요.
@@ -1701,19 +1934,23 @@
 
                 const className = hasAllergy ? 'ingredient-warning' : 'ingredient-normal';
                 const requiredText = ing.required ? '' : '(선택)';
-                const warningMark = hasAllergy && allergyObjects.length > 0 ? '⚠️ ' : '';
+                const warningMark = hasAllergy && avoidSources.length > 0 ? '⚠️ ' : '';
                 const ingredientId = `ingredient_${recipeName}_${ingIdx}`;
                 const alternativeId = `alternative_${recipeName}_${ingIdx}`;
 
                 // 위험한 재료에 대한 대체음식 + 팁 찾기
                 let alternativeFoods = [];
                 let allergyTip = '';
-                if (hasAllergy && allergyObjects.length > 0) {
-                    allergyObjects.forEach((allergyObj) => {
-                        allergyObj.avoidFoods.forEach(avoidFood => {
+                if (hasAllergy && avoidSources.length > 0) {
+                    avoidSources.forEach((source) => {
+                        source.avoidFoods.forEach(avoidFood => {
                             if (isIngredientMatch(ing.name, avoidFood)) {
-                                alternativeFoods = [...new Set([...alternativeFoods, ...allergyObj.safeFoods])];
-                                allergyTip = allergyObj.tips;
+                                // substitutes 맵이 있으면(기저질환) 매칭된 재료의 정확한 대체품만 사용
+                                // 없으면(알레르기) 카테고리 전체 safeFoods 사용 (알레르기는 회피식품이 한 카테고리라 안전함)
+                                const specificSubs = source.substitutes ? source.substitutes[avoidFood] : null;
+                                const foodsToAdd = specificSubs || source.safeFoods;
+                                alternativeFoods = [...new Set([...alternativeFoods, ...foodsToAdd])];
+                                allergyTip = source.tips;
                             }
                         });
                     });
@@ -1735,7 +1972,7 @@
                             </div>
                             ${alternativeFoods.map((food, foodIdx) => `
                                 <div id="${alternativeId}_tip_${foodIdx}" style="display: none; font-size: 11px; color: #0d47a1; background: white; padding: 8px; border-radius: 4px; margin-bottom: 6px;">
-                                    💡 <strong>${food}</strong>: ${allergyTip}
+                                    💡 <strong>${food}</strong>: ${getSubstituteInfo(food) || allergyTip}
                                 </div>
                             `).join('')}
                         </div>
@@ -1881,6 +2118,63 @@
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
             loadHealthInfo();
+        });
+    </script>
+
+    <!-- Firebase 연동 (구글 로그인 + Firestore 건강정보 저장) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        import {
+            getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+        import {
+            getFirestore, doc, getDoc, setDoc
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCADE92y4U6Z-Q_2AVEt90xjZtqrl-2LeE",
+            authDomain: "mucgojukja.firebaseapp.com",
+            projectId: "mucgojukja",
+            storageBucket: "mucgojukja.firebasestorage.app",
+            messagingSenderId: "174151295375",
+            appId: "1:174151295375:web:5755201571e332df466bfa"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.signInWithGoogle = function() {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).catch(err => {
+                console.error('로그인 실패:', err);
+                alert('로그인에 실패했어요. 잠시 후 다시 시도해주세요.');
+            });
+        };
+
+        window.signOutUser = function() {
+            signOut(auth).catch(err => console.error('로그아웃 실패:', err));
+        };
+
+        window.saveHealthInfoToFirestore = async function(uid, healthText) {
+            await setDoc(doc(db, 'users', uid), {
+                healthInfo: healthText,
+                updatedAt: new Date().toISOString()
+            }, { merge: true });
+        };
+
+        window.loadHealthInfoFromFirestore = async function(uid) {
+            const snap = await getDoc(doc(db, 'users', uid));
+            if (snap.exists() && snap.data().healthInfo !== undefined) {
+                return snap.data().healthInfo;
+            }
+            return null;
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (typeof window.onAuthChanged === 'function') {
+                window.onAuthChanged(user);
+            }
         });
     </script>
 </body>
