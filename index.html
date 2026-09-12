@@ -7,6 +7,9 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>먹고죽자! - 식이제약 레시피 플랫폼</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -35,9 +38,10 @@
         }
 
         .navbar-brand {
-            font-size: 18px;
-            font-weight: 700;
-            color: #378ADD;
+            font-size: 20px;
+            font-weight: 400;
+            font-family: 'Jua', 'Apple SD Gothic Neo', sans-serif;
+            color: #1a1a1a;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -61,8 +65,237 @@
         }
 
         .nav-link:hover {
-            color: #378ADD;
-            border-bottom-color: #378ADD;
+            color: #5A8B4A;
+            border-bottom-color: #5A8B4A;
+        }
+
+        .more-btn {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2B3E2F;
+            background: #EAF3DE;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .more-btn:hover {
+            background: #D8EAC4;
+        }
+
+        .more-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(43,62,47,0.3);
+            z-index: 999;
+        }
+
+        .more-overlay.active { display: block; }
+
+        .more-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            height: 100%;
+            background: #FAF8F5;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+            transition: right 0.3s;
+        }
+
+        .more-panel.active {
+            display: block;
+            right: 0;
+        }
+
+        .more-panel-header {
+            background: #8FB878;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .more-panel-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2B3E2F;
+        }
+
+        .more-panel-close {
+            font-size: 18px;
+            color: #2B3E2F;
+            cursor: pointer;
+        }
+
+        .more-panel-body {
+            padding: 16px 20px 90px;
+        }
+
+        .more-cat-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #999;
+            margin: 16px 0 8px;
+        }
+
+        .more-menu-row {
+            background: #ffffff;
+            border: 1px solid #E8E3DD;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 13px;
+            color: #2B3E2F;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .more-menu-row:hover {
+            background: #EAF3DE;
+        }
+
+        .more-ic { margin-right: 8px; font-size: 15px; }
+
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: #8FB878;
+            padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+            z-index: 500;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
+        }
+
+        .bottom-nav-item {
+            flex: 1;
+            text-align: center;
+            color: #3B6D11;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .bottom-nav-item.active {
+            color: #1F3D0F;
+            font-weight: 700;
+        }
+
+        .bn-icon {
+            font-size: 18px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .section-label-home {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2B3E2F;
+            margin: 30px 0 14px;
+        }
+
+        .carousel-cat-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .carousel-cat-tab {
+            background: #ffffff;
+            border: 1px solid #E8E3DD;
+            color: #666;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .carousel-cat-tab.active {
+            background: #5A8B4A;
+            color: white;
+            border-color: #5A8B4A;
+        }
+
+        .carousel-track {
+            display: flex;
+            overflow-x: auto;
+            gap: 14px;
+            padding-bottom: 10px;
+            margin-bottom: 8px;
+            scroll-snap-type: x mandatory;
+        }
+
+        .carousel-card {
+            flex: 0 0 240px;
+            scroll-snap-align: start;
+            background: #ffffff;
+            border: 1px solid #E8E3DD;
+            border-radius: 14px;
+            padding: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .carousel-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .carousel-tag {
+            display: inline-block;
+            background: #EAF3DE;
+            color: #3B6D11;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+
+        .carousel-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2B3E2F;
+            margin-bottom: 4px;
+        }
+
+        .carousel-desc {
+            font-size: 12px;
+            color: #8A897E;
+        }
+
+        .carousel-empty {
+            font-size: 13px;
+            color: #999;
+            padding: 20px 0;
+        }
+
+        .carousel-refresh-btn {
+            background: #ffffff;
+            border: 1px solid #8FB878;
+            color: #3B6D11;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .carousel-refresh-btn:hover {
+            background: #EAF3DE;
+        }
+
+        .fav-star {
+            cursor: pointer;
+            font-size: 16px;
         }
 
         .page {
@@ -79,8 +312,8 @@
         .hero {
             text-align: center;
             padding: 60px 20px;
-            background: linear-gradient(135deg, #378ADD 0%, #2563eb 100%);
-            color: white;
+            background: linear-gradient(135deg, #A9CC93 0%, #8FB878 100%);
+            color: #2B3E2F;
             border-radius: 12px;
             margin-bottom: 40px;
         }
@@ -92,7 +325,7 @@
 
         .hero p {
             font-size: 16px;
-            opacity: 0.9;
+            color: #3B6D11;
             margin-bottom: 20px;
         }
 
@@ -109,6 +342,13 @@
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .value-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
         }
 
         .value-card-icon {
@@ -160,13 +400,13 @@
 
         input[type="text"]:focus, textarea:focus {
             outline: none;
-            border-color: #378ADD;
+            border-color: #5A8B4A;
             box-shadow: 0 0 0 3px rgba(55, 138, 221, 0.1);
         }
 
         .btn-search {
             padding: 12px 24px;
-            background: #378ADD;
+            background: #5A8B4A;
             color: white;
             border: none;
             border-radius: 8px;
@@ -177,7 +417,7 @@
         }
 
         .btn-search:hover {
-            background: #2563eb;
+            background: #4a7a3d;
             transform: translateY(-2px);
         }
 
@@ -284,8 +524,8 @@
         }
 
         .ingredient-normal {
-            background: #f0f8ff;
-            border-left: 3px solid #378ADD;
+            background: #EAF3DE;
+            border-left: 3px solid #5A8B4A;
         }
 
         .ingredient-warning {
@@ -297,7 +537,7 @@
             padding: 12px;
             margin-bottom: 8px;
             background: #f8f9fa;
-            border-left: 3px solid #378ADD;
+            border-left: 3px solid #5A8B4A;
             border-radius: 6px;
             font-size: 13px;
             line-height: 1.6;
@@ -326,9 +566,9 @@
         }
 
         .category-tab.active {
-            background: #378ADD;
+            background: #5A8B4A;
             color: white;
-            border-color: #378ADD;
+            border-color: #5A8B4A;
         }
 
         .safety-filter-toggle {
@@ -337,7 +577,7 @@
             gap: 10px;
             margin-top: 20px;
             padding: 12px;
-            background: #f0f8ff;
+            background: #EAF3DE;
             border-radius: 6px;
             font-size: 13px;
         }
@@ -358,11 +598,20 @@
             }
 
             .navbar-nav {
-                gap: 15px;
+                display: none;
             }
 
-            .nav-link {
-                font-size: 12px;
+            .bottom-nav {
+                display: flex;
+            }
+
+            body {
+                padding-bottom: 70px;
+            }
+
+            .more-panel {
+                width: 85%;
+                right: -85%;
             }
 
             .hero h1 {
@@ -424,40 +673,102 @@
                 display: block !important;
             }
         }
+
+        @media (min-width: 1024px) {
+            .recipe-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .carousel-track {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                overflow-x: visible;
+            }
+
+            .carousel-card {
+                flex: none;
+            }
+        }
     </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="navbar-brand" onclick="showPage('home');">🍽️ 먹고죽자!</div>
         <div class="navbar-nav">
-            <div class="nav-link" onclick="showPage('search');">🔍 검색</div>
-            <div class="nav-link" onclick="showPage('recipeBook');">📖 레시피 북</div>
+            <div class="nav-link" onclick="showPage('home');">홈</div>
+            <div class="nav-link" onclick="showPage('recipeBook');">📖 레시피북</div>
+            <div class="nav-link" onclick="showPage('search');">🔍 대체식품검색</div>
             <div class="nav-link" onclick="showPage('profile');">👤 내 정보</div>
         </div>
+        <div class="more-btn" onclick="toggleMoreMenu();">☰ 더보기</div>
     </nav>
+
+    <!-- 더보기 패널 -->
+    <div id="moreOverlay" class="more-overlay" onclick="toggleMoreMenu();"></div>
+    <div id="morePanel" class="more-panel">
+        <div class="more-panel-header">
+            <div class="more-panel-title">더보기</div>
+            <div class="more-panel-close" onclick="toggleMoreMenu();">✕</div>
+        </div>
+        <div class="more-panel-body">
+            <div class="more-cat-label">내 계정</div>
+            <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('profile');"><span class="more-ic">👤</span>내 정보 (알레르기·기저질환 관리)</div>
+            <div class="more-menu-row" id="moreLoginRow" onclick="toggleMoreMenu(); signInWithGoogle();"><span class="more-ic">🔑</span>Google로 로그인</div>
+            <div class="more-menu-row" id="moreLogoutRow" style="display:none;" onclick="toggleMoreMenu(); signOutUser();"><span class="more-ic">🔑</span>로그아웃</div>
+
+            <div class="more-cat-label">나의 활동</div>
+            <div class="more-menu-row" onclick="comingSoon('최근 본 레시피');"><span class="more-ic">🕘</span>최근 본 레시피</div>
+            <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('recipeBook'); toggleFavoritesFilter(true);"><span class="more-ic">⭐</span>즐겨찾기 (레시피북 바로가기)</div>
+
+            <div class="more-cat-label">도구</div>
+            <div class="more-menu-row" onclick="comingSoon('장보기 리스트');"><span class="more-ic">🛒</span>장보기 리스트</div>
+            <div class="more-menu-row" onclick="comingSoon('영양정보 설정');"><span class="more-ic">📊</span>영양정보 설정</div>
+
+            <div class="more-cat-label">기타</div>
+            <div class="more-menu-row" onclick="comingSoon('서비스 소개');"><span class="more-ic">ℹ️</span>서비스 소개</div>
+            <div class="more-menu-row" onclick="comingSoon('의견 보내기');"><span class="more-ic">✉️</span>의견 보내기</div>
+            <div class="more-menu-row" onclick="comingSoon('다크모드');"><span class="more-ic">🌙</span>다크모드</div>
+        </div>
+    </div>
+
+    <!-- 모바일 하단 네비게이션 -->
+    <div class="bottom-nav">
+        <div class="bottom-nav-item active" data-page="home" onclick="showPage('home');"><span class="bn-icon">🏠</span>홈</div>
+        <div class="bottom-nav-item" data-page="recipeBook" onclick="showPage('recipeBook');"><span class="bn-icon">📖</span>레시피북</div>
+        <div class="bottom-nav-item" data-page="search" onclick="showPage('search');"><span class="bn-icon">🔍</span>대체식품검색</div>
+        <div class="bottom-nav-item" data-page="profile" onclick="showPage('profile');"><span class="bn-icon">👤</span>내정보</div>
+    </div>
 
     <!-- 홈 페이지 -->
     <div id="home" class="page active">
-        <div class="hero">
-            <h1>🍽️ 먹고죽자!</h1>
-            <p>식이제약이 있는 모든 사람을 위한 맞춤형 레시피 플랫폼</p>
+        <div class="section-label-home" style="margin-top: 30px;">오늘 뭐 먹지? 🎲</div>
+        <div class="carousel-cat-row">
+            <div class="carousel-cat-tab active" data-cat="all" onclick="selectCarouselCategory('all', this);">전체</div>
+            <div class="carousel-cat-tab" data-cat="한식" onclick="selectCarouselCategory('한식', this);">한식</div>
+            <div class="carousel-cat-tab" data-cat="양식" onclick="selectCarouselCategory('양식', this);">양식</div>
+            <div class="carousel-cat-tab" data-cat="일식" onclick="selectCarouselCategory('일식', this);">일식</div>
+            <div class="carousel-cat-tab" data-cat="중식" onclick="selectCarouselCategory('중식', this);">중식</div>
+        </div>
+        <div id="carouselTrack" class="carousel-track"></div>
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button class="carousel-refresh-btn" onclick="renderCarousel();">🔄 다른 추천 보기</button>
         </div>
 
         <div class="value-cards">
-            <div class="value-card">
-                <div class="value-card-icon">🛡️</div>
-                <h3>안전한 재료</h3>
-                <p>당신의 알레르기와 기저질환에 맞는 안전한 재료만 추천</p>
+            <div class="value-card" onclick="showPage('recipeBook');">
+                <div class="value-card-icon">📖</div>
+                <h3>레시피 둘러보기</h3>
+                <p>22가지 레시피 중 내가 먹을 수 있는 것만 한눈에 확인해보세요</p>
             </div>
-            <div class="value-card">
-                <div class="value-card-icon">🍜</div>
-                <h3>실제 맛 보증</h3>
-                <p>주변에서 쉽게 구할 수 있는 재료로 만든 맛있는 음식</p>
+            <div class="value-card" onclick="showPage('profile');">
+                <div class="value-card-icon">👤</div>
+                <h3>알레르기·질환 등록하기</h3>
+                <p>한 번만 입력하면 모든 레시피에 자동으로 경고가 표시돼요</p>
             </div>
-            <div class="value-card">
-                <div class="value-card-icon">✨</div>
-                <h3>대체식품 제안</h3>
-                <p>피해야 할 재료의 안전한 대체품을 추천해줍니다</p>
+            <div class="value-card" onclick="showPage('search');">
+                <div class="value-card-icon">🔍</div>
+                <h3>대체식품 바로 찾기</h3>
+                <p>못 먹는 재료를 검색하면 안전한 대체품을 바로 알려드려요</p>
             </div>
         </div>
     </div>
@@ -468,7 +779,7 @@
             <div class="search-grid-layout">
                 <div>
                     <div class="search-title">🛡️ 대체식품 찾기</div>
-                    <div style="margin-bottom: 20px; padding: 16px; background: #e8f4f8; border-radius: 8px; color: #0c447c; font-size: 13px; line-height: 1.6;">
+                    <div style="margin-bottom: 20px; padding: 16px; background: #EAF3DE; border-radius: 8px; color: #3B6D11; font-size: 13px; line-height: 1.6;">
                         <div style="font-weight: 500; margin-bottom: 8px;">📋 사용 방법:</div>
                         <div>1. 음식의 재료를 텍스트로 입력</div>
                         <div>2. "분석하기" 버튼 클릭</div>
@@ -536,6 +847,10 @@
                 <div class="category-tab" onclick="selectCategory('중식', this);">중식</div>
             </div>
 
+            <div style="margin: 12px 0;">
+                <span id="favoritesTab" class="carousel-cat-tab" onclick="toggleFavoritesFilter();">⭐ 즐겨찾기</span>
+            </div>
+
             <div class="safety-filter-toggle">
                 <input type="checkbox" id="safetyFilter" onchange="toggleSafetyFilter()">
                 <label for="safetyFilter">🛡️ 안전한 것만 보기</label>
@@ -584,7 +899,7 @@
                 </textarea>
             </div>
 
-            <div style="padding: 12px; background: #f0f8ff; border-left: 4px solid #378ADD; border-radius: 4px; font-size: 13px; color: #0c447c;">
+            <div style="padding: 12px; background: #EAF3DE; border-left: 4px solid #5A8B4A; border-radius: 4px; font-size: 13px; color: #3B6D11;">
                 💡 입력한 조건에 맞는 재료는 레시피에 ⚠️ 표시되고, 대체식품과 피해야할 음식이 제안됩니다.
             </div>
 
@@ -1084,6 +1399,7 @@
                 keywords: ['뇨끼', 'gnocchi'],
                 baseIngredient: '감자',
                 description: '포슬포슬한 감자로 만든 이탈리아식 수제비',
+                calories: 550,
                 source: "https://www.kurly.com/recipe/676d1b278d7c834ea3acf1c0",
                 ingredients: [
                     { name: '감자', amount: '400g', required: true },
@@ -1108,6 +1424,7 @@
                 keywords: ['모츠나베', '곱창전골'],
                 baseIngredient: '소곱창',
                 description: '곱창과 채소를 넣고 끓인 일본식 전골',
+                calories: 480,
                 source: "https://int.japanesetaste.com/blogs/japanese-taste-blog/how-to-make-motsunabe-japanese-offal-hotpot-recipe",
                 ingredients: [
                     { name: '소곱창', amount: '300g', required: true },
@@ -1132,6 +1449,7 @@
                 keywords: ['어묵탕', '오뎅탕'],
                 baseIngredient: '어묵',
                 description: '시원한 국물의 어묵 꼬치탕',
+                calories: 250,
                 source: "https://m.cafe.daum.net/kangneungedu/IQ2n/1579",
                 ingredients: [
                     { name: '사각어묵', amount: '300g', required: true },
@@ -1154,6 +1472,7 @@
                 keywords: ['알리올리오', '알리오올리오'],
                 baseIngredient: '파스타',
                 description: '마늘과 올리브유로 만드는 담백한 오일 파스타',
+                calories: 600,
                 source: null,
                 ingredients: [
                     { name: '파스타', amount: '100g', required: true },
@@ -1178,6 +1497,7 @@
                 keywords: ['우삼겹숙주볶음', '숙주볶음'],
                 baseIngredient: '우삼겹',
                 description: '고소한 우삼겹과 아삭한 숙주의 조합',
+                calories: 520,
                 source: "https://m.10000recipe.com/recipe/6905743",
                 ingredients: [
                     { name: '우삼겹', amount: '200g', required: true },
@@ -1201,6 +1521,7 @@
                 keywords: ['제육볶음'],
                 baseIngredient: '돼지고기',
                 description: '매콤달콤한 양념의 대표 한식 볶음 요리',
+                calories: 480,
                 source: "https://m.blog.naver.com/jsoof/223181427619",
                 ingredients: [
                     { name: '돼지고기(목살)', amount: '400g', required: true },
@@ -1227,6 +1548,7 @@
                 keywords: ['리조또', 'risotto'],
                 baseIngredient: '쌀',
                 description: '크리미하고 고소한 이탈리아식 쌀 요리',
+                calories: 520,
                 source: "https://brunch.co.kr/@sdw4789/153",
                 ingredients: [
                     { name: '리조또용 쌀', amount: '200g', required: true },
@@ -1251,6 +1573,7 @@
                 keywords: ['아란치니', 'arancini'],
                 baseIngredient: '쌀',
                 description: '치즈가 들어간 바삭한 이탈리아식 쌀 튀김',
+                calories: 350,
                 source: "https://realfood.tesco.com/step-by-step/how-to-make-arancini.html",
                 ingredients: [
                     { name: '리조또(또는 찬밥)', amount: '300g', required: true },
@@ -1273,6 +1596,7 @@
                 keywords: ['순두부계란찜', '순두부 계란찜'],
                 baseIngredient: '순두부',
                 description: '부드러운 순두부와 계란으로 만든 담백한 찜 요리',
+                calories: 200,
                 source: "https://m.cafe.daum.net/cheonan-GBP/OdzR/1889",
                 ingredients: [
                     { name: '순두부', amount: '1팩', required: true },
@@ -1294,6 +1618,7 @@
                 keywords: ['팬케이크', '핫케이크'],
                 baseIngredient: '밀가루',
                 description: '폭신하고 든든한 기본 팬케이크',
+                calories: 300,
                 source: "https://www.10000recipe.com/recipe/1834871",
                 ingredients: [
                     { name: '밀가루', amount: '150g', required: true },
@@ -1317,6 +1642,7 @@
                 keywords: ['꽁치김치찌개', '꽁치 김치찌개'],
                 baseIngredient: '꽁치',
                 description: '꽁치 통조림으로 구수하게 끓인 김치찌개',
+                calories: 350,
                 source: "https://m.cafe.daum.net/subdued20club/WI6v/5219",
                 ingredients: [
                     { name: '꽁치통조림', amount: '1캔', required: true },
@@ -1340,6 +1666,7 @@
                 keywords: ['잡채'],
                 baseIngredient: '당면',
                 description: '쫄깃한 당면과 채소, 고기를 볶아 무친 명절 대표 요리',
+                calories: 400,
                 source: "https://m.10000recipe.com/recipe/6953648",
                 ingredients: [
                     { name: '당면', amount: '200g', required: true },
@@ -1365,6 +1692,7 @@
                 keywords: ['김치볶음밥'],
                 baseIngredient: '밥',
                 description: '새콤한 김치와 밥을 볶아 만드는 간단 한 끼',
+                calories: 550,
                 source: null,
                 ingredients: [
                     { name: '밥', amount: '1공기', required: true },
@@ -1390,6 +1718,7 @@
                 keywords: ['간장계란밥'],
                 baseIngredient: '밥',
                 description: '간단하지만 든든한 간장과 계란의 조합',
+                calories: 450,
                 source: null,
                 ingredients: [
                     { name: '밥', amount: '1공기', required: true },
@@ -1412,6 +1741,7 @@
                 keywords: ['올리브파스타', '올리브 파스타'],
                 baseIngredient: '파스타',
                 description: '블랙올리브와 마늘로 짭짤하게 즐기는 오일 파스타',
+                calories: 550,
                 source: "https://noseychef.com/?p=9871",
                 ingredients: [
                     { name: '파스타', amount: '200g', required: true },
@@ -1435,6 +1765,7 @@
                 keywords: ['로제파스타', '로제 파스타'],
                 baseIngredient: '파스타',
                 description: '토마토와 크림이 어우러진 부드러운 로제 소스 파스타',
+                calories: 650,
                 source: "https://www.10000recipe.com/recipe/6884145",
                 ingredients: [
                     { name: '파스타', amount: '200g', required: true },
@@ -1459,6 +1790,7 @@
                 keywords: ['우동'],
                 baseIngredient: '국수',
                 description: '따뜻하고 쫄깃한 기본 우동',
+                calories: 400,
                 source: "https://m.cafe.daum.net/cheonan-GBP/OdzR/1638",
                 ingredients: [
                     { name: '우동면', amount: '200g', required: true },
@@ -1482,6 +1814,7 @@
                 keywords: ['크림파스타', '크림 파스타'],
                 baseIngredient: '파스타',
                 description: '부드럽고 풍미 있는 크림 파스타',
+                calories: 650,
                 source: "https://www.10000recipe.com/recipe/7018890",
                 ingredients: [
                     { name: '파스타', amount: '200g', required: true },
@@ -1509,6 +1842,7 @@
                 keywords: ['김치찌개', '김치 찌개'],
                 baseIngredient: '찌개',
                 description: '밥도둑 국민 찌개',
+                calories: 300,
                 source: "https://m.cafe.daum.net/cheonan-GBP/OdzR/1737",
                 ingredients: [
                     { name: '신김치', amount: '2컵 (300g)', required: true },
@@ -1531,6 +1865,7 @@
                 keywords: ['된장찌개', '된장 찌개'],
                 baseIngredient: '찌개',
                 description: '깊고 구수한 전통 찌개',
+                calories: 250,
                 source: "https://m.cafe.daum.net/party3434/gECq/1075",
                 ingredients: [
                     { name: '된장', amount: '2큰술', required: true },
@@ -1553,6 +1888,7 @@
                 keywords: ['계란국', '계란 국'],
                 baseIngredient: '국',
                 description: '담백하고 부드러운 아침 국',
+                calories: 120,
                 source: "https://m.cafe.daum.net/investm/V8VB/662",
                 ingredients: [
                     { name: '계란', amount: '2개', required: true },
@@ -1573,6 +1909,7 @@
                 keywords: ['미역국', '미역 국'],
                 baseIngredient: '국',
                 description: '풍미 깊은 소고기 미역국',
+                calories: 150,
                 source: "https://www.kurly.com/recipe/671764624701d5e8aa02eeea",
                 ingredients: [
                     { name: '소고기', amount: '100g', required: true },
@@ -1601,7 +1938,11 @@
         function saveHealthInfo() {
             const healthText = document.getElementById('healthInput').value;
             // 로그인 여부와 상관없이 항상 로컬에도 저장 (오프라인/미로그인 대비 폴백)
-            localStorage.setItem('userHealthInfo', healthText);
+            try {
+                localStorage.setItem('userHealthInfo', healthText);
+            } catch (e) {
+                console.warn('localStorage 사용 불가:', e.message);
+            }
             // 로그인한 경우 Firestore에도 저장 (기기 상관없이 동기화됨)
             if (currentUser && window.saveHealthInfoToFirestore) {
                 window.saveHealthInfoToFirestore(currentUser.uid, healthText).catch(err => {
@@ -1611,9 +1952,13 @@
         }
 
         function loadHealthInfo() {
-            const saved = localStorage.getItem('userHealthInfo');
-            if (saved) {
-                document.getElementById('healthInput').value = saved;
+            try {
+                const saved = localStorage.getItem('userHealthInfo');
+                if (saved) {
+                    document.getElementById('healthInput').value = saved;
+                }
+            } catch (e) {
+                console.warn('localStorage 사용 불가:', e.message);
             }
         }
 
@@ -1623,11 +1968,15 @@
             const loggedOutEl = document.getElementById('authLoggedOut');
             const loggedInEl = document.getElementById('authLoggedIn');
             const nameEl = document.getElementById('authUserName');
+            const moreLoginRow = document.getElementById('moreLoginRow');
+            const moreLogoutRow = document.getElementById('moreLogoutRow');
 
             if (user) {
                 loggedOutEl.style.display = 'none';
                 loggedInEl.style.display = 'flex';
                 nameEl.textContent = user.displayName || user.email || '사용자';
+                if (moreLoginRow) moreLoginRow.style.display = 'none';
+                if (moreLogoutRow) moreLogoutRow.style.display = 'flex';
 
                 // 로그인 시 Firestore에 저장된 건강정보를 우선 불러옴
                 if (window.loadHealthInfoFromFirestore) {
@@ -1645,11 +1994,14 @@
                         // 현재 보고 있는 페이지에 맞춰 화면 갱신
                         if (document.getElementById('recipeBook').classList.contains('active')) filterRecipeBook();
                         if (document.getElementById('search').classList.contains('active')) loadAvoidFoods();
+                        if (document.getElementById('home').classList.contains('active')) renderCarousel();
                     }).catch(err => console.error('Firestore 불러오기 실패:', err));
                 }
             } else {
                 loggedOutEl.style.display = 'flex';
                 loggedInEl.style.display = 'none';
+                if (moreLoginRow) moreLoginRow.style.display = 'flex';
+                if (moreLogoutRow) moreLogoutRow.style.display = 'none';
             }
         };
 
@@ -1790,7 +2142,11 @@
         function showPage(pageName) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageName).classList.add('active');
-            
+
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.page === pageName);
+            });
+
             if (pageName === 'recipeBook') {
                 initializeRecipeBook();
             }
@@ -1798,6 +2154,113 @@
             if (pageName === 'search') {
                 loadAvoidFoods();
             }
+
+            if (pageName === 'home') {
+                renderCarousel();
+            }
+        }
+
+        // 더보기 패널 토글
+        function toggleMoreMenu() {
+            document.getElementById('morePanel').classList.toggle('active');
+            document.getElementById('moreOverlay').classList.toggle('active');
+        }
+
+        // 아직 준비되지 않은 기능 안내
+        function comingSoon(featureName) {
+            toggleMoreMenu();
+            alert(featureName + ' 기능은 곧 추가될 예정이에요!');
+        }
+
+        // ===== 즐겨찾기 =====
+        function getFavorites() {
+            try {
+                return JSON.parse(localStorage.getItem('favoriteRecipes') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function isFavorite(name) {
+            return getFavorites().includes(name);
+        }
+
+        function toggleFavorite(name, event) {
+            if (event) event.stopPropagation();
+            let favs = getFavorites();
+            if (favs.includes(name)) {
+                favs = favs.filter(f => f !== name);
+            } else {
+                favs.push(name);
+            }
+            try {
+                localStorage.setItem('favoriteRecipes', JSON.stringify(favs));
+            } catch (e) {
+                console.warn('localStorage 사용 불가:', e.message);
+            }
+            filterRecipeBook();
+        }
+
+        let favoritesFilterOn = false;
+        function toggleFavoritesFilter(forceOn) {
+            favoritesFilterOn = forceOn === true ? true : !favoritesFilterOn;
+            const tab = document.getElementById('favoritesTab');
+            if (tab) tab.classList.toggle('active', favoritesFilterOn);
+            filterRecipeBook();
+        }
+
+        // ===== 오늘 뭐 먹지 캐러셀 =====
+        let carouselCategory = 'all';
+        function selectCarouselCategory(cat, element) {
+            carouselCategory = cat;
+            document.querySelectorAll('.carousel-cat-tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+            renderCarousel();
+        }
+
+        function renderCarousel() {
+            const track = document.getElementById('carouselTrack');
+            if (!track) return;
+
+            const allergyObjects = getUserAllergies();
+            const diseases = getHealthDiseases();
+            const avoidSources = [
+                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods })),
+                ...diseases.map(d => {
+                    const dObj = diseaseMapping[d];
+                    return { avoidFoods: dObj.avoidIngredients || [] };
+                })
+            ];
+            const allAvoidFoods = [];
+            avoidSources.forEach(source => {
+                source.avoidFoods.forEach(food => {
+                    if (!allAvoidFoods.includes(food)) allAvoidFoods.push(food);
+                });
+            });
+
+            let candidates = Object.entries(recipes).filter(([name, r]) => {
+                if (carouselCategory !== 'all' && r.category !== carouselCategory) return false;
+                const hasAllergy = r.ingredients.some(ing =>
+                    allAvoidFoods.some(avoidFood => isIngredientMatch(ing.name, avoidFood))
+                );
+                return !hasAllergy;
+            });
+
+            if (candidates.length === 0) {
+                track.innerHTML = '<div class="carousel-empty">이 카테고리에는 지금 안전하게 추천할 레시피가 없어요.</div>';
+                return;
+            }
+
+            // 랜덤으로 섞어서 최대 4개 추출
+            const shuffled = candidates.sort(() => Math.random() - 0.5).slice(0, 4);
+
+            track.innerHTML = shuffled.map(([name, r]) => `
+                <div class="carousel-card" onclick="showRecipeModal('${name}')">
+                    <span class="carousel-tag">${r.category}</span>
+                    <div class="carousel-title">${name}</div>
+                    <div class="carousel-desc">${r.description}</div>
+                </div>
+            `).join('');
         }
 
         // 레시피 북 초기화
@@ -1851,6 +2314,10 @@
                     return;
                 }
 
+                if (favoritesFilterOn && !isFavorite(name)) {
+                    return;
+                }
+
                 if (searchQuery && !name.toLowerCase().includes(searchQuery) && 
                     !recipe.description.toLowerCase().includes(searchQuery)) {
                     return;
@@ -1862,16 +2329,22 @@
                 );
 
                 const style = safetyFilterOn && hasAllergy ? 'opacity: 0.4; filter: grayscale(50%);' : '';
-                const warningIcon = hasAllergy && avoidSources.length > 0 ? '🚨 ' : '';
+                const showBadge = avoidSources.length > 0;
+                const badge = !showBadge ? '' : hasAllergy
+                    ? '<span style="background: #FFEBEE; color: #DC3545; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">주의 필요</span>'
+                    : '<span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">안전</span>';
+                const kcalText = recipe.calories ? ` · <span style="color: #5A8B4A; font-weight: 700;">약 ${recipe.calories}kcal</span>` : '';
+                const starIcon = isFavorite(name) ? '⭐' : '☆';
 
                 html += `<div class="recipe-card" style="${style}" onclick="showRecipeModal('${name}')">
-                    <div class="recipe-card-header">
-                        <div class="recipe-card-title">${warningIcon}${name}</div>
+                    <div class="recipe-card-header" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                        <div class="recipe-card-title"><span class="fav-star" onclick="toggleFavorite('${name}', event)">${starIcon}</span> ${name}</div>
+                        ${badge}
                     </div>
                     <div class="recipe-card-body">
                         <div style="font-size: 12px; color: #999; margin-bottom: 6px;">${recipe.category}</div>
                         <div style="font-size: 13px; color: #666;">
-                            ${recipe.description}
+                            ${recipe.description}${kcalText}
                         </div>
                     </div>
                 </div>`;
@@ -1926,6 +2399,9 @@
             }
 
             html += `<div class="modal-title">${recipeName}</div>`;
+            if (recipe.calories) {
+                html += `<div style="font-size: 12px; color: #5A8B4A; font-weight: 700; margin-bottom: 12px;">약 ${recipe.calories}kcal (1인분 기준, 추정치)</div>`;
+            }
             html += `<div class="section-title">재료</div>`;
             
             recipe.ingredients.forEach((ing, ingIdx) => {
@@ -1960,18 +2436,18 @@
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; ${alternativeFoods.length > 0 ? 'border-bottom: 1px solid #e0e0e0;' : ''}" onclick="${alternativeFoods.length > 0 ? `document.getElementById('${alternativeId}').style.display = document.getElementById('${alternativeId}').style.display === 'none' ? 'block' : 'none'` : ''}">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span>${warningMark}${ing.name} ${requiredText}</span>
-                            ${alternativeFoods.length > 0 ? `<span style="color: #2196F3; font-weight: 600; font-size: 16px;">ℹ️</span>` : ''}
+                            ${alternativeFoods.length > 0 ? `<span style="color: #5A8B4A; font-weight: 600; font-size: 16px;">ℹ️</span>` : ''}
                         </div>
                         <div style="text-align: right;">${ing.amount}</div>
                     </div>
                     ${alternativeFoods.length > 0 ? `
-                        <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #e3f2fd; border-left: 3px solid #2196F3; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
-                            <div style="font-size: 12px; font-weight: 600; color: #1565c0; margin-bottom: 8px;">✅ 대체 음식 (클릭하면 팁이 보여요):</div>
+                        <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #3B6D11; margin-bottom: 8px;">✅ 대체 음식 (클릭하면 팁이 보여요):</div>
                             <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
-                                ${alternativeFoods.map((food, foodIdx) => `<span onclick="event.stopPropagation(); const wasOpen = document.getElementById('${alternativeId}_tip_${foodIdx}').style.display === 'block'; document.querySelectorAll('[id^=&quot;${alternativeId}_tip_&quot;]').forEach(el => el.style.display = 'none'); document.getElementById('${alternativeId}_tip_${foodIdx}').style.display = wasOpen ? 'none' : 'block';" style="background: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; color: #1565c0; border: 1px solid #2196F3; cursor: pointer;">${food}</span>`).join('')}
+                                ${alternativeFoods.map((food, foodIdx) => `<span onclick="event.stopPropagation(); const wasOpen = document.getElementById('${alternativeId}_tip_${foodIdx}').style.display === 'block'; document.querySelectorAll('[id^=&quot;${alternativeId}_tip_&quot;]').forEach(el => el.style.display = 'none'); document.getElementById('${alternativeId}_tip_${foodIdx}').style.display = wasOpen ? 'none' : 'block';" style="background: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; color: #3B6D11; border: 1px solid #5A8B4A; cursor: pointer;">${food}</span>`).join('')}
                             </div>
                             ${alternativeFoods.map((food, foodIdx) => `
-                                <div id="${alternativeId}_tip_${foodIdx}" style="display: none; font-size: 11px; color: #0d47a1; background: white; padding: 8px; border-radius: 4px; margin-bottom: 6px;">
+                                <div id="${alternativeId}_tip_${foodIdx}" style="display: none; font-size: 11px; color: #2B3E2F; background: white; padding: 8px; border-radius: 4px; margin-bottom: 6px;">
                                     💡 <strong>${food}</strong>: ${getSubstituteInfo(food) || allergyTip}
                                 </div>
                             `).join('')}
@@ -1987,7 +2463,7 @@
 
             if (recipe.source) {
                 html += `<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee; font-size: 11px; color: #999;">
-                    출처: <a href="${recipe.source}" target="_blank" rel="noopener noreferrer" style="color: #2196F3; text-decoration: underline;">${recipe.source}</a>
+                    출처: <a href="${recipe.source}" target="_blank" rel="noopener noreferrer" style="color: #5A8B4A; text-decoration: underline;">${recipe.source}</a>
                 </div>`;
             } else {
                 html += `<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee; font-size: 11px; color: #999;">
@@ -2118,6 +2594,7 @@
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
             loadHealthInfo();
+            renderCarousel();
         });
     </script>
 
