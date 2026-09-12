@@ -24,8 +24,8 @@
         }
 
         .navbar {
-            background: #fff;
-            border-bottom: 1px solid #e0e0e0;
+            background: #8FB878;
+            border-bottom: none;
             padding: 0 20px;
             height: 60px;
             display: flex;
@@ -34,7 +34,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
         }
 
         .navbar-brand {
@@ -57,7 +57,7 @@
         .nav-link {
             font-size: 14px;
             font-weight: 500;
-            color: #666;
+            color: #2B3E2F;
             cursor: pointer;
             padding: 8px 0;
             border-bottom: 2px solid transparent;
@@ -65,15 +65,15 @@
         }
 
         .nav-link:hover {
-            color: #5A8B4A;
-            border-bottom-color: #5A8B4A;
+            color: #1F3D0F;
+            border-bottom-color: #2B3E2F;
         }
 
         .more-btn {
             font-size: 13px;
             font-weight: 600;
             color: #2B3E2F;
-            background: #EAF3DE;
+            background: rgba(255,255,255,0.6);
             padding: 8px 14px;
             border-radius: 20px;
             cursor: pointer;
@@ -713,7 +713,7 @@
         <div class="more-panel-body">
             <div class="more-cat-label">내 계정</div>
             <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('profile');"><span class="more-ic">👤</span>내 정보 (알레르기·기저질환 관리)</div>
-            <div class="more-menu-row" id="moreLoginRow" onclick="toggleMoreMenu(); signInWithGoogle();"><span class="more-ic">🔑</span>Google로 로그인</div>
+            <div class="more-menu-row" id="moreLoginRow" onclick="signInWithGoogle(); toggleMoreMenu();"><span class="more-ic">🔑</span>Google로 로그인</div>
             <div class="more-menu-row" id="moreLogoutRow" style="display:none;" onclick="toggleMoreMenu(); signOutUser();"><span class="more-ic">🔑</span>로그아웃</div>
 
             <div class="more-cat-label">나의 활동</div>
@@ -754,23 +754,11 @@
             <button class="carousel-refresh-btn" onclick="renderCarousel();">🔄 다른 추천 보기</button>
         </div>
 
-        <div class="value-cards">
-            <div class="value-card" onclick="showPage('recipeBook');">
-                <div class="value-card-icon">📖</div>
-                <h3>레시피 둘러보기</h3>
-                <p>22가지 레시피 중 내가 먹을 수 있는 것만 한눈에 확인해보세요</p>
-            </div>
-            <div class="value-card" onclick="showPage('profile');">
-                <div class="value-card-icon">👤</div>
-                <h3>알레르기·질환 등록하기</h3>
-                <p>한 번만 입력하면 모든 레시피에 자동으로 경고가 표시돼요</p>
-            </div>
-            <div class="value-card" onclick="showPage('search');">
-                <div class="value-card-icon">🔍</div>
-                <h3>대체식품 바로 찾기</h3>
-                <p>못 먹는 재료를 검색하면 안전한 대체품을 바로 알려드려요</p>
-            </div>
+        <div class="section-label-home" style="display: flex; align-items: center; justify-content: space-between;">
+            <span>📖 레시피 북</span>
+            <span onclick="showPage('recipeBook');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">전체 보기 →</span>
         </div>
+        <div id="homeRecipeGrid" class="recipe-grid" style="margin-bottom: 30px;"></div>
     </div>
 
     <!-- 검색 페이지 -->
@@ -2157,6 +2145,7 @@
 
             if (pageName === 'home') {
                 renderCarousel();
+                renderHomeRecipeGrid();
             }
         }
 
@@ -2261,6 +2250,60 @@
                     <div class="carousel-desc">${r.description}</div>
                 </div>
             `).join('');
+        }
+
+        // ===== 홈 화면 레시피 북 섹션 (간추린 미리보기, 즐겨찾기 탭은 우선 숨김) =====
+        function renderHomeRecipeGrid() {
+            const grid = document.getElementById('homeRecipeGrid');
+            if (!grid) return;
+
+            const allergyObjects = getUserAllergies();
+            const diseases = getHealthDiseases();
+
+            const avoidSources = [
+                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods })),
+                ...diseases.map(d => {
+                    const dObj = diseaseMapping[d];
+                    return { avoidFoods: dObj.avoidIngredients || [] };
+                })
+            ];
+            const allAvoidFoods = [];
+            avoidSources.forEach(source => {
+                source.avoidFoods.forEach(food => {
+                    if (!allAvoidFoods.includes(food)) allAvoidFoods.push(food);
+                });
+            });
+
+            // 홈 화면에는 6개만 간추려서 보여줌 (전체 목록은 "전체 보기"에서)
+            const preview = Object.entries(recipes).slice(0, 6);
+
+            let html = '';
+            preview.forEach(([name, recipe]) => {
+                const hasAllergy = recipe.ingredients.some(ing =>
+                    allAvoidFoods.some(avoidFood => isIngredientMatch(ing.name, avoidFood))
+                );
+
+                const showBadge = avoidSources.length > 0;
+                const badge = !showBadge ? '' : hasAllergy
+                    ? '<span style="background: #FFEBEE; color: #DC3545; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">주의 필요</span>'
+                    : '<span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">안전</span>';
+                const kcalText = recipe.calories ? ` · <span style="color: #5A8B4A; font-weight: 700;">약 ${recipe.calories}kcal</span>` : '';
+
+                html += `<div class="recipe-card" onclick="showRecipeModal('${name}')">
+                    <div class="recipe-card-header" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                        <div class="recipe-card-title">${name}</div>
+                        ${badge}
+                    </div>
+                    <div class="recipe-card-body">
+                        <div style="font-size: 12px; color: #999; margin-bottom: 6px;">${recipe.category}</div>
+                        <div style="font-size: 13px; color: #666;">
+                            ${recipe.description}${kcalText}
+                        </div>
+                    </div>
+                </div>`;
+            });
+
+            grid.innerHTML = html;
         }
 
         // 레시피 북 초기화
@@ -2595,6 +2638,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadHealthInfo();
             renderCarousel();
+            renderHomeRecipeGrid();
         });
     </script>
 
