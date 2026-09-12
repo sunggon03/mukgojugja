@@ -249,6 +249,21 @@
             transform: translateY(-3px);
         }
 
+        .home-recipe-row {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            scroll-snap-type: x mandatory;
+        }
+
+        .home-recipe-row .recipe-card {
+            flex: 0 0 220px;
+            scroll-snap-align: start;
+            margin-bottom: 0;
+        }
+
         .carousel-tag {
             display: inline-block;
             background: #EAF3DE;
@@ -751,14 +766,14 @@
         </div>
         <div id="carouselTrack" class="carousel-track"></div>
         <div style="text-align: center; margin-bottom: 30px;">
-            <button class="carousel-refresh-btn" onclick="renderCarousel();">🔄 다른 추천 보기</button>
+            <button class="carousel-refresh-btn" onclick="renderCarousel(); resetCarouselAutoPlay();">🔄 다른 추천 보기</button>
         </div>
 
         <div class="section-label-home" style="display: flex; align-items: center; justify-content: space-between;">
             <span>📖 레시피 북</span>
             <span onclick="showPage('recipeBook');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">전체 보기 →</span>
         </div>
-        <div id="homeRecipeGrid" class="recipe-grid" style="margin-bottom: 30px;"></div>
+        <div id="homeRecipeGrid" class="home-recipe-row"></div>
 
         <div class="section-label-home">🩺 알레르기 · 기저질환 입력</div>
         <div style="background: #ffffff; border: 1px solid #E8E3DD; border-radius: 12px; padding: 16px; margin-bottom: 30px;">
@@ -2225,6 +2240,7 @@
             document.querySelectorAll('.carousel-cat-tab').forEach(t => t.classList.remove('active'));
             element.classList.add('active');
             renderCarousel();
+            resetCarouselAutoPlay();
         }
 
         function renderCarousel() {
@@ -2272,6 +2288,18 @@
             `).join('');
         }
 
+        // 캐러셀 자동 전환 (5초마다), 수동으로 "다른 추천 보기" 누르면 타이머 리셋
+        let carouselAutoTimer = null;
+        function startCarouselAutoPlay() {
+            if (carouselAutoTimer) clearInterval(carouselAutoTimer);
+            carouselAutoTimer = setInterval(() => {
+                renderCarousel();
+            }, 5000);
+        }
+        function resetCarouselAutoPlay() {
+            startCarouselAutoPlay();
+        }
+
         // ===== 홈 화면 레시피 북 섹션 (간추린 미리보기, 즐겨찾기 탭은 우선 숨김) =====
         function renderHomeRecipeGrid() {
             const grid = document.getElementById('homeRecipeGrid');
@@ -2294,8 +2322,8 @@
                 });
             });
 
-            // 홈 화면에는 6개만 간추려서 보여줌 (전체 목록은 "전체 보기"에서)
-            const preview = Object.entries(recipes).slice(0, 6);
+            // 홈 화면에는 4개만 간추려서 보여줌 (전체 목록은 "전체 보기"에서)
+            const preview = Object.entries(recipes).slice(0, 4);
 
             let html = '';
             preview.forEach(([name, recipe]) => {
@@ -2659,6 +2687,7 @@
             loadHealthInfo();
             renderCarousel();
             renderHomeRecipeGrid();
+            startCarouselAutoPlay();
         });
     </script>
 
