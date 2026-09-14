@@ -194,6 +194,47 @@
             margin-bottom: 3px;
         }
 
+        .cart-fab {
+            position: fixed;
+            right: 20px;
+            bottom: 84px;
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: #5A8B4A;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(43,62,47,0.3);
+            cursor: pointer;
+            z-index: 600;
+        }
+
+        .cart-fab-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #DC3545;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        @media (min-width: 769px) {
+            .cart-fab {
+                bottom: 24px;
+            }
+        }
+
         .section-label-home {
             font-size: 16px;
             font-weight: 700;
@@ -324,65 +365,6 @@
             display: block;
         }
 
-        .hero {
-            text-align: center;
-            padding: 60px 20px;
-            background: linear-gradient(135deg, #A9CC93 0%, #8FB878 100%);
-            color: #2B3E2F;
-            border-radius: 12px;
-            margin-bottom: 40px;
-        }
-
-        .hero h1 {
-            font-size: 36px;
-            margin-bottom: 16px;
-        }
-
-        .hero p {
-            font-size: 16px;
-            color: #3B6D11;
-            margin-bottom: 20px;
-        }
-
-        .value-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .value-card {
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .value-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-        }
-
-        .value-card-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
-        }
-
-        .value-card h3 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #1a1a1a;
-        }
-
-        .value-card p {
-            font-size: 13px;
-            color: #666;
-            line-height: 1.6;
-        }
-
         .search-section {
             background: white;
             padding: 30px;
@@ -396,12 +378,6 @@
             font-weight: 600;
             margin-bottom: 20px;
             color: #1a1a1a;
-        }
-
-        .search-container {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
         }
 
         input[type="text"], textarea {
@@ -456,6 +432,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transform: translateY(-4px);
         }
+
 
         .recipe-card-header {
             background: #f8f9fa;
@@ -629,20 +606,38 @@
                 right: -85%;
             }
 
-            .hero h1 {
-                font-size: 28px;
+            .carousel-cat-row {
+                display: none;
             }
 
-            .hero p {
+            .carousel-track {
+                display: block;
+                overflow-x: visible;
+            }
+
+            .carousel-card {
+                flex: none;
+                padding: 27px 21px;
+                min-height: 133px;
+            }
+
+            .carousel-tag {
+                font-size: 12px;
+                padding: 5px 11px;
+            }
+
+            .carousel-title {
+                font-size: 21px;
+                margin: 10px 0 8px;
+            }
+
+            .carousel-desc {
                 font-size: 14px;
+                line-height: 1.5;
             }
 
             .search-section {
                 padding: 20px;
-            }
-
-            .search-container {
-                flex-direction: column;
             }
 
             .recipe-grid {
@@ -736,8 +731,7 @@
             <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('recipeBook'); toggleFavoritesFilter(true);"><span class="more-ic">⭐</span>즐겨찾기 (레시피북 바로가기)</div>
 
             <div class="more-cat-label">도구</div>
-            <div class="more-menu-row" onclick="comingSoon('장보기 리스트');"><span class="more-ic">🛒</span>장보기 리스트</div>
-            <div class="more-menu-row" onclick="comingSoon('영양정보 설정');"><span class="more-ic">📊</span>영양정보 설정</div>
+            <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('shoppingList');"><span class="more-ic">🛒</span>장보기 리스트</div>
 
             <div class="more-cat-label">기타</div>
             <div class="more-menu-row" onclick="comingSoon('서비스 소개');"><span class="more-ic">ℹ️</span>서비스 소개</div>
@@ -754,6 +748,12 @@
         <div class="bottom-nav-item" data-page="profile" onclick="showPage('profile');"><span class="bn-icon">👤</span>내정보</div>
     </div>
 
+    <!-- 장바구니 플로팅 버튼 -->
+    <div id="cartFab" class="cart-fab" onclick="showPage('shoppingList');">
+        🛒
+        <span id="cartFabBadge" class="cart-fab-badge" style="display: none;">0</span>
+    </div>
+
     <!-- 홈 페이지 -->
     <div id="home" class="page active">
         <div class="section-label-home" style="margin-top: 30px;">오늘 뭐 먹지? 🎲</div>
@@ -763,6 +763,7 @@
             <div class="carousel-cat-tab" data-cat="양식" onclick="selectCarouselCategory('양식', this);">양식</div>
             <div class="carousel-cat-tab" data-cat="일식" onclick="selectCarouselCategory('일식', this);">일식</div>
             <div class="carousel-cat-tab" data-cat="중식" onclick="selectCarouselCategory('중식', this);">중식</div>
+            <div class="carousel-cat-tab" data-cat="디저트" onclick="selectCarouselCategory('디저트', this);">디저트</div>
         </div>
         <div id="carouselTrack" class="carousel-track"></div>
         <div style="text-align: center; margin-bottom: 30px;">
@@ -856,6 +857,7 @@
                 <div class="category-tab" onclick="selectCategory('양식', this);">양식</div>
                 <div class="category-tab" onclick="selectCategory('일식', this);">일식</div>
                 <div class="category-tab" onclick="selectCategory('중식', this);">중식</div>
+                <div class="category-tab" onclick="selectCategory('디저트', this);">디저트</div>
             </div>
 
             <div style="margin: 12px 0;">
@@ -921,6 +923,14 @@
         </div>
     </div>
 
+    <!-- 장보기 리스트 페이지 -->
+    <div id="shoppingList" class="page">
+        <div class="search-section">
+            <div class="search-title">🛒 장보기 리스트</div>
+            <div id="shoppingListContent"></div>
+        </div>
+    </div>
+
     <!-- 레시피 모달 -->
     <div id="recipeModal" class="modal">
         <div class="modal-content">
@@ -937,7 +947,14 @@
                 type: 'intolerance',
                 avoidFoods: ['우유', '버터', '치즈', '크림', '우유초콜릿'],
                 safeFoods: ['락토스프리 우유', '저유당 우유', '두유', '귀리 밀크', '코코넛 밀크', '요구르트(소량)'],
-                tips: '유당 함량이 낮은 제품 선택 권장. 무가당 유제품은 더 안전합니다.',
+                substitutes: {
+                    '우유': ['락토스프리 우유', '저유당 우유', '두유'],
+                    '버터': ['버터(소량은 대부분 괜찮음)', '식물성 마가린'],
+                    '치즈': ['저유당 치즈(체다·파마산 등 숙성치즈)', '영양 효모(대체 치즈 맛)'],
+                    '크림': ['코코넛 크림', '식물성 휘핑크림'],
+                    '우유초콜릿': ['다크초콜릿(유당 적음)', '두유초콜릿']
+                },
+                tips: '버터·숙성치즈는 유당 함량이 매우 낮아 소량은 대부분 문제없이 섭취 가능. 우유·크림처럼 유당이 많은 것 위주로 주의하세요.',
                 source: "https://doctornow.co.kr/content/magazine/b48b909b5091430182dfd4cd0bd3837f"
             },
             '유당': {
@@ -945,7 +962,13 @@
                 type: 'intolerance',
                 avoidFoods: ['우유', '버터', '치즈', '크림'],
                 safeFoods: ['락토스프리 우유', '저유당 우유', '두유'],
-                tips: '유당 함량이 낮은 제품 선택 권장',
+                substitutes: {
+                    '우유': ['락토스프리 우유', '저유당 우유', '두유'],
+                    '버터': ['버터(소량은 대부분 괜찮음)', '식물성 마가린'],
+                    '치즈': ['저유당 치즈(숙성치즈)', '영양 효모(대체 치즈 맛)'],
+                    '크림': ['코코넛 크림', '식물성 휘핑크림']
+                },
+                tips: '버터는 유당 함량이 매우 낮아 소량은 대부분 문제없이 섭취 가능',
                 source: "https://doctornow.co.kr/content/magazine/b48b909b5091430182dfd4cd0bd3837f"
             },
             '유제품': {
@@ -953,7 +976,14 @@
                 type: 'intolerance',
                 avoidFoods: ['우유', '버터', '치즈', '크림', '요구르트'],
                 safeFoods: ['두유', '귀리 밀크', '아몬드 밀크'],
-                tips: '모든 유제품 피하기',
+                substitutes: {
+                    '우유': ['두유', '귀리 밀크', '아몬드 밀크'],
+                    '버터': ['버터(소량은 대부분 괜찮음)', '식물성 마가린'],
+                    '치즈': ['저유당 치즈(숙성치즈)', '영양 효모(대체 치즈 맛)'],
+                    '크림': ['코코넛 크림', '식물성 휘핑크림'],
+                    '요구르트': ['두유 요구르트', '코코넛 요구르트']
+                },
+                tips: '버터는 유당 함량이 매우 낮아 대부분 문제없이 섭취 가능한 경우가 많음',
                 source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
             },
             '우유 알레르기': {
@@ -961,7 +991,16 @@
                 type: 'allergy',
                 avoidFoods: ['우유', '버터', '치즈', '크림', '요구르트', '밀크파우더', '유제품'],
                 safeFoods: ['두유', '귀리 밀크', '아몬드 밀크', '코코넛 밀크', '쌀 음료'],
-                tips: '모든 유제품 완전히 피하기. 가공식품의 유제품 함유 여부 확인 필수',
+                substitutes: {
+                    '우유': ['두유', '귀리 밀크', '아몬드 밀크', '코코넛 밀크', '쌀 음료'],
+                    '버터': ['식물성 마가린', '코코넛 오일'],
+                    '치즈': ['비건 치즈(식물성 치즈)', '영양 효모(대체 치즈 맛)'],
+                    '크림': ['코코넛 크림', '식물성 휘핑크림'],
+                    '요구르트': ['두유 요구르트', '코코넛 요구르트'],
+                    '밀크파우더': ['두유가루', '코코넛밀크가루'],
+                    '유제품': ['식물성 대체식품 전반(두유·코코넛 제품 등)']
+                },
+                tips: '단순 불내증과 달리 우유 알레르기는 소량의 유단백도 위험할 수 있어 완전히 피해야 함. 버터·치즈도 예외 없이 모두 식물성으로 대체 필요',
                 source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
             },
             '버터': {
@@ -969,7 +1008,12 @@
                 type: 'intolerance',
                 avoidFoods: ['버터', '크림', '우유'],
                 safeFoods: ['올리브유', '포도씨유', '참기름'],
-                tips: '식물성 기름으로 대체',
+                substitutes: {
+                    '버터': ['식물성 마가린', '코코넛 오일', '올리브유'],
+                    '크림': ['코코넛 크림', '식물성 휘핑크림'],
+                    '우유': ['두유', '귀리 밀크', '아몬드 밀크']
+                },
+                tips: '버터는 유당 함량이 매우 낮아 유당불내증이라면 소량은 대부분 괜찮은 경우가 많음 (우유 알레르기는 예외이며 완전히 피해야 함)',
                 source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
             },
             '치즈': {
@@ -977,23 +1021,36 @@
                 type: 'intolerance',
                 avoidFoods: ['치즈', '우유'],
                 safeFoods: ['영양 효모(대체 치즈 맛)', '통곡물'],
-                tips: '영양 효모로 풍미 보충',
+                substitutes: {
+                    '치즈': ['비건 치즈(식물성 치즈)', '영양 효모(대체 치즈 맛)'],
+                    '우유': ['두유', '귀리 밀크', '아몬드 밀크']
+                },
+                tips: '오래 숙성된 치즈(파마산 등)는 발효 과정에서 유당이 상당히 분해되어 있어 유당불내증이면 소량은 괜찮을 수 있음',
                 source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
             },
             '계란': {
                 name: '계란 알레르기',
                 type: 'allergy',
                 avoidFoods: ['계란', '계란 함유 음식', '달걀'],
-                safeFoods: ['아쿠아파바(계란 대체)', '바나나(베이킹)', '요구르트(베이킹)'],
-                tips: '계란이 들어간 모든 음식 피하기. 성분표 확인 필수',
+                safeFoods: ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
+                substitutes: {
+                    '계란': ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
+                    '계란 함유 음식': ['아쿠아파바(베이킹용)', '바나나(베이킹용)'],
+                    '달걀': ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)']
+                },
+                tips: '계란이 들어간 모든 음식 피하기, 성분표 확인 필수. ⚠️ 아쿠아파바·바나나·요구르트는 "베이킹에서 반죽을 뭉치는 역할"만 대체 가능 - 계란국·계란찜처럼 계란 자체가 주재료인 요리는 마땅한 대체품이 없어 다른 메뉴를 고르는 게 나을 수 있음',
                 source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
             },
             '계란 알레르기': {
                 name: '계란 알레르기',
                 type: 'allergy',
                 avoidFoods: ['계란', '계란 함유 음식'],
-                safeFoods: ['아쿠아파바', '바나나', '요구르트'],
-                tips: '계란 완전 피하기',
+                safeFoods: ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
+                substitutes: {
+                    '계란': ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
+                    '계란 함유 음식': ['아쿠아파바(베이킹용)', '바나나(베이킹용)']
+                },
+                tips: '계란 완전 피하기. ⚠️ 대체품은 "베이킹용"으로만 유효 - 계란국·계란찜처럼 계란이 주재료인 요리는 대체가 어려워 다른 메뉴를 고르는 게 나을 수 있음',
                 source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
             },
             '밀가루': {
@@ -1312,6 +1369,20 @@
 
         // 대체 음식별 짧은 설명/특징 (괄호 부가정보 제거 후 이름으로 매칭)
         const substituteInfo = {
+            '버터': '유당 함량이 매우 낮아 유당불내증이면 소량은 대부분 괜찮은 경우가 많음 (우유 알레르기는 예외)',
+            '식물성 마가린': '유제품이 없는 식물성 기름 기반 스프레드로 버터를 대체',
+            '코코넛 크림': '코코넛 과육에서 추출한 고형질 크림, 휘핑도 가능한 유제품 대체품',
+            '식물성 휘핑크림': '두유 등 식물성 원료로 만든 유제품 없는 휘핑크림',
+            '저유당 치즈': '오래 숙성되며 유당이 많이 분해된 치즈, 유당불내증이면 소량 섭취 가능한 경우가 많음',
+            '다크초콜릿': '카카오 함량이 높아 유제품이 적게 들어간 초콜릿',
+            '두유초콜릿': '두유로 만들어 유당이 없는 초콜릿 대체품',
+            '비건 치즈': '유제품 없이 식물성 원료로 만든 치즈 대체품',
+            '두유 요구르트': '두유를 발효시켜 만든 유당 없는 요구르트 대체품',
+            '코코넛 요구르트': '코코넛 밀크를 발효시켜 만든 유당 없는 요구르트 대체품',
+            '두유가루': '두유를 분말화한 우유가루 대체품',
+            '코코넛밀크가루': '코코넛밀크를 분말화한 우유가루 대체품',
+            '식물성 대체식품 전반': '두유·코코넛 등 식물성 원료 기반 유제품 대체식품 전반',
+            '코코넛 오일': '코코넛 과육에서 추출한 식물성 기름, 버터 대신 굽거나 볶는 요리에 활용 가능',
             '감자': '탄수화물 공급원, 삶거나 쪄서 조리하면 좋음',
             '고기류': '동물성 단백질 공급원',
             '구운 음식': '기름을 적게 써서 지방 섭취를 줄일 수 있음',
@@ -1405,12 +1476,671 @@
 
         // 레시피 데이터
         const recipes = {
+            '순두부찌개': {
+                category: '한식',
+                keywords: ['순두부찌개'],
+                baseIngredient: '순두부',
+                description: '얼큰하고 부드러운 국물이 일품인 찌개',
+                calories: 320,
+                difficulty: '보통',
+                cookTime: '30분',
+                ingredients: [
+                    { name: '순두부', amount: '1봉', required: true },
+                    { name: '다진 돼지고기', amount: '80g', required: true },
+                    { name: '바지락', amount: '12개', required: false },
+                    { name: '양파', amount: '1/4개', required: true },
+                    { name: '대파', amount: '1/2대', required: true },
+                    { name: '청양고추', amount: '1개', required: false },
+                    { name: '고춧가루', amount: '1큰술', required: true },
+                    { name: '다진마늘', amount: '1큰술', required: true },
+                    { name: '계란', amount: '1개', required: false },
+                    { name: '물', amount: '2컵', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '팬에 식용유를 두르고 다진 돼지고기를 볶는다.' },
+                    { step: 2, instruction: '고기가 익으면 고춧가루와 다진마늘을 넣고 함께 볶아 고추기름을 낸다.' },
+                    { step: 3, instruction: '양파와 바지락을 넣고 물을 부어 끓인다.' },
+                    { step: 4, instruction: '끓어오르면 순두부를 큼직하게 떠 넣는다.' },
+                    { step: 5, instruction: '대파와 청양고추를 넣고 한소끔 더 끓인다.' },
+                    { step: 6, instruction: '계란을 톡 깨 넣고 살짝 더 익혀 마무리한다.' }
+                ],
+                source: "https://www.kurly.com/recipe/671764624701d5e8aa02eee7"
+            },
+            '닭볶음탕': {
+                category: '한식',
+                keywords: ['닭볶음탕', '닭도리탕'],
+                baseIngredient: '닭고기',
+                description: '매콤달콤한 양념에 조려낸 얼큰한 닭요리',
+                calories: 480,
+                difficulty: '보통',
+                cookTime: '40분',
+                ingredients: [
+                    { name: '토막 닭고기', amount: '800g', required: true },
+                    { name: '감자', amount: '2개', required: true },
+                    { name: '당근', amount: '1/2개', required: true },
+                    { name: '양파', amount: '1개', required: true },
+                    { name: '대파', amount: '1대', required: false },
+                    { name: '고추장', amount: '2큰술', required: true },
+                    { name: '고춧가루', amount: '2큰술', required: true },
+                    { name: '간장', amount: '2큰술', required: true },
+                    { name: '설탕', amount: '1큰술', required: true },
+                    { name: '다진마늘', amount: '1큰술', required: true },
+                    { name: '물', amount: '2컵', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '닭고기는 끓는 물에 한 번 데쳐 잡내를 제거한다.' },
+                    { step: 2, instruction: '고추장, 고춧가루, 간장, 설탕, 다진마늘을 섞어 양념장을 만든다.' },
+                    { step: 3, instruction: '냄비에 닭고기와 양념장, 물을 넣고 센 불에서 끓인다.' },
+                    { step: 4, instruction: '끓어오르면 감자와 당근을 넣고 중불로 줄여 조린다.' },
+                    { step: 5, instruction: '감자가 익고 국물이 걸쭉해지면 양파와 대파를 넣고 마무리한다.' }
+                ],
+                source: "https://www.kurly.com/recipe/671764624701d5e8aa02eee5"
+            },
+            '오징어볶음': {
+                category: '한식',
+                keywords: ['오징어볶음'],
+                baseIngredient: '오징어',
+                description: '쫄깃한 오징어를 매콤하게 볶아낸 밥도둑 반찬',
+                calories: 310,
+                difficulty: '보통',
+                cookTime: '20분',
+                ingredients: [
+                    { name: '오징어', amount: '1마리', required: true },
+                    { name: '양파', amount: '1/2개', required: true },
+                    { name: '양배추', amount: '2장', required: false },
+                    { name: '당근', amount: '1/4개', required: false },
+                    { name: '청양고추', amount: '1개', required: false },
+                    { name: '고추장', amount: '1.5큰술', required: true },
+                    { name: '고춧가루', amount: '1큰술', required: true },
+                    { name: '간장', amount: '1큰술', required: true },
+                    { name: '설탕', amount: '1큰술', required: true },
+                    { name: '다진마늘', amount: '1큰술', required: true },
+                    { name: '참기름', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '오징어는 손질하여 먹기 좋은 크기로 썬다.' },
+                    { step: 2, instruction: '고추장, 고춧가루, 간장, 설탕, 다진마늘을 섞어 양념장을 만든다.' },
+                    { step: 3, instruction: '팬에 기름을 두르고 양파, 당근을 먼저 볶는다.' },
+                    { step: 4, instruction: '채소가 살짝 익으면 오징어와 양념장을 넣고 센 불에서 빠르게 볶는다.' },
+                    { step: 5, instruction: '양배추와 청양고추를 넣고 짧게 더 볶은 뒤 참기름을 둘러 마무리한다.' }
+                ],
+                source: "https://www.kurly.com/recipe/6720460d512b7f58a373ea96"
+            },
+            '떡갈비': {
+                category: '한식',
+                keywords: ['떡갈비'],
+                baseIngredient: '다진고기',
+                description: '고기를 다져 치대어 구운 담양 향토 음식',
+                calories: 420,
+                difficulty: '보통',
+                cookTime: '40분',
+                ingredients: [
+                    { name: '다진 소고기', amount: '200g', required: true },
+                    { name: '다진 돼지고기', amount: '200g', required: true },
+                    { name: '간장', amount: '2큰술', required: true },
+                    { name: '설탕', amount: '1큰술', required: true },
+                    { name: '다진마늘', amount: '1큰술', required: true },
+                    { name: '다진파', amount: '2큰술', required: true },
+                    { name: '참기름', amount: '1큰술', required: true },
+                    { name: '후추', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '다진 소고기와 돼지고기를 볼에 담는다.' },
+                    { step: 2, instruction: '간장, 설탕, 다진마늘, 다진파, 참기름, 후추를 넣는다.' },
+                    { step: 3, instruction: '끈기가 생길 때까지 충분히 치댄다.' },
+                    { step: 4, instruction: '반죽을 동글납작하게 빚는다.' },
+                    { step: 5, instruction: '팬에 앞뒤로 노릇하게 구워낸다.' }
+                ],
+                source: "https://www.wegive.co.kr/wezine/detail/1317"
+            },
+            '소고기뭇국': {
+                category: '한식',
+                keywords: ['소고기뭇국', '뭇국'],
+                baseIngredient: '소고기',
+                description: '깔끔하고 시원한 국물의 기본 국 요리',
+                calories: 180,
+                difficulty: '쉬움',
+                cookTime: '30분',
+                ingredients: [
+                    { name: '소고기(국거리)', amount: '150g', required: true },
+                    { name: '무', amount: '1/4개', required: true },
+                    { name: '국간장', amount: '2큰술', required: true },
+                    { name: '다진마늘', amount: '1큰술', required: true },
+                    { name: '참기름', amount: '1큰술', required: true },
+                    { name: '대파', amount: '1/2대', required: false },
+                    { name: '물', amount: '4컵', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '무는 나박썰기 한다.' },
+                    { step: 2, instruction: '냄비에 참기름을 두르고 소고기를 볶는다.' },
+                    { step: 3, instruction: '고기 겉면이 익으면 무를 넣고 함께 볶는다.' },
+                    { step: 4, instruction: '물을 붓고 끓어오르면 다진마늘, 국간장을 넣는다.' },
+                    { step: 5, instruction: '무가 투명하게 익을 때까지 끓인 뒤 대파를 올려 마무리한다.' }
+                ],
+                source: null
+            },
+            '계란볶음밥': {
+                category: '중식',
+                keywords: ['계란볶음밥'],
+                baseIngredient: '밥',
+                description: '고슬고슬하게 볶아낸 기본 계란볶음밥',
+                calories: 480,
+                difficulty: '쉬움',
+                cookTime: '15분',
+                ingredients: [
+                    { name: '밥', amount: '1공기', required: true },
+                    { name: '계란', amount: '2개', required: true },
+                    { name: '대파', amount: '1대', required: true },
+                    { name: '굴소스', amount: '1큰술', required: true },
+                    { name: '식용유', amount: '2큰술', required: true },
+                    { name: '소금', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '팬에 식용유를 두르고 대파를 볶아 파기름을 낸다.' },
+                    { step: 2, instruction: '계란을 풀어 넣고 스크램블처럼 볶는다.' },
+                    { step: 3, instruction: '밥을 넣고 날알이 흩어지도록 강불에서 볶는다.' },
+                    { step: 4, instruction: '굴소스와 소금으로 간을 맞춰 마무리한다.' }
+                ],
+                source: null
+            },
+            '마파두부': {
+                category: '중식',
+                keywords: ['마파두부'],
+                baseIngredient: '두부',
+                description: '두반장으로 얼큰하게 볶아낸 중국식 두부요리',
+                calories: 350,
+                difficulty: '보통',
+                cookTime: '25분',
+                ingredients: [
+                    { name: '두부', amount: '1모', required: true },
+                    { name: '다진 돼지고기', amount: '100g', required: true },
+                    { name: '대파', amount: '1대', required: true },
+                    { name: '다진마늘', amount: '1큰술', required: true },
+                    { name: '두반장', amount: '1큰술', required: true },
+                    { name: '굴소스', amount: '1큰술', required: false },
+                    { name: '간장', amount: '1큰술', required: true },
+                    { name: '전분물', amount: '2큰술', required: true },
+                    { name: '참기름', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '두부는 깍둑썰기 하여 끓는 물에 살짝 데쳐 물기를 뺀다.' },
+                    { step: 2, instruction: '팬에 식용유를 두르고 다진마늘, 대파를 볶아 향을 낸다.' },
+                    { step: 3, instruction: '다진 돼지고기를 넣고 볶다가 두반장, 간장을 넣는다.' },
+                    { step: 4, instruction: '물을 조금 넣고 끓으면 두부를 넣어 살살 섞는다.' },
+                    { step: 5, instruction: '전분물을 둘러 걸쭉하게 만들고 참기름을 둘러 마무리한다.' }
+                ],
+                source: "https://www.kurly.com/recipe/671764624701d5e8aa02ef19"
+            },
+            '토마토계란볶음': {
+                category: '중식',
+                keywords: ['토마토계란볶음', '토달볶'],
+                baseIngredient: '토마토',
+                description: '새콤달콤한 토마토와 부드러운 계란의 조합',
+                calories: 220,
+                difficulty: '쉬움',
+                cookTime: '15분',
+                ingredients: [
+                    { name: '토마토', amount: '2개', required: true },
+                    { name: '계란', amount: '3개', required: true },
+                    { name: '대파', amount: '1/2대', required: false },
+                    { name: '굴소스', amount: '1작은술', required: false },
+                    { name: '설탕', amount: '1작은술', required: true },
+                    { name: '소금', amount: '약간', required: true },
+                    { name: '식용유', amount: '2큰술', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '계란은 소금 한 꼬집을 넣고 풀어둔다.' },
+                    { step: 2, instruction: '토마토는 먹기 좋은 크기로 썬다.' },
+                    { step: 3, instruction: '팬에 기름을 두르고 계란물을 부어 스크램블을 만든 뒤 따로 덜어둔다.' },
+                    { step: 4, instruction: '같은 팬에 토마토를 볶다가 굴소스, 설탕을 넣는다.' },
+                    { step: 5, instruction: '토마토가 물러지면 계란과 대파를 넣고 함께 볶아 마무리한다.' }
+                ],
+                source: "https://www.10000recipe.com/recipe/6905626"
+            },
+            '고추잡채': {
+                category: '중식',
+                keywords: ['고추잡채'],
+                baseIngredient: '돼지고기',
+                description: '고기와 채소를 가늘게 썰어 볶은 중국식 요리',
+                calories: 340,
+                difficulty: '보통',
+                cookTime: '25분',
+                ingredients: [
+                    { name: '돼지고기', amount: '200g', required: true },
+                    { name: '피망', amount: '2개', required: true },
+                    { name: '양파', amount: '1/2개', required: true },
+                    { name: '당근', amount: '1/3개', required: false },
+                    { name: '다진마늘', amount: '1작은술', required: true },
+                    { name: '간장', amount: '2큰술', required: true },
+                    { name: '굴소스', amount: '1큰술', required: true },
+                    { name: '설탕', amount: '1작은술', required: true },
+                    { name: '전분', amount: '1작은술', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '돼지고기와 채소는 모두 얇게 채 썬다.' },
+                    { step: 2, instruction: '고기에 간장 약간, 전분을 넣어 밑간한다.' },
+                    { step: 3, instruction: '팬에 기름을 두르고 고기를 먼저 볶아 따로 덜어둔다.' },
+                    { step: 4, instruction: '같은 팬에 마늘, 당근, 양파를 볶다가 피망을 넣는다.' },
+                    { step: 5, instruction: '고기를 다시 넣고 간장, 굴소스, 설탕을 넣어 센 불에서 빠르게 볶는다.' }
+                ],
+                source: "https://m.cafe.daum.net/jinju1009/Fewl/3178"
+            },
+            '꿔바로우': {
+                category: '중식',
+                keywords: ['꿔바로우', '탕수육'],
+                baseIngredient: '돼지고기',
+                description: '바삭한 튀김에 새콤달콤한 소스를 곁들인 중국식 튀김요리',
+                calories: 590,
+                difficulty: '어려움',
+                cookTime: '50분',
+                ingredients: [
+                    { name: '돼지고기(등심)', amount: '300g', required: true },
+                    { name: '감자전분', amount: '1컵', required: true },
+                    { name: '계란', amount: '1개', required: true },
+                    { name: '당근', amount: '1/4개', required: false },
+                    { name: '오이', amount: '1/4개', required: false },
+                    { name: '식초', amount: '3큰술', required: true },
+                    { name: '설탕', amount: '3큰술', required: true },
+                    { name: '간장', amount: '1큰술', required: true },
+                    { name: '식용유(튀김용)', amount: '적당량', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '돼지고기는 먹기 좋은 크기로 썰어 간장, 후추로 밑간한다.' },
+                    { step: 2, instruction: '고기에 계란과 불린 감자전분을 묻힌다.' },
+                    { step: 3, instruction: '170도 기름에 한 번 튀기고, 다시 한 번 더 바삭하게 튀긴다.' },
+                    { step: 4, instruction: '식초, 설탕, 간장, 물을 섞어 소스를 만들어 끓인다.' },
+                    { step: 5, instruction: '당근, 오이를 채 썰어 소스에 곁들이고 튀긴 고기 위에 소스를 끼얹어 완성한다.' }
+                ],
+                source: "https://m.cafe.daum.net/031-212-1253/DELk/737"
+            },
+            '가츠동': {
+                category: '일식',
+                keywords: ['가츠동'],
+                baseIngredient: '돈가스',
+                description: '돈가스를 계란과 함께 조려 얹은 일본식 덮밥',
+                calories: 650,
+                difficulty: '보통',
+                cookTime: '25분',
+                ingredients: [
+                    { name: '돈가스', amount: '1장', required: true },
+                    { name: '계란', amount: '2개', required: true },
+                    { name: '양파', amount: '1/2개', required: true },
+                    { name: '쯔유', amount: '4큰술', required: true },
+                    { name: '물', amount: '1/2컵', required: true },
+                    { name: '밥', amount: '1공기', required: true },
+                    { name: '대파', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '팬에 쯔유와 물을 넣고 양파를 채 썰어 넣어 조린다.' },
+                    { step: 2, instruction: '양파가 익으면 튀긴 돈가스를 썰어 올린다.' },
+                    { step: 3, instruction: '계란물을 풀어 반쯤 익도록 둘러 붓는다.' },
+                    { step: 4, instruction: '뚜껑을 덮고 계란이 반숙이 될 때까지 익힌다.' },
+                    { step: 5, instruction: '밥 위에 통째로 얹고 대파를 올려 마무리한다.' }
+                ],
+                source: null
+            },
+            '오야코동': {
+                category: '일식',
+                keywords: ['오야코동'],
+                baseIngredient: '닭고기',
+                description: '닭고기와 계란을 조려 얹은 부모자식 덮밥',
+                calories: 550,
+                difficulty: '보통',
+                cookTime: '20분',
+                ingredients: [
+                    { name: '닭다리살', amount: '200g', required: true },
+                    { name: '계란', amount: '2개', required: true },
+                    { name: '양파', amount: '1/2개', required: true },
+                    { name: '쯔유', amount: '4큰술', required: true },
+                    { name: '물', amount: '1/2컵', required: true },
+                    { name: '밥', amount: '1공기', required: true },
+                    { name: '대파', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '닭고기는 한입 크기로 썬다.' },
+                    { step: 2, instruction: '팬에 쯔유와 물, 채 썬 양파를 넣고 끓인다.' },
+                    { step: 3, instruction: '닭고기를 넣고 속까지 익도록 조린다.' },
+                    { step: 4, instruction: '계란물을 풀어 둘러 붓고 살짝만 익힌다.' },
+                    { step: 5, instruction: '밥 위에 얹고 대파를 올려 완성한다.' }
+                ],
+                source: null
+            },
+            '야키소바': {
+                category: '일식',
+                keywords: ['야키소바'],
+                baseIngredient: '면',
+                description: '채소와 고기를 볶아 소스에 버무린 일본식 볶음면',
+                calories: 520,
+                difficulty: '보통',
+                cookTime: '20분',
+                ingredients: [
+                    { name: '야키소바면(또는 중화면)', amount: '2인분', required: true },
+                    { name: '양배추', amount: '2장', required: true },
+                    { name: '돼지고기', amount: '100g', required: true },
+                    { name: '당근', amount: '약간', required: false },
+                    { name: '야키소바소스', amount: '4큰술', required: true },
+                    { name: '식용유', amount: '2큰술', required: true },
+                    { name: '가쓰오부시', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '양배추와 당근은 채 썰고 돼지고기는 한입 크기로 썬다.' },
+                    { step: 2, instruction: '팬에 기름을 두르고 돼지고기를 먼저 볶는다.' },
+                    { step: 3, instruction: '고기가 익으면 채소를 넣고 함께 볶는다.' },
+                    { step: 4, instruction: '면을 넣고 야키소바소스를 둘러 골고루 섞어 볶는다.' },
+                    { step: 5, instruction: '그릇에 담고 가쓰오부시를 뿌려 마무리한다.' }
+                ],
+                source: "https://m.cafe.daum.net/gil6548/MOwf/7581"
+            },
+            '카레라이스': {
+                category: '일식',
+                keywords: ['카레라이스', '카레'],
+                baseIngredient: '카레',
+                description: '고체카레로 만드는 부드럽고 든든한 한 그릇 요리',
+                calories: 580,
+                difficulty: '쉬움',
+                cookTime: '40분',
+                ingredients: [
+                    { name: '고체카레', amount: '4조각', required: true },
+                    { name: '감자', amount: '1개', required: true },
+                    { name: '당근', amount: '1/2개', required: true },
+                    { name: '양파', amount: '1개', required: true },
+                    { name: '돼지고기(또는 소고기)', amount: '150g', required: false },
+                    { name: '물', amount: '2컵', required: true },
+                    { name: '밥', amount: '1공기', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '감자, 당근, 양파는 한입 크기로 썬다.' },
+                    { step: 2, instruction: '팬에 기름을 두르고 양파를 갈색이 나도록 볶는다.' },
+                    { step: 3, instruction: '고기를 넣고 겉면이 익을 때까지 볶는다.' },
+                    { step: 4, instruction: '감자, 당근과 물을 넣고 재료가 무를 때까지 끓인다.' },
+                    { step: 5, instruction: '불을 끄고 고체카레를 넣어 녹인 뒤 약불에서 걸쭉해질 때까지 저어가며 끓인다.' },
+                    { step: 6, instruction: '밥과 함께 그릇에 담아 완성한다.' }
+                ],
+                source: null
+            },
+            '메밀소바': {
+                category: '일식',
+                keywords: ['메밀소바', '자루소바'],
+                baseIngredient: '메밀면',
+                description: '차갑게 즐기는 담백한 일본식 메밀국수',
+                calories: 380,
+                difficulty: '쉬움',
+                cookTime: '15분',
+                ingredients: [
+                    { name: '메밀면', amount: '200g', required: true },
+                    { name: '쯔유', amount: '4큰술', required: true },
+                    { name: '물', amount: '1컵', required: true },
+                    { name: '간 무', amount: '약간', required: false },
+                    { name: '와사비', amount: '약간', required: false },
+                    { name: '김가루', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '쯔유와 물을 섞어 차갑게 육수를 준비한다.' },
+                    { step: 2, instruction: '메밀면은 끓는 물에 삶은 뒤 찬물에 헹궈 물기를 뺀다.' },
+                    { step: 3, instruction: '그릇에 면을 담고 육수를 곁들인다.' },
+                    { step: 4, instruction: '간 무, 와사비, 김가루를 올려 완성한다.' }
+                ],
+                source: "https://m.cafe.daum.net/jinju1009/Fewl/3087"
+            },
+            '까르보나라': {
+                category: '양식',
+                keywords: ['까르보나라', '카르보나라'],
+                baseIngredient: '파스타',
+                description: '계란과 치즈로 만드는 부드럽고 고소한 크림 없는 파스타',
+                calories: 680,
+                difficulty: '보통',
+                cookTime: '25분',
+                ingredients: [
+                    { name: '파스타면', amount: '200g', required: true },
+                    { name: '베이컨', amount: '80g', required: true },
+                    { name: '계란노른자', amount: '2개', required: true },
+                    { name: '파마산 치즈', amount: '40g', required: true },
+                    { name: '마늘', amount: '1쪽', required: false },
+                    { name: '후추', amount: '약간', required: true },
+                    { name: '소금', amount: '약간', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '끓는 소금물에 파스타면을 삶는다.' },
+                    { step: 2, instruction: '계란노른자와 파마산 치즈, 후추를 섞어 소스를 만든다.' },
+                    { step: 3, instruction: '팬에 베이컨과 마늘을 볶아 기름을 낸다.' },
+                    { step: 4, instruction: '불을 끄고 삶은 면과 면수를 조금 넣어 섞는다.' },
+                    { step: 5, instruction: '준비한 계란 소스를 넣고 잔열로 재빨리 버무려 완성한다.' }
+                ],
+                source: "https://glukhov.org/ko/post/2023/pasta-carbonara/"
+            },
+            '감바스알아히요': {
+                category: '양식',
+                keywords: ['감바스', '감바스알아히요'],
+                baseIngredient: '새우',
+                description: '마늘과 올리브유 향이 가득한 스페인식 새우 요리',
+                calories: 380,
+                difficulty: '쉬움',
+                cookTime: '15분',
+                ingredients: [
+                    { name: '새우', amount: '200g', required: true },
+                    { name: '마늘', amount: '6쪽', required: true },
+                    { name: '페페론치노', amount: '5개', required: false },
+                    { name: '올리브유', amount: '1컵', required: true },
+                    { name: '바게트', amount: '적당량', required: false },
+                    { name: '소금', amount: '약간', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '새우는 손질하여 소금으로 밑간한다.' },
+                    { step: 2, instruction: '팬에 올리브유를 넉넉히 붓고 마늘, 페페론치노를 넣어 약불로 향을 낸다.' },
+                    { step: 3, instruction: '마늘이 노릇해지면 새우를 넣고 중불에서 익힌다.' },
+                    { step: 4, instruction: '새우가 다 익으면 소금으로 간을 맞춘다.' },
+                    { step: 5, instruction: '구운 바게트를 곁들여 완성한다.' }
+                ],
+                source: "https://www.kurly.com/recipe/671764624701d5e8aa02eefb"
+            },
+            '바질페스토파스타': {
+                category: '양식',
+                keywords: ['바질페스토파스타', '바질파스타'],
+                baseIngredient: '파스타',
+                description: '바질 페스토를 비벼 간단하게 완성하는 파스타',
+                calories: 550,
+                difficulty: '쉬움',
+                cookTime: '15분',
+                ingredients: [
+                    { name: '파스타면', amount: '200g', required: true },
+                    { name: '바질페스토', amount: '3큰술', required: true },
+                    { name: '올리브유', amount: '1큰술', required: true },
+                    { name: '방울토마토', amount: '8개', required: false },
+                    { name: '파마산 치즈', amount: '적당량', required: false },
+                    { name: '소금', amount: '약간', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '끓는 소금물에 파스타면을 삶는다.' },
+                    { step: 2, instruction: '방울토마토는 반으로 썬다.' },
+                    { step: 3, instruction: '삶은 면에 바질페스토와 올리브유를 넣고 비빈다.' },
+                    { step: 4, instruction: '방울토마토를 넣고 살짝 더 섞는다.' },
+                    { step: 5, instruction: '그릇에 담고 파마산 치즈를 뿌려 완성한다.' }
+                ],
+                source: "https://m.cafe.daum.net/party3434/gECq/1337"
+            },
+            '함박스테이크': {
+                category: '양식',
+                keywords: ['함박스테이크'],
+                baseIngredient: '다진고기',
+                description: '육즙 가득한 일본식 다진 고기 스테이크',
+                calories: 520,
+                difficulty: '어려움',
+                cookTime: '40분',
+                ingredients: [
+                    { name: '다진 소고기', amount: '200g', required: true },
+                    { name: '다진 돼지고기', amount: '100g', required: true },
+                    { name: '빵가루', amount: '1/2컵', required: true },
+                    { name: '양파', amount: '1/2개', required: true },
+                    { name: '계란', amount: '1개', required: true },
+                    { name: '우유', amount: '2큰술', required: false },
+                    { name: '우스터소스', amount: '2큰술', required: true },
+                    { name: '케첩', amount: '2큰술', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '양파는 잘게 다져 볶아 식힌다.' },
+                    { step: 2, instruction: '빵가루는 우유에 불려둔다.' },
+                    { step: 3, instruction: '다진 고기에 볶은 양파, 빵가루, 계란을 넣고 끈기가 생길 때까지 치댄다.' },
+                    { step: 4, instruction: '타원형으로 빚어 가운데를 살짝 눌러준다.' },
+                    { step: 5, instruction: '팬에 앞뒤로 구운 뒤 뚜껑을 덮어 속까지 익힌다.' },
+                    { step: 6, instruction: '우스터소스와 케첩을 섞어 소스를 만들어 곁들인다.' }
+                ],
+                source: null
+            },
+            '크림리조또': {
+                category: '양식',
+                keywords: ['크림리조또'],
+                baseIngredient: '쌀',
+                description: '베이컨과 생크림으로 더 진하고 부드럽게 만든 리조또',
+                calories: 620,
+                difficulty: '보통',
+                cookTime: '30분',
+                ingredients: [
+                    { name: '밥(또는 쌀)', amount: '1공기', required: true },
+                    { name: '생크림', amount: '100ml', required: true },
+                    { name: '우유', amount: '100ml', required: true },
+                    { name: '베이컨', amount: '60g', required: false },
+                    { name: '버터', amount: '20g', required: true },
+                    { name: '파마산 치즈', amount: '30g', required: false },
+                    { name: '양파', amount: '1/4개', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '팬에 버터를 녹이고 양파, 베이컨을 볶는다.' },
+                    { step: 2, instruction: '밥을 넣고 골고루 볶는다.' },
+                    { step: 3, instruction: '우유와 생크림을 부어 약불에서 저어가며 끓인다.' },
+                    { step: 4, instruction: '국물이 걸쭉해지면 파마산 치즈를 넣어 섞는다.' },
+                    { step: 5, instruction: '농도가 적당해지면 불을 끄고 완성한다.' }
+                ],
+                source: null
+            },
+            '프렌치토스트': {
+                category: '디저트',
+                keywords: ['프렌치토스트'],
+                baseIngredient: '식빵',
+                description: '계란물에 적셔 구운 폭신한 아침 메뉴',
+                calories: 350,
+                difficulty: '쉬움',
+                cookTime: '15분',
+                ingredients: [
+                    { name: '식빵', amount: '2장', required: true },
+                    { name: '계란', amount: '1개', required: true },
+                    { name: '우유', amount: '1/2컵', required: true },
+                    { name: '설탕', amount: '1큰술', required: false },
+                    { name: '버터', amount: '10g', required: true },
+                    { name: '메이플시럽', amount: '적당량', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '계란, 우유, 설탕을 잘 섞어 계란물을 만든다.' },
+                    { step: 2, instruction: '식빵을 계란물에 충분히 적신다.' },
+                    { step: 3, instruction: '팬에 버터를 녹이고 약불에서 앞뒤로 노릇하게 굽는다.' },
+                    { step: 4, instruction: '메이플시럽을 뿌려 완성한다.' }
+                ],
+                source: null
+            },
+            '바나나팬케이크': {
+                category: '디저트',
+                keywords: ['바나나팬케이크'],
+                baseIngredient: '바나나',
+                description: '으깬 바나나를 넣어 달콤하게 구운 팬케이크',
+                calories: 380,
+                difficulty: '쉬움',
+                cookTime: '15분',
+                ingredients: [
+                    { name: '바나나', amount: '1개', required: true },
+                    { name: '계란', amount: '1개', required: true },
+                    { name: '팬케이크 가루', amount: '1컵', required: true },
+                    { name: '우유', amount: '1/2컵', required: false },
+                    { name: '버터', amount: '10g', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '바나나는 포크로 곱게 으깬다.' },
+                    { step: 2, instruction: '계란, 우유, 팬케이크 가루를 넣고 반죽을 만든다.' },
+                    { step: 3, instruction: '으깬 바나나를 반죽에 섞는다.' },
+                    { step: 4, instruction: '팬에 버터를 녹이고 반죽을 한 국자씩 부어 약불로 굽는다.' },
+                    { step: 5, instruction: '기포가 올라오면 뒤집어 반대쪽도 노릇하게 굽는다.' }
+                ],
+                source: null
+            },
+            '플레인스콘': {
+                category: '디저트',
+                keywords: ['스콘', '플레인스콘'],
+                baseIngredient: '밀가루',
+                description: '버터 향 가득한 폭신하고 담백한 기본 스콘',
+                calories: 320,
+                difficulty: '보통',
+                cookTime: '35분',
+                ingredients: [
+                    { name: '박력분', amount: '200g', required: true },
+                    { name: '차가운 버터', amount: '60g', required: true },
+                    { name: '우유', amount: '80ml', required: true },
+                    { name: '베이킹파우더', amount: '1작은술', required: true },
+                    { name: '설탕', amount: '30g', required: false },
+                    { name: '소금', amount: '약간', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '오븐을 190도로 예열한다.' },
+                    { step: 2, instruction: '밀가루, 베이킹파우더, 설탕, 소금을 체에 친다.' },
+                    { step: 3, instruction: '차가운 버터를 넣고 소보로 상태가 되도록 손으로 비빈다.' },
+                    { step: 4, instruction: '우유를 넣고 반죽이 뭉칠 정도로만 가볍게 섞는다.' },
+                    { step: 5, instruction: '두툼하게 밀어 모양대로 잘라 오븐에서 15~18분 굽는다.' }
+                ],
+                source: null
+            },
+            '퐁당오쇼콜라': {
+                category: '디저트',
+                keywords: ['퐁당오쇼콜라', '퐁당쇼콜라'],
+                baseIngredient: '초콜릿',
+                description: '겉은 익고 속은 촉촉한 초콜릿 디저트',
+                calories: 420,
+                difficulty: '어려움',
+                cookTime: '30분',
+                ingredients: [
+                    { name: '다크초콜릿', amount: '100g', required: true },
+                    { name: '버터', amount: '80g', required: true },
+                    { name: '계란', amount: '2개', required: true },
+                    { name: '설탕', amount: '60g', required: true },
+                    { name: '밀가루', amount: '40g', required: true }
+                ],
+                steps: [
+                    { step: 1, instruction: '오븐을 200도로 예열한다.' },
+                    { step: 2, instruction: '다크초콜릿과 버터를 함께 중탕으로 녹인다.' },
+                    { step: 3, instruction: '계란과 설탕을 섞어 거품을 낸 뒤 녹인 초콜릿과 합친다.' },
+                    { step: 4, instruction: '밀가루를 체 쳐서 넣고 가볍게 섞는다.' },
+                    { step: 5, instruction: '틀에 부어 오븐에서 10~12분만 구워 속을 촉촉하게 남긴다.' }
+                ],
+                source: null
+            },
+            '우유푸딩': {
+                category: '디저트',
+                keywords: ['우유푸딩'],
+                baseIngredient: '우유',
+                description: '부드럽고 시원하게 즐기는 우유 디저트',
+                calories: 180,
+                difficulty: '보통',
+                cookTime: '20분',
+                ingredients: [
+                    { name: '우유', amount: '500ml', required: true },
+                    { name: '설탕', amount: '50g', required: true },
+                    { name: '젤라틴', amount: '10g', required: true },
+                    { name: '바닐라 에센스', amount: '약간', required: false }
+                ],
+                steps: [
+                    { step: 1, instruction: '젤라틴은 찬물에 불려둔다.' },
+                    { step: 2, instruction: '냄비에 우유와 설탕을 넣고 약불에서 데운다.' },
+                    { step: 3, instruction: '불린 젤라틴을 넣어 완전히 녹인다.' },
+                    { step: 4, instruction: '바닐라 에센스를 넣고 향을 더한다.' },
+                    { step: 5, instruction: '용기에 부어 냉장고에서 2시간 이상 굳혀 완성한다.' }
+                ],
+                source: null
+            },
+
             '뇨끼': {
                 category: '양식',
                 keywords: ['뇨끼', 'gnocchi'],
                 baseIngredient: '감자',
                 description: '포슬포슬한 감자로 만든 이탈리아식 수제비',
                 calories: 550,
+                difficulty: '보통',
+                cookTime: '35분',
                 source: "https://www.kurly.com/recipe/676d1b278d7c834ea3acf1c0",
                 ingredients: [
                     { name: '감자', amount: '400g', required: true },
@@ -1436,6 +2166,8 @@
                 baseIngredient: '소곱창',
                 description: '곱창과 채소를 넣고 끓인 일본식 전골',
                 calories: 480,
+                difficulty: '어려움',
+                cookTime: '50분',
                 source: "https://int.japanesetaste.com/blogs/japanese-taste-blog/how-to-make-motsunabe-japanese-offal-hotpot-recipe",
                 ingredients: [
                     { name: '소곱창', amount: '300g', required: true },
@@ -1461,6 +2193,8 @@
                 baseIngredient: '어묵',
                 description: '시원한 국물의 어묵 꼬치탕',
                 calories: 250,
+                difficulty: '쉬움',
+                cookTime: '20분',
                 source: "https://m.cafe.daum.net/kangneungedu/IQ2n/1579",
                 ingredients: [
                     { name: '사각어묵', amount: '300g', required: true },
@@ -1484,7 +2218,10 @@
                 baseIngredient: '파스타',
                 description: '마늘과 올리브유로 만드는 담백한 오일 파스타',
                 calories: 600,
+                difficulty: '쉬움',
+                cookTime: '20분',
                 source: null,
+                teamSubmitted: true,
                 ingredients: [
                     { name: '파스타', amount: '100g', required: true },
                     { name: '올리브유', amount: '4큰술', required: true },
@@ -1509,6 +2246,8 @@
                 baseIngredient: '우삼겹',
                 description: '고소한 우삼겹과 아삭한 숙주의 조합',
                 calories: 520,
+                difficulty: '쉬움',
+                cookTime: '15분',
                 source: "https://m.10000recipe.com/recipe/6905743",
                 ingredients: [
                     { name: '우삼겹', amount: '200g', required: true },
@@ -1533,6 +2272,8 @@
                 baseIngredient: '돼지고기',
                 description: '매콤달콤한 양념의 대표 한식 볶음 요리',
                 calories: 480,
+                difficulty: '보통',
+                cookTime: '25분',
                 source: "https://m.blog.naver.com/jsoof/223181427619",
                 ingredients: [
                     { name: '돼지고기(목살)', amount: '400g', required: true },
@@ -1560,6 +2301,8 @@
                 baseIngredient: '쌀',
                 description: '크리미하고 고소한 이탈리아식 쌀 요리',
                 calories: 520,
+                difficulty: '보통',
+                cookTime: '30분',
                 source: "https://brunch.co.kr/@sdw4789/153",
                 ingredients: [
                     { name: '리조또용 쌀', amount: '200g', required: true },
@@ -1585,6 +2328,8 @@
                 baseIngredient: '쌀',
                 description: '치즈가 들어간 바삭한 이탈리아식 쌀 튀김',
                 calories: 350,
+                difficulty: '어려움',
+                cookTime: '40분',
                 source: "https://realfood.tesco.com/step-by-step/how-to-make-arancini.html",
                 ingredients: [
                     { name: '리조또(또는 찬밥)', amount: '300g', required: true },
@@ -1608,6 +2353,8 @@
                 baseIngredient: '순두부',
                 description: '부드러운 순두부와 계란으로 만든 담백한 찜 요리',
                 calories: 200,
+                difficulty: '쉬움',
+                cookTime: '15분',
                 source: "https://m.cafe.daum.net/cheonan-GBP/OdzR/1889",
                 ingredients: [
                     { name: '순두부', amount: '1팩', required: true },
@@ -1630,6 +2377,8 @@
                 baseIngredient: '밀가루',
                 description: '폭신하고 든든한 기본 팬케이크',
                 calories: 300,
+                difficulty: '쉬움',
+                cookTime: '15분',
                 source: "https://www.10000recipe.com/recipe/1834871",
                 ingredients: [
                     { name: '밀가루', amount: '150g', required: true },
@@ -1654,6 +2403,8 @@
                 baseIngredient: '꽁치',
                 description: '꽁치 통조림으로 구수하게 끓인 김치찌개',
                 calories: 350,
+                difficulty: '쉬움',
+                cookTime: '20분',
                 source: "https://m.cafe.daum.net/subdued20club/WI6v/5219",
                 ingredients: [
                     { name: '꽁치통조림', amount: '1캔', required: true },
@@ -1678,6 +2429,8 @@
                 baseIngredient: '당면',
                 description: '쫄깃한 당면과 채소, 고기를 볶아 무친 명절 대표 요리',
                 calories: 400,
+                difficulty: '보통',
+                cookTime: '40분',
                 source: "https://m.10000recipe.com/recipe/6953648",
                 ingredients: [
                     { name: '당면', amount: '200g', required: true },
@@ -1704,7 +2457,10 @@
                 baseIngredient: '밥',
                 description: '새콤한 김치와 밥을 볶아 만드는 간단 한 끼',
                 calories: 550,
+                difficulty: '쉬움',
+                cookTime: '15분',
                 source: null,
+                teamSubmitted: true,
                 ingredients: [
                     { name: '밥', amount: '1공기', required: true },
                     { name: '신김치', amount: '1컵', required: true },
@@ -1730,7 +2486,10 @@
                 baseIngredient: '밥',
                 description: '간단하지만 든든한 간장과 계란의 조합',
                 calories: 450,
+                difficulty: '쉬움',
+                cookTime: '10분',
                 source: null,
+                teamSubmitted: true,
                 ingredients: [
                     { name: '밥', amount: '1공기', required: true },
                     { name: '계란', amount: '1개', required: true },
@@ -1753,6 +2512,8 @@
                 baseIngredient: '파스타',
                 description: '블랙올리브와 마늘로 짭짤하게 즐기는 오일 파스타',
                 calories: 550,
+                difficulty: '쉬움',
+                cookTime: '20분',
                 source: "https://noseychef.com/?p=9871",
                 ingredients: [
                     { name: '파스타', amount: '200g', required: true },
@@ -1777,6 +2538,8 @@
                 baseIngredient: '파스타',
                 description: '토마토와 크림이 어우러진 부드러운 로제 소스 파스타',
                 calories: 650,
+                difficulty: '보통',
+                cookTime: '25분',
                 source: "https://www.10000recipe.com/recipe/6884145",
                 ingredients: [
                     { name: '파스타', amount: '200g', required: true },
@@ -1802,6 +2565,8 @@
                 baseIngredient: '국수',
                 description: '따뜻하고 쫄깃한 기본 우동',
                 calories: 400,
+                difficulty: '쉬움',
+                cookTime: '15분',
                 source: "https://m.cafe.daum.net/cheonan-GBP/OdzR/1638",
                 ingredients: [
                     { name: '우동면', amount: '200g', required: true },
@@ -1826,6 +2591,8 @@
                 baseIngredient: '파스타',
                 description: '부드럽고 풍미 있는 크림 파스타',
                 calories: 650,
+                difficulty: '쉬움',
+                cookTime: '20분',
                 source: "https://www.10000recipe.com/recipe/7018890",
                 ingredients: [
                     { name: '파스타', amount: '200g', required: true },
@@ -1854,6 +2621,8 @@
                 baseIngredient: '찌개',
                 description: '밥도둑 국민 찌개',
                 calories: 300,
+                difficulty: '쉬움',
+                cookTime: '25분',
                 source: "https://m.cafe.daum.net/cheonan-GBP/OdzR/1737",
                 ingredients: [
                     { name: '신김치', amount: '2컵 (300g)', required: true },
@@ -1877,6 +2646,8 @@
                 baseIngredient: '찌개',
                 description: '깊고 구수한 전통 찌개',
                 calories: 250,
+                difficulty: '쉬움',
+                cookTime: '20분',
                 source: "https://m.cafe.daum.net/party3434/gECq/1075",
                 ingredients: [
                     { name: '된장', amount: '2큰술', required: true },
@@ -1900,6 +2671,8 @@
                 baseIngredient: '국',
                 description: '담백하고 부드러운 아침 국',
                 calories: 120,
+                difficulty: '쉬움',
+                cookTime: '10분',
                 source: "https://m.cafe.daum.net/investm/V8VB/662",
                 ingredients: [
                     { name: '계란', amount: '2개', required: true },
@@ -1921,6 +2694,8 @@
                 baseIngredient: '국',
                 description: '풍미 깊은 소고기 미역국',
                 calories: 150,
+                difficulty: '쉬움',
+                cookTime: '20분',
                 source: "https://www.kurly.com/recipe/671764624701d5e8aa02eeea",
                 ingredients: [
                     { name: '소고기', amount: '100g', required: true },
@@ -2077,11 +2852,6 @@
             return allergyObjects;
         }
 
-        function getAllergyNames() {
-            const allergyObjects = getUserAllergies();
-            return allergyObjects.map(obj => obj.name);
-        }
-
         // 기저질환 정보 조회
         function getHealthDiseases() {
             const healthText = document.getElementById('healthInput').value.toLowerCase();
@@ -2170,6 +2940,9 @@
                 item.classList.toggle('active', item.dataset.page === pageName);
             });
 
+            const cartFab = document.getElementById('cartFab');
+            if (cartFab) cartFab.style.display = pageName === 'shoppingList' ? 'none' : 'flex';
+
             if (pageName === 'recipeBook') {
                 initializeRecipeBook();
             }
@@ -2181,6 +2954,10 @@
             if (pageName === 'home') {
                 renderCarousel();
                 renderHomeRecipeGrid();
+            }
+
+            if (pageName === 'shoppingList') {
+                renderShoppingList();
             }
         }
 
@@ -2225,6 +3002,124 @@
             filterRecipeBook();
         }
 
+        // ===== 장보기 리스트 =====
+        function getShoppingList() {
+            try {
+                return JSON.parse(localStorage.getItem('shoppingList') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveShoppingListForRecipe(recipeName, items) {
+            let list = getShoppingList().filter(item => item.recipe !== recipeName);
+            items.forEach(it => list.push({ recipe: recipeName, name: it.name, amount: it.amount, checked: false }));
+            try {
+                localStorage.setItem('shoppingList', JSON.stringify(list));
+            } catch (e) {
+                console.warn('localStorage 사용 불가:', e.message);
+            }
+            updateCartBadge();
+        }
+
+        function confirmAddToCart(recipeName) {
+            const recipe = recipes[recipeName];
+            const items = [];
+            recipe.ingredients.forEach((ing, ingIdx) => {
+                const checkEl = document.getElementById(`cart_${ingIdx}_check`);
+                if (!checkEl || !checkEl.checked) return;
+                const selectEl = document.getElementById(`cart_${ingIdx}_select`);
+                const chosenName = selectEl ? selectEl.value : ing.name;
+                const amount = scaleAmount(ing.amount, currentServings);
+                items.push({ name: chosenName, amount: amount });
+            });
+            saveShoppingListForRecipe(recipeName, items);
+            cartModeOn = false;
+            showRecipeModal(recipeName, true);
+            alert('🛒 장바구니에 담았어요! 오른쪽 아래 장바구니 버튼에서 확인할 수 있어요.');
+        }
+
+        function removeRecipeFromShoppingList(recipeName) {
+            let list = getShoppingList().filter(item => item.recipe !== recipeName);
+            try {
+                localStorage.setItem('shoppingList', JSON.stringify(list));
+            } catch (e) {
+                console.warn('localStorage 사용 불가:', e.message);
+            }
+            updateCartBadge();
+            renderShoppingList();
+        }
+
+        // 장바구니 플로팅 버튼의 담긴 개수 뱃지 갱신 (고유 재료명 기준)
+        function updateCartBadge() {
+            const badge = document.getElementById('cartFabBadge');
+            if (!badge) return;
+            const uniqueCount = new Set(getShoppingList().map(i => i.name)).size;
+            if (uniqueCount > 0) {
+                badge.textContent = uniqueCount;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function toggleShoppingItemChecked(itemName) {
+            let list = getShoppingList();
+            const currentlyAllChecked = list.filter(i => i.name === itemName).every(i => i.checked);
+            list.forEach(item => {
+                if (item.name === itemName) item.checked = !currentlyAllChecked;
+            });
+            try {
+                localStorage.setItem('shoppingList', JSON.stringify(list));
+            } catch (e) {
+                console.warn('localStorage 사용 불가:', e.message);
+            }
+            renderShoppingList();
+        }
+
+        function renderShoppingList() {
+            const container = document.getElementById('shoppingListContent');
+            if (!container) return;
+            const list = getShoppingList();
+
+            if (list.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 60px 20px; color: #999;">담은 레시피가 없어요.<br>레시피 상세에서 🛒 장바구니에 담기를 눌러보세요.</div>';
+                return;
+            }
+
+            const recipeNames = [...new Set(list.map(i => i.recipe))];
+            let html = '<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px;">';
+            recipeNames.forEach(r => {
+                html += `<span style="display: inline-flex; align-items: center; gap: 6px; background: #EAF3DE; color: #3B6D11; font-size: 12px; font-weight: 600; padding: 5px 8px 5px 10px; border-radius: 20px;">${r} <span style="cursor: pointer; font-weight: 700; color: #8FA97D;" onclick="removeRecipeFromShoppingList('${r}')">✕</span></span>`;
+            });
+            html += '</div>';
+
+            const grouped = {};
+            list.forEach(item => {
+                if (!grouped[item.name]) grouped[item.name] = [];
+                grouped[item.name].push(item);
+            });
+
+            Object.entries(grouped).forEach(([name, items]) => {
+                const amounts = items.map(i => i.amount).join(' + ');
+                const subLabel = items.map(i => `${i.recipe} ${i.amount}`).join(' · ');
+                const allChecked = items.every(i => i.checked);
+                const searchUrl = 'https://www.coupang.com/np/search?component=&q=' + encodeURIComponent(name);
+                html += `<div style="background: #ffffff; border: 1px solid #E8E3DD; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; ${allChecked ? 'opacity: 0.5;' : ''}">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" ${allChecked ? 'checked' : ''} onchange="toggleShoppingItemChecked('${name}')" style="width: 18px; height: 18px; flex-shrink: 0;">
+                            <div><span style="font-size: 14px; color: #2B3E2F; font-weight: 500;">${name}</span> <span style="font-size: 12px; color: #999;">${amounts}</span></div>
+                        </div>
+                        <div onclick="window.open('${searchUrl}', '_blank')" style="width: 30px; height: 30px; border-radius: 8px; background: #F5F3EE; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #8A897E; cursor: pointer; flex-shrink: 0;">🔍</div>
+                    </div>
+                    <div style="font-size: 11px; color: #B7B3A8; margin-top: 6px; margin-left: 28px;">${subLabel}</div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
         let favoritesFilterOn = false;
         function toggleFavoritesFilter(forceOn) {
             favoritesFilterOn = forceOn === true ? true : !favoritesFilterOn;
@@ -2247,6 +3142,8 @@
             const track = document.getElementById('carouselTrack');
             if (!track) return;
 
+            const isMobile = window.innerWidth <= 768;
+
             const allergyObjects = getUserAllergies();
             const diseases = getHealthDiseases();
             const avoidSources = [
@@ -2263,8 +3160,9 @@
                 });
             });
 
+            // 모바일에서는 카테고리와 상관없이 전체에서 완전 랜덤으로 추천
             let candidates = Object.entries(recipes).filter(([name, r]) => {
-                if (carouselCategory !== 'all' && r.category !== carouselCategory) return false;
+                if (!isMobile && carouselCategory !== 'all' && r.category !== carouselCategory) return false;
                 const hasAllergy = r.ingredients.some(ing =>
                     allAvoidFoods.some(avoidFood => isIngredientMatch(ing.name, avoidFood))
                 );
@@ -2272,12 +3170,13 @@
             });
 
             if (candidates.length === 0) {
-                track.innerHTML = '<div class="carousel-empty">이 카테고리에는 지금 안전하게 추천할 레시피가 없어요.</div>';
+                track.innerHTML = '<div class="carousel-empty">지금 안전하게 추천할 레시피가 없어요.</div>';
                 return;
             }
 
-            // 랜덤으로 섞어서 최대 4개 추출
-            const shuffled = candidates.sort(() => Math.random() - 0.5).slice(0, 4);
+            // 모바일: 1개만 크게, 데스크톱: 최대 4개
+            const count = isMobile ? 1 : 4;
+            const shuffled = candidates.sort(() => Math.random() - 0.5).slice(0, count);
 
             track.innerHTML = shuffled.map(([name, r]) => `
                 <div class="carousel-card" onclick="showRecipeModal('${name}')">
@@ -2336,6 +3235,7 @@
                     ? '<span style="background: #FFEBEE; color: #DC3545; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">주의 필요</span>'
                     : '<span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">안전</span>';
                 const kcalText = recipe.calories ? ` · <span style="color: #5A8B4A; font-weight: 700;">약 ${recipe.calories}kcal</span>` : '';
+                const metaText = recipe.category + (recipe.difficulty ? ' · ' + recipe.difficulty : '') + (recipe.cookTime ? ' · ⏱ ' + recipe.cookTime : '');
 
                 html += `<div class="recipe-card" onclick="showRecipeModal('${name}')">
                     <div class="recipe-card-header" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -2343,7 +3243,7 @@
                         ${badge}
                     </div>
                     <div class="recipe-card-body">
-                        <div style="font-size: 12px; color: #999; margin-bottom: 6px;">${recipe.category}</div>
+                        <div style="font-size: 12px; color: #999; margin-bottom: 6px;">${metaText}</div>
                         <div style="font-size: 13px; color: #666;">
                             ${recipe.description}${kcalText}
                         </div>
@@ -2409,9 +3309,12 @@
                     return;
                 }
 
-                if (searchQuery && !name.toLowerCase().includes(searchQuery) && 
-                    !recipe.description.toLowerCase().includes(searchQuery)) {
-                    return;
+                if (searchQuery) {
+                    const nameMatch = name.toLowerCase().includes(searchQuery);
+                    const keywordMatch = (recipe.keywords || []).some(k => k.toLowerCase().includes(searchQuery));
+                    if (!nameMatch && !keywordMatch) {
+                        return;
+                    }
                 }
 
                 // 단어 단위로 정확하게 비교 (헬퍼 함수 사용 - 괄호 부가정보 처리 포함)
@@ -2426,6 +3329,7 @@
                     : '<span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">안전</span>';
                 const kcalText = recipe.calories ? ` · <span style="color: #5A8B4A; font-weight: 700;">약 ${recipe.calories}kcal</span>` : '';
                 const starIcon = isFavorite(name) ? '⭐' : '☆';
+                const metaText = recipe.category + (recipe.difficulty ? ' · ' + recipe.difficulty : '') + (recipe.cookTime ? ' · ⏱ ' + recipe.cookTime : '');
 
                 html += `<div class="recipe-card" style="${style}" onclick="showRecipeModal('${name}')">
                     <div class="recipe-card-header" style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
@@ -2433,7 +3337,7 @@
                         ${badge}
                     </div>
                     <div class="recipe-card-body">
-                        <div style="font-size: 12px; color: #999; margin-bottom: 6px;">${recipe.category}</div>
+                        <div style="font-size: 12px; color: #999; margin-bottom: 6px;">${metaText}</div>
                         <div style="font-size: 13px; color: #666;">
                             ${recipe.description}${kcalText}
                         </div>
@@ -2445,7 +3349,47 @@
         }
 
         // 레시피 모달
-        function showRecipeModal(recipeName) {
+        let currentServings = 1;
+        let currentModalRecipe = null;
+        let cartModeOn = false;
+
+        // 재료량 문자열에서 앞쪽 숫자(정수/소수/분수)를 찾아 인분수만큼 스케일링
+        function scaleAmount(amountStr, servings) {
+            if (servings === 1) return amountStr;
+            const match = amountStr.match(/^(\d+\/\d+|\d+\.\d+|\d+)(.*)$/);
+            if (!match) {
+                return `${amountStr} (1인분 기준)`;
+            }
+            const numPart = match[1];
+            const rest = match[2];
+            let value;
+            if (numPart.includes('/')) {
+                const [n, d] = numPart.split('/').map(Number);
+                value = n / d;
+            } else {
+                value = parseFloat(numPart);
+            }
+            value = value * servings;
+            const display = Number.isInteger(value) ? value.toString() : value.toFixed(1).replace(/\.0$/, '');
+            return display + rest;
+        }
+
+        function changeServings(delta) {
+            currentServings = Math.max(1, Math.min(10, currentServings + delta));
+            showRecipeModal(currentModalRecipe, true);
+        }
+
+        function toggleCartMode() {
+            cartModeOn = !cartModeOn;
+            showRecipeModal(currentModalRecipe, true);
+        }
+
+        function showRecipeModal(recipeName, keepState) {
+            if (!keepState || currentModalRecipe !== recipeName) {
+                currentServings = 1;
+                cartModeOn = false;
+            }
+            currentModalRecipe = recipeName;
             const recipe = recipes[recipeName];
             const modal = document.getElementById('recipeModal');
             const modalBody = document.getElementById('modalBody');
@@ -2454,7 +3398,7 @@
 
             // 알레르기 + 기저질환을 하나의 목록으로 합침
             const avoidSources = [
-                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods, safeFoods: a.safeFoods, tips: a.tips, substitutes: null })),
+                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods, safeFoods: a.safeFoods, tips: a.tips, substitutes: a.substitutes || null })),
                 ...diseases.map(d => {
                     const dObj = diseaseMapping[d];
                     return { avoidFoods: dObj.avoidIngredients || [], safeFoods: dObj.safeIngredients || [], tips: dObj.tips, substitutes: dObj.substitutes || null };
@@ -2490,10 +3434,23 @@
             }
 
             html += `<div class="modal-title">${recipeName}</div>`;
+            if (recipe.difficulty || recipe.cookTime) {
+                const metaParts = [];
+                if (recipe.difficulty) metaParts.push('난이도: ' + recipe.difficulty);
+                if (recipe.cookTime) metaParts.push('⏱ ' + recipe.cookTime);
+                html += `<div style="font-size: 12px; color: #666; margin-bottom: 4px;">${metaParts.join(' · ')}</div>`;
+            }
             if (recipe.calories) {
                 html += `<div style="font-size: 12px; color: #5A8B4A; font-weight: 700; margin-bottom: 12px;">약 ${recipe.calories}kcal (1인분 기준, 추정치)</div>`;
             }
-            html += `<div class="section-title">재료</div>`;
+            html += `<div class="section-title" style="display: flex; align-items: center; justify-content: space-between;">
+                <span>재료</span>
+                <span style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #2B3E2F;">
+                    <span onclick="changeServings(-1)" style="width: 24px; height: 24px; border-radius: 50%; background: #F5F3EE; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">－</span>
+                    <span>${currentServings}인분</span>
+                    <span onclick="changeServings(1)" style="width: 24px; height: 24px; border-radius: 50%; background: #F5F3EE; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;">＋</span>
+                </span>
+            </div>`;
             
             recipe.ingredients.forEach((ing, ingIdx) => {
                 const ingNameLower = ing.name.toLowerCase();
@@ -2523,15 +3480,34 @@
                     });
                 }
 
+                const scaledAmount = scaleAmount(ing.amount, currentServings);
+
+                const cartRowId = `cart_${ingIdx}`;
+                let cartControlHtml = '';
+                if (cartModeOn) {
+                    if (hasAllergy && alternativeFoods.length > 0) {
+                        cartControlHtml = `
+                            <input type="checkbox" id="${cartRowId}_check" style="width: 18px; height: 18px;">
+                            <select id="${cartRowId}_select" style="font-size: 12px; padding: 2px 4px; border-radius: 6px; border: 1px solid #ccc;">
+                                ${alternativeFoods.map((food, i) => `<option value="${food}" ${i === 0 ? 'selected' : ''}>${food}</option>`).join('')}
+                                <option value="${ing.name}">${ing.name} (원래 재료)</option>
+                            </select>
+                        `;
+                    } else {
+                        cartControlHtml = `<input type="checkbox" id="${cartRowId}_check" style="width: 18px; height: 18px;">`;
+                    }
+                }
+
                 html += `<div class="ingredient-item ${className}" style="cursor: ${alternativeFoods.length > 0 ? 'pointer' : 'default'};padding-bottom: 0;">
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; ${alternativeFoods.length > 0 ? 'border-bottom: 1px solid #e0e0e0;' : ''}" onclick="${alternativeFoods.length > 0 ? `document.getElementById('${alternativeId}').style.display = document.getElementById('${alternativeId}').style.display === 'none' ? 'block' : 'none'` : ''}">
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; ${alternativeFoods.length > 0 ? 'border-bottom: 1px solid #e0e0e0;' : ''}" onclick="${alternativeFoods.length > 0 && !cartModeOn ? `document.getElementById('${alternativeId}').style.display = document.getElementById('${alternativeId}').style.display === 'none' ? 'block' : 'none'` : ''}">
                         <div style="display: flex; align-items: center; gap: 8px;">
+                            ${cartControlHtml}
                             <span>${warningMark}${ing.name} ${requiredText}</span>
-                            ${alternativeFoods.length > 0 ? `<span style="color: #5A8B4A; font-weight: 600; font-size: 16px;">ℹ️</span>` : ''}
+                            ${alternativeFoods.length > 0 && !cartModeOn ? `<span style="color: #5A8B4A; font-weight: 600; font-size: 16px;">ℹ️</span>` : ''}
                         </div>
-                        <div style="text-align: right;">${ing.amount}</div>
+                        <div style="text-align: right;" data-base-amount="${ing.amount}">${scaledAmount}</div>
                     </div>
-                    ${alternativeFoods.length > 0 ? `
+                    ${alternativeFoods.length > 0 && !cartModeOn ? `
                         <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
                             <div style="font-size: 12px; font-weight: 600; color: #3B6D11; margin-bottom: 8px;">✅ 대체 음식 (클릭하면 팁이 보여요):</div>
                             <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
@@ -2547,7 +3523,11 @@
                 </div>`;
             });
 
-            html += `<div class="section-title">조리 단계</div>`;
+            html += cartModeOn
+                ? `<div style="margin-top: 12px; background: #5A8B4A; color: white; text-align: center; font-weight: 700; font-size: 14px; padding: 12px; border-radius: 10px; cursor: pointer;" onclick="confirmAddToCart('${recipeName}')">✅ 선택한 재료 장바구니에 담기</div>`
+                : `<div style="margin-top: 12px; background: #F5F3EE; color: #3B6D11; border: 1px solid #8FB878; text-align: center; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 10px; cursor: pointer;" onclick="toggleCartMode()">🛒 장바구니에 담기</div>`;
+
+            html += `<div class="section-title" style="margin-top: 16px;">조리 단계</div>`;
             recipe.steps.forEach(step => {
                 html += `<div class="step-item"><strong>${step.step}단계:</strong> ${step.instruction}</div>`;
             });
@@ -2556,9 +3536,13 @@
                 html += `<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee; font-size: 11px; color: #999;">
                     출처: <a href="${recipe.source}" target="_blank" rel="noopener noreferrer" style="color: #5A8B4A; text-decoration: underline;">${recipe.source}</a>
                 </div>`;
-            } else {
+            } else if (recipe.teamSubmitted) {
                 html += `<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee; font-size: 11px; color: #999;">
                     출처: 팀원 제출 레시피
+                </div>`;
+            } else {
+                html += `<div style="margin-top: 16px; padding-top: 12px; border-top: 1px solid #eee; font-size: 11px; color: #999;">
+                    출처: 일반적으로 널리 알려진 조리법을 바탕으로 구성
                 </div>`;
             }
 
@@ -2688,6 +3672,7 @@
             renderCarousel();
             renderHomeRecipeGrid();
             startCarouselAutoPlay();
+            updateCartBadge();
         });
     </script>
 
