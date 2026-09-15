@@ -776,12 +776,12 @@
         </div>
         <div id="homeRecipeGrid" class="home-recipe-row"></div>
 
-        <div class="section-label-home">🩺 알레르기 · 기저질환 입력</div>
+        <div class="section-label-home">🩺 내 알레르기 · 기저질환</div>
         <div style="background: #ffffff; border: 1px solid #E8E3DD; border-radius: 12px; padding: 16px; margin-bottom: 30px;">
-            <div style="font-size: 12px; color: #999; margin-bottom: 10px;">
-                여기에 입력하면 위 레시피북 미리보기와 전체 목록에 바로 반영돼요. (예: 유당불내증, 계란 알레르기, 당뇨병)
+            <div id="homeHealthDisplay" style="font-size: 13px; color: #2B3E2F; margin-bottom: 10px; line-height: 1.6;">
+                등록된 정보가 없어요.
             </div>
-            <textarea id="homeHealthInput" placeholder="알레르기·기저질환을 콤마(,)로 구분해서 입력하세요" onchange="saveHealthInfo(this.value)" style="width: 100%; min-height: 70px;"></textarea>
+            <span onclick="showPage('profile');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">내 정보에서 수정하기 →</span>
         </div>
     </div>
 
@@ -896,20 +896,30 @@
             <div style="margin-bottom: 24px;">
                 <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">
                     🩺 건강 정보 (알레르기 + 기저질환)
-                    <span style="font-size: 12px; font-weight: 400; color: #e74c3c;"> (!) 정확한 이름을 입력해주세요</span>
-                </div>
-                
-                <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: 12px; color: #856404; line-height: 1.6;">
-                    <div style="font-weight: 500; margin-bottom: 6px;">📝 입력 예시 (쉼표로 구분):</div>
-                    <div>유당불내증, 계란 알레르기, 당뇨병, 고혈압</div>
-                    <div style="margin-top: 6px; font-size: 11px; opacity: 0.8;">💡 알레르기와 기저질환을 함께 입력하세요</div>
-                    <div style="font-size: 11px; opacity: 0.8;">시스템이 자동으로 구분하여 관리합니다</div>
                 </div>
 
-                <textarea id="healthInput" placeholder="예: 유당불내증, 계란 알레르기, 당뇨병, 고혈압" 
-                    onchange="saveHealthInfo()"
-                    style="width: 100%; height: 100px; resize: vertical;">
-                </textarea>
+                <div style="font-size: 13px; font-weight: 600; color: #2B3E2F; margin-bottom: 8px;">자주 있는 알레르기</div>
+                <div id="topAllergyGroup" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="0" onchange="onHealthCheckboxChange()"> 계란</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="1" onchange="onHealthCheckboxChange()"> 우유</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="2" onchange="onHealthCheckboxChange()"> 밀가루</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="3" onchange="onHealthCheckboxChange()"> 대두</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="4" onchange="onHealthCheckboxChange()"> 갑각류</label>
+                </div>
+
+                <div style="font-size: 13px; font-weight: 600; color: #2B3E2F; margin-bottom: 8px;">자주 있는 기저질환</div>
+                <div id="topDiseaseGroup" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-disease-cb" data-idx="0" onchange="onHealthCheckboxChange()"> 고콜레스테롤</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-disease-cb" data-idx="1" onchange="onHealthCheckboxChange()"> 고혈압</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-disease-cb" data-idx="2" onchange="onHealthCheckboxChange()"> 당뇨병</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-disease-cb" data-idx="3" onchange="onHealthCheckboxChange()"> 위산역류</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-disease-cb" data-idx="4" onchange="onHealthCheckboxChange()"> 신장질환</label>
+                </div>
+
+                <div style="font-size: 13px; font-weight: 600; color: #2B3E2F; margin-bottom: 8px;">기타 (위에 없는 알레르기·기저질환, 쉼표로 구분)</div>
+                <textarea id="etcHealthInput" placeholder="예: 땅콩 알레르기, 통풍" onchange="onHealthCheckboxChange()" style="width: 100%; height: 60px; resize: vertical;"></textarea>
+
+                <textarea id="healthInput" style="display: none;"></textarea>
             </div>
 
             <div style="padding: 12px; background: #EAF3DE; border-left: 4px solid #5A8B4A; border-radius: 4px; font-size: 13px; color: #3B6D11;">
@@ -945,6 +955,7 @@
             '유당불내증': {
                 name: '유당불내증',
                 type: 'intolerance',
+                reason: '유당을 분해하는 소화효소(락타아제)가 부족해 복통·가스·설사를 유발함',
                 avoidFoods: ['우유', '버터', '치즈', '크림', '우유초콜릿'],
                 safeFoods: ['락토스프리 우유', '저유당 우유', '두유', '귀리 밀크', '코코넛 밀크', '요구르트(소량)'],
                 substitutes: {
@@ -960,6 +971,7 @@
             '유당': {
                 name: '유당불내증',
                 type: 'intolerance',
+                reason: '유당을 분해하는 소화효소(락타아제)가 부족해 복통·가스·설사를 유발함',
                 avoidFoods: ['우유', '버터', '치즈', '크림'],
                 safeFoods: ['락토스프리 우유', '저유당 우유', '두유'],
                 substitutes: {
@@ -974,6 +986,7 @@
             '유제품': {
                 name: '유제품 불내증',
                 type: 'intolerance',
+                reason: '유제품 속 성분을 소화하기 어려워 소화기 불편감을 유발함',
                 avoidFoods: ['우유', '버터', '치즈', '크림', '요구르트'],
                 safeFoods: ['두유', '귀리 밀크', '아몬드 밀크'],
                 substitutes: {
@@ -989,6 +1002,25 @@
             '우유 알레르기': {
                 name: '우유 알레르기',
                 type: 'allergy',
+                reason: '우유 단백질에 면역계가 과민 반응해 두드러기·구토·호흡곤란 등을 일으킬 수 있음',
+                avoidFoods: ['우유', '버터', '치즈', '크림', '요구르트', '밀크파우더', '유제품'],
+                safeFoods: ['두유', '귀리 밀크', '아몬드 밀크', '코코넛 밀크', '쌀 음료'],
+                substitutes: {
+                    '우유': ['두유', '귀리 밀크', '아몬드 밀크', '코코넛 밀크', '쌀 음료'],
+                    '버터': ['식물성 마가린', '코코넛 오일'],
+                    '치즈': ['비건 치즈(식물성 치즈)', '영양 효모(대체 치즈 맛)'],
+                    '크림': ['코코넛 크림', '식물성 휘핑크림'],
+                    '요구르트': ['두유 요구르트', '코코넛 요구르트'],
+                    '밀크파우더': ['두유가루', '코코넛밀크가루'],
+                    '유제품': ['식물성 대체식품 전반(두유·코코넛 제품 등)']
+                },
+                tips: '단순 불내증과 달리 우유 알레르기는 소량의 유단백도 위험할 수 있어 완전히 피해야 함. 버터·치즈도 예외 없이 모두 식물성으로 대체 필요',
+                source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
+            },
+            '우유': {
+                name: '우유 알레르기',
+                type: 'allergy',
+                reason: '우유 단백질에 면역계가 과민 반응해 두드러기·구토·호흡곤란 등을 일으킬 수 있음',
                 avoidFoods: ['우유', '버터', '치즈', '크림', '요구르트', '밀크파우더', '유제품'],
                 safeFoods: ['두유', '귀리 밀크', '아몬드 밀크', '코코넛 밀크', '쌀 음료'],
                 substitutes: {
@@ -1006,6 +1038,7 @@
             '버터': {
                 name: '유제품 불내증',
                 type: 'intolerance',
+                reason: '유제품 속 성분을 소화하기 어려워 소화기 불편감을 유발함',
                 avoidFoods: ['버터', '크림', '우유'],
                 safeFoods: ['올리브유', '포도씨유', '참기름'],
                 substitutes: {
@@ -1019,6 +1052,7 @@
             '치즈': {
                 name: '유제품 불내증',
                 type: 'intolerance',
+                reason: '유제품 속 성분을 소화하기 어려워 소화기 불편감을 유발함',
                 avoidFoods: ['치즈', '우유'],
                 safeFoods: ['영양 효모(대체 치즈 맛)', '통곡물'],
                 substitutes: {
@@ -1031,6 +1065,7 @@
             '계란': {
                 name: '계란 알레르기',
                 type: 'allergy',
+                reason: '계란 단백질에 대한 면역 과민반응으로 피부·소화기·호흡기 증상을 유발할 수 있음',
                 avoidFoods: ['계란', '계란 함유 음식', '달걀'],
                 safeFoods: ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
                 substitutes: {
@@ -1044,6 +1079,7 @@
             '계란 알레르기': {
                 name: '계란 알레르기',
                 type: 'allergy',
+                reason: '계란 단백질에 대한 면역 과민반응으로 피부·소화기·호흡기 증상을 유발할 수 있음',
                 avoidFoods: ['계란', '계란 함유 음식'],
                 safeFoods: ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
                 substitutes: {
@@ -1056,6 +1092,7 @@
             '밀가루': {
                 name: '글루텐 불내증',
                 type: 'intolerance',
+                reason: '밀·보리 등에 든 글루텐이 소장 점막을 손상시켜 복통·설사·영양흡수 장애를 유발함',
                 avoidFoods: ['밀가루', '밀', '보리', '호밀', '일반 파스타', '일반 빵'],
                 safeFoods: ['글루텐프리 밀가루', '글루텐프리 파스타', '쌀가루', '옥수수가루'],
                 tips: '교차오염 주의. 조리기구 별도 사용',
@@ -1064,6 +1101,7 @@
             '글루텐': {
                 name: '글루텐 불내증',
                 type: 'intolerance',
+                reason: '밀·보리 등에 든 글루텐이 소장 점막을 손상시켜 복통·설사·영양흡수 장애를 유발함',
                 avoidFoods: ['밀', '보리', '호밀', '글루텐 함유 식품'],
                 safeFoods: ['글루텐프리 밀가루', '쌀', '옥수수', '감자'],
                 tips: '교차오염 주의',
@@ -1072,6 +1110,16 @@
             '글루텐 불내증': {
                 name: '글루텐 불내증',
                 type: 'intolerance',
+                reason: '밀·보리 등에 든 글루텐이 소장 점막을 손상시켜 복통·설사·영양흡수 장애를 유발함',
+                avoidFoods: ['밀', '보리', '호밀', '밀가루', '일반 파스타', '일반 빵'],
+                safeFoods: ['글루텐프리 밀가루', '글루텐프리 파스타', '글루텐프리 빵', '쌀가루', '옥수수가루'],
+                tips: '글루텐프리 마크 확인. 교차오염 주의',
+                source: "https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"
+            },
+            '글루텐 알레르기': {
+                name: '글루텐 불내증',
+                type: 'intolerance',
+                reason: '밀·보리 등에 든 글루텐이 소장 점막을 손상시켜 복통·설사·영양흡수 장애를 유발함',
                 avoidFoods: ['밀', '보리', '호밀', '밀가루', '일반 파스타', '일반 빵'],
                 safeFoods: ['글루텐프리 밀가루', '글루텐프리 파스타', '글루텐프리 빵', '쌀가루', '옥수수가루'],
                 tips: '글루텐프리 마크 확인. 교차오염 주의',
@@ -1080,6 +1128,7 @@
             '땅콩': {
                 name: '땅콩 알레르기',
                 type: 'allergy',
+                reason: '땅콩 단백질에 대한 면역 과민반응으로 심하면 아나필락시스(전신 쇼크)까지 유발할 수 있음',
                 avoidFoods: ['땅콩', '땅콩버터', '땅콩기름', '땅콩과자'],
                 safeFoods: ['해바라기씨버터', '두유', '씨앗류'],
                 tips: '아나필락시스(전신 알레르기 쇼크) 위험이 높은 대표 알레르겐. 가공식품 성분표의 땅콩 함유 여부 반드시 확인',
@@ -1088,6 +1137,7 @@
             '땅콩 알레르기': {
                 name: '땅콩 알레르기',
                 type: 'allergy',
+                reason: '땅콩 단백질에 대한 면역 과민반응으로 심하면 아나필락시스(전신 쇼크)까지 유발할 수 있음',
                 avoidFoods: ['땅콩', '땅콩버터', '땅콩기름', '땅콩과자'],
                 safeFoods: ['해바라기씨버터', '두유', '씨앗류'],
                 tips: '아나필락시스(전신 알레르기 쇼크) 위험이 높은 대표 알레르겐. 가공식품 성분표의 땅콩 함유 여부 반드시 확인',
@@ -1096,6 +1146,7 @@
             '견과류': {
                 name: '견과류 알레르기',
                 type: 'allergy',
+                reason: '견과류 단백질에 대한 면역 과민반응, 땅콩 알레르기와 별개로 발생할 수 있음',
                 avoidFoods: ['호두', '아몬드', '캐슈넛', '피스타치오', '헤이즐넛', '잣'],
                 safeFoods: ['해바라기씨', '호박씨'],
                 tips: '한 가지 견과류에 알레르기가 있으면 다른 견과류도 함께 피하는 것이 안전 (견과류 간 교차반응 가능)',
@@ -1104,6 +1155,7 @@
             '견과류 알레르기': {
                 name: '견과류 알레르기',
                 type: 'allergy',
+                reason: '견과류 단백질에 대한 면역 과민반응, 땅콩 알레르기와 별개로 발생할 수 있음',
                 avoidFoods: ['호두', '아몬드', '캐슈넛', '피스타치오', '헤이즐넛', '잣'],
                 safeFoods: ['해바라기씨', '호박씨'],
                 tips: '한 가지 견과류에 알레르기가 있으면 다른 견과류도 함께 피하는 것이 안전 (견과류 간 교차반응 가능)',
@@ -1112,6 +1164,7 @@
             '갑각류': {
                 name: '갑각류 알레르기',
                 type: 'allergy',
+                reason: '새우·게 등 갑각류 단백질에 대한 면역 과민반응, 성인 발병이 흔하고 증상이 심할 수 있음',
                 avoidFoods: ['새우', '게', '랍스터', '가재'],
                 safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
                 tips: '성인이 된 후 발생하면 잘 없어지지 않는 대표적 알레르겐. 같은 팬·기름을 사용한 조리도 교차오염 주의',
@@ -1120,6 +1173,7 @@
             '갑각류 알레르기': {
                 name: '갑각류 알레르기',
                 type: 'allergy',
+                reason: '새우·게 등 갑각류 단백질에 대한 면역 과민반응, 성인 발병이 흔하고 증상이 심할 수 있음',
                 avoidFoods: ['새우', '게', '랍스터', '가재'],
                 safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
                 tips: '성인이 된 후 발생하면 잘 없어지지 않는 대표적 알레르겐. 같은 팬·기름을 사용한 조리도 교차오염 주의',
@@ -1128,6 +1182,7 @@
             '새우': {
                 name: '갑각류 알레르기',
                 type: 'allergy',
+                reason: '새우·게 등 갑각류 단백질에 대한 면역 과민반응, 성인 발병이 흔하고 증상이 심할 수 있음',
                 avoidFoods: ['새우', '게', '랍스터', '가재'],
                 safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
                 tips: '성인이 된 후 발생하면 잘 없어지지 않는 대표적 알레르겐. 같은 팬·기름을 사용한 조리도 교차오염 주의',
@@ -1136,6 +1191,7 @@
             '게': {
                 name: '갑각류 알레르기',
                 type: 'allergy',
+                reason: '새우·게 등 갑각류 단백질에 대한 면역 과민반응, 성인 발병이 흔하고 증상이 심할 수 있음',
                 avoidFoods: ['새우', '게', '랍스터', '가재'],
                 safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
                 tips: '성인이 된 후 발생하면 잘 없어지지 않는 대표적 알레르겐. 같은 팬·기름을 사용한 조리도 교차오염 주의',
@@ -1144,6 +1200,7 @@
             '조개류': {
                 name: '조개류 알레르기',
                 type: 'allergy',
+                reason: '조개·홍합 등 연체동물 단백질에 대한 면역 과민반응',
                 avoidFoods: ['굴', '전복', '홍합', '조개', '바지락'],
                 safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
                 tips: '식약처 알레르기 표시 의무 대상 원재료(굴·전복·홍합 포함). 가공식품의 조개류 함유 여부 확인 필수',
@@ -1152,6 +1209,7 @@
             '조개류 알레르기': {
                 name: '조개류 알레르기',
                 type: 'allergy',
+                reason: '조개·홍합 등 연체동물 단백질에 대한 면역 과민반응',
                 avoidFoods: ['굴', '전복', '홍합', '조개', '바지락'],
                 safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
                 tips: '식약처 알레르기 표시 의무 대상 원재료(굴·전복·홍합 포함). 가공식품의 조개류 함유 여부 확인 필수',
@@ -1160,6 +1218,7 @@
             '대두': {
                 name: '대두 알레르기',
                 type: 'allergy',
+                reason: '대두 단백질에 대한 면역 과민반응',
                 avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)'],
                 safeFoods: ['쌀', '고기류', '달걀(알레르기 없는 경우)'],
                 tips: '된장·간장·두부 등 한식에 대두가 광범위하게 쓰이므로 성분표 확인이 특히 중요한 국내 5대 알레르기 원인 식품 중 하나',
@@ -1168,6 +1227,7 @@
             '대두 알레르기': {
                 name: '대두 알레르기',
                 type: 'allergy',
+                reason: '대두 단백질에 대한 면역 과민반응',
                 avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)'],
                 safeFoods: ['쌀', '고기류', '달걀(알레르기 없는 경우)'],
                 tips: '된장·간장·두부 등 한식에 대두가 광범위하게 쓰이므로 성분표 확인이 특히 중요한 국내 5대 알레르기 원인 식품 중 하나',
@@ -1176,6 +1236,7 @@
             '콩': {
                 name: '대두 알레르기',
                 type: 'allergy',
+                reason: '대두 단백질에 대한 면역 과민반응',
                 avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)'],
                 safeFoods: ['쌀', '고기류', '달걀(알레르기 없는 경우)'],
                 tips: '된장·간장·두부 등 한식에 대두가 광범위하게 쓰이므로 성분표 확인이 특히 중요한 국내 5대 알레르기 원인 식품 중 하나',
@@ -1184,6 +1245,7 @@
             '메밀': {
                 name: '메밀 알레르기',
                 type: 'allergy',
+                reason: '메밀 단백질에 대한 면역 과민반응, 국내에서 비교적 흔하고 중증 반응 가능성이 있음',
                 avoidFoods: ['메밀', '메밀면', '냉면(메밀 함유)', '막국수'],
                 safeFoods: ['쌀국수', '밀면(밀 알레르기 없는 경우)'],
                 tips: '소량 노출로도 심한 반응을 일으킬 수 있는 국내 5대 알레르기 원인 식품 중 하나. 냉면·막국수 등에 흔히 쓰이므로 주의',
@@ -1192,6 +1254,7 @@
             '메밀 알레르기': {
                 name: '메밀 알레르기',
                 type: 'allergy',
+                reason: '메밀 단백질에 대한 면역 과민반응, 국내에서 비교적 흔하고 중증 반응 가능성이 있음',
                 avoidFoods: ['메밀', '메밀면', '냉면(메밀 함유)', '막국수'],
                 safeFoods: ['쌀국수', '밀면(밀 알레르기 없는 경우)'],
                 tips: '소량 노출로도 심한 반응을 일으킬 수 있는 국내 5대 알레르기 원인 식품 중 하나. 냉면·막국수 등에 흔히 쓰이므로 주의',
@@ -1200,6 +1263,7 @@
             '고등어': {
                 name: '생선 알레르기',
                 type: 'allergy',
+                reason: '생선 단백질에 대한 면역 과민반응',
                 avoidFoods: ['고등어', '참치', '연어', '생선류'],
                 safeFoods: ['닭고기', '두부', '달걀(알레르기 없는 경우)'],
                 tips: '고등어는 국내 알레르기 원인 조사에서 가장 많이 보고된 식품. 신선도가 떨어지면 히스타민 중독(알레르기와 유사한 증상)도 유발 가능',
@@ -1208,6 +1272,7 @@
             '생선 알레르기': {
                 name: '생선 알레르기',
                 type: 'allergy',
+                reason: '생선 단백질에 대한 면역 과민반응',
                 avoidFoods: ['고등어', '참치', '연어', '생선류'],
                 safeFoods: ['닭고기', '두부', '달걀(알레르기 없는 경우)'],
                 tips: '고등어는 국내 알레르기 원인 조사에서 가장 많이 보고된 식품. 신선도가 떨어지면 히스타민 중독(알레르기와 유사한 증상)도 유발 가능',
@@ -1216,6 +1281,7 @@
             '돼지고기': {
                 name: '돼지고기 알레르기',
                 type: 'allergy',
+                reason: '돼지고기 단백질에 대한 면역 과민반응(비교적 드물지만 발생 가능)',
                 avoidFoods: ['돼지고기', '삼겹살', '베이컨', '햄'],
                 safeFoods: ['닭고기', '소고기(알레르기 없는 경우)', '두부'],
                 tips: '국내 병력 조사에서 원인 식품 상위권으로 보고된 알레르겐. 가공육(햄·베이컨)에도 돼지고기가 포함되니 확인 필요',
@@ -1224,6 +1290,7 @@
             '돼지고기 알레르기': {
                 name: '돼지고기 알레르기',
                 type: 'allergy',
+                reason: '돼지고기 단백질에 대한 면역 과민반응(비교적 드물지만 발생 가능)',
                 avoidFoods: ['돼지고기', '삼겹살', '베이컨', '햄'],
                 safeFoods: ['닭고기', '소고기(알레르기 없는 경우)', '두부'],
                 tips: '국내 병력 조사에서 원인 식품 상위권으로 보고된 알레르겐. 가공육(햄·베이컨)에도 돼지고기가 포함되니 확인 필요',
@@ -1232,6 +1299,7 @@
             '복숭아': {
                 name: '복숭아 알레르기',
                 type: 'allergy',
+                reason: '복숭아 등 장미과 과일 단백질에 대한 면역 과민반응, 입 주위 가려움 등으로 나타나기도 함',
                 avoidFoods: ['복숭아', '천도복숭아', '복숭아 통조림'],
                 safeFoods: ['사과', '배', '포도'],
                 tips: '국내 병력 조사에서 가장 흔한 과일 알레르겐. 자작나무 꽃가루 알레르기가 있으면 복숭아 등과 교차반응(구강알레르기증후군)이 나타날 수 있음',
@@ -1240,6 +1308,7 @@
             '복숭아 알레르기': {
                 name: '복숭아 알레르기',
                 type: 'allergy',
+                reason: '복숭아 등 장미과 과일 단백질에 대한 면역 과민반응, 입 주위 가려움 등으로 나타나기도 함',
                 avoidFoods: ['복숭아', '천도복숭아', '복숭아 통조림'],
                 safeFoods: ['사과', '배', '포도'],
                 tips: '국내 병력 조사에서 가장 흔한 과일 알레르겐. 자작나무 꽃가루 알레르기가 있으면 복숭아 등과 교차반응(구강알레르기증후군)이 나타날 수 있음',
@@ -1251,6 +1320,7 @@
         const diseaseMapping = {
             '당뇨': {
                 name: '당뇨병',
+                reason: '혈당을 급격히 올리는 음식은 혈당 조절을 어렵게 하고 합병증 위험을 높임',
                 avoidIngredients: ['설탕', '흰쌀', '흰빵', '과일주스', '단음료'],
                 safeIngredients: ['현미', '귀리', '통곡물', '채소', '콩류', '견과류'],
                 substitutes: {
@@ -1265,6 +1335,7 @@
             },
             '당뇨병': {
                 name: '당뇨병',
+                reason: '혈당을 급격히 올리는 음식은 혈당 조절을 어렵게 하고 합병증 위험을 높임',
                 avoidIngredients: ['설탕', '흰쌀', '흰빵', '과일주스', '단음료'],
                 safeIngredients: ['현미', '귀리', '통곡물', '채소', '콩류', '견과류'],
                 substitutes: {
@@ -1279,6 +1350,7 @@
             },
             '고혈압': {
                 name: '고혈압',
+                reason: '나트륨이 많은 음식은 체내 수분을 저류시켜 혈압을 높임',
                 avoidIngredients: ['소금', '나트륨', '가공식품', '젓갈', '라면'],
                 safeIngredients: ['채소', '과일', '저지방 유제품', '통곡물', '견과류'],
                 substitutes: {
@@ -1293,6 +1365,7 @@
             },
             '고콜레스테롤': {
                 name: '고콜레스테롤',
+                reason: '포화지방·콜레스테롤이 많은 음식은 혈중 콜레스테롤을 높여 심혈관 질환 위험을 높임',
                 avoidIngredients: ['삼겹살', '가공육', '튀긴음식', '전지우유', '버터'],
                 safeIngredients: ['올리브유', '생선', '귀리', '저지방 유제품', '견과류'],
                 substitutes: {
@@ -1307,6 +1380,7 @@
             },
             '신장질환': {
                 name: '신장질환',
+                reason: '나트륨·칼륨·단백질이 과다한 음식은 신장에 부담을 줘 기능 저하를 악화시킬 수 있음',
                 avoidIngredients: ['바나나', '토마토', '감자', '시금치', '가공식품', '짠음식'],
                 safeIngredients: ['사과', '포도', '양배추', '흰쌀'],
                 substitutes: {
@@ -1322,6 +1396,7 @@
             },
             '위산역류': {
                 name: '위산역류',
+                reason: '자극적이거나 기름진 음식은 위산 분비를 늘리고 식도괄약근을 약화시켜 역류를 악화시킴',
                 avoidIngredients: ['커피', '탄산음료', '기름진 음식', '매운 음식', '초콜릿', '술'],
                 safeIngredients: ['오트밀', '바나나', '채소', '현미'],
                 substitutes: {
@@ -1337,6 +1412,7 @@
             },
             '글루텐불내증': {
                 name: '글루텐 불내증(셀리악병)',
+                reason: '글루텐이 소장 점막을 손상시켜 영양흡수 장애를 유발함',
                 avoidIngredients: ['밀', '보리', '호밀', '밀가루', '일반 파스타', '일반 빵'],
                 safeIngredients: ['쌀', '옥수수', '감자', '글루텐프리 제품'],
                 substitutes: {
@@ -1352,6 +1428,7 @@
             },
             '통풍': {
                 name: '통풍',
+                reason: '퓨린 함량이 높은 음식은 요산 수치를 높여 통풍 발작을 유발할 수 있음',
                 avoidIngredients: ['맥주', '내장류', '멸치', '고등어', '정어리', '조개류'],
                 safeIngredients: ['저지방 유제품', '채소', '두부', '달걀'],
                 substitutes: {
@@ -2722,11 +2799,51 @@
         let currentUser = null; // Firebase 로그인 사용자 (로그인 안 했으면 null)
 
         // 내 정보 입력칸과 홈 화면 입력칸의 값을 서로 동기화
+        const TOP_ALLERGIES = ['계란', '우유', '밀가루', '대두', '갑각류'];
+        const TOP_DISEASES = ['고콜레스테롤', '고혈압', '당뇨병', '위산역류', '신장질환'];
+
+        // 체크박스+기타 입력을 조합해서 하나의 건강정보 텍스트로 만들고 저장
+        function onHealthCheckboxChange() {
+            const checkedAllergies = [...document.querySelectorAll('.top-allergy-cb:checked')].map(cb => TOP_ALLERGIES[cb.dataset.idx]);
+            const checkedDiseases = [...document.querySelectorAll('.top-disease-cb:checked')].map(cb => TOP_DISEASES[cb.dataset.idx]);
+            const etcInput = document.getElementById('etcHealthInput');
+            const etcItems = etcInput ? etcInput.value.split(',').map(s => s.trim()).filter(Boolean) : [];
+            const combined = [...checkedAllergies, ...checkedDiseases, ...etcItems].join(', ');
+            saveHealthInfo(combined);
+        }
+
+        // 저장된 텍스트를 바탕으로 체크박스/기타 입력칸 상태를 복원
+        function syncCheckboxesFromText(text) {
+            const items = text.split(',').map(s => s.trim()).filter(Boolean);
+            document.querySelectorAll('.top-allergy-cb').forEach(cb => {
+                cb.checked = items.includes(TOP_ALLERGIES[cb.dataset.idx]);
+            });
+            document.querySelectorAll('.top-disease-cb').forEach(cb => {
+                cb.checked = items.includes(TOP_DISEASES[cb.dataset.idx]);
+            });
+            const known = [...TOP_ALLERGIES, ...TOP_DISEASES];
+            const others = items.filter(i => !known.includes(i));
+            const etcInput = document.getElementById('etcHealthInput');
+            if (etcInput) etcInput.value = others.join(', ');
+        }
+
+        // 홈 화면의 알레르기·기저질환 표시(읽기 전용) 갱신
+        function renderHomeHealthDisplay(text) {
+            const display = document.getElementById('homeHealthDisplay');
+            if (!display) return;
+            const items = text.split(',').map(s => s.trim()).filter(Boolean);
+            if (items.length === 0) {
+                display.textContent = '등록된 정보가 없어요.';
+            } else {
+                display.textContent = '현재 등록: ' + items.join(', ');
+            }
+        }
+
         function syncHealthInputs(text) {
             const a = document.getElementById('healthInput');
-            const b = document.getElementById('homeHealthInput');
             if (a) a.value = text;
-            if (b) b.value = text;
+            syncCheckboxesFromText(text);
+            renderHomeHealthDisplay(text);
         }
 
         function saveHealthInfo(valueOverride) {
@@ -3398,10 +3515,10 @@
 
             // 알레르기 + 기저질환을 하나의 목록으로 합침
             const avoidSources = [
-                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods, safeFoods: a.safeFoods, tips: a.tips, substitutes: a.substitutes || null })),
+                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods, safeFoods: a.safeFoods, tips: a.tips, reason: a.reason, substitutes: a.substitutes || null })),
                 ...diseases.map(d => {
                     const dObj = diseaseMapping[d];
-                    return { avoidFoods: dObj.avoidIngredients || [], safeFoods: dObj.safeIngredients || [], tips: dObj.tips, substitutes: dObj.substitutes || null };
+                    return { avoidFoods: dObj.avoidIngredients || [], safeFoods: dObj.safeIngredients || [], tips: dObj.tips, reason: dObj.reason, substitutes: dObj.substitutes || null };
                 })
             ];
 
@@ -3465,6 +3582,7 @@
                 // 위험한 재료에 대한 대체음식 + 팁 찾기
                 let alternativeFoods = [];
                 let allergyTip = '';
+                let allergyReason = '';
                 if (hasAllergy && avoidSources.length > 0) {
                     avoidSources.forEach((source) => {
                         source.avoidFoods.forEach(avoidFood => {
@@ -3475,6 +3593,7 @@
                                 const foodsToAdd = specificSubs || source.safeFoods;
                                 alternativeFoods = [...new Set([...alternativeFoods, ...foodsToAdd])];
                                 allergyTip = source.tips;
+                                allergyReason = source.reason || '';
                             }
                         });
                     });
@@ -3509,6 +3628,7 @@
                     </div>
                     ${alternativeFoods.length > 0 && !cartModeOn ? `
                         <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
+                            ${allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-bottom: 8px;">⚠️ <strong>왜 피해야 하나요?</strong> ${allergyReason}</div>` : ''}
                             <div style="font-size: 12px; font-weight: 600; color: #3B6D11; margin-bottom: 8px;">✅ 대체 음식 (클릭하면 팁이 보여요):</div>
                             <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
                                 ${alternativeFoods.map((food, foodIdx) => `<span onclick="event.stopPropagation(); const wasOpen = document.getElementById('${alternativeId}_tip_${foodIdx}').style.display === 'block'; document.querySelectorAll('[id^=&quot;${alternativeId}_tip_&quot;]').forEach(el => el.style.display = 'none'); document.getElementById('${alternativeId}_tip_${foodIdx}').style.display = wasOpen ? 'none' : 'block';" style="background: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; color: #3B6D11; border: 1px solid #5A8B4A; cursor: pointer;">${food}</span>`).join('')}
