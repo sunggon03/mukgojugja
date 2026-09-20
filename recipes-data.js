@@ -1349,7 +1349,7 @@ const recipes = {
         cookTime: '15분',
         ingredients: [
             { name: '식빵', amount: '2장', required: true },
-            { name: '계란', amount: '1개', required: true, substituteOverride: ['전분 우유물(계란물 대신)'] },
+            { name: '계란', amount: '1개', required: true, noSubstituteHere: true },
             { name: '우유', amount: '1/2컵', required: true },
             { name: '설탕', amount: '1큰술', required: false },
             { name: '버터', amount: '10g', required: true },
