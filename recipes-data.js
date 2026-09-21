@@ -13,7 +13,7 @@ const recipes = {
         difficulty: '쉬움',
         cookTime: '30분',
         ingredients: [
-            { name: '청국장', amount: '200g', required: true },
+            { name: '청국장', amount: '200g', required: true, noSubstituteHere: true },
             { name: '두부', amount: '150g', required: true },
             { name: '무', amount: '1/4개', required: true },
             { name: '신김치', amount: '150g', required: true },
@@ -452,7 +452,7 @@ const recipes = {
         difficulty: '보통',
         cookTime: '25분',
         ingredients: [
-            { name: '돈가스', amount: '1장', required: true },
+            { name: '돈가스', amount: '1장', required: true, noSubstituteHere: '돈가스는 돼지고기가 주재료이고 튀김옷에 밀가루·계란이 쓰여서 대체하기 어려워요. 다른 메뉴를 골라보시는 걸 추천해요.' },
             { name: '계란', amount: '2개', required: true, noSubstituteHere: '계란이 이 요리의 정체성이라 마땅한 대체품이 없어요. 돈가스 튀김옷에도 계란이 쓰이는 경우가 많아서, 다른 메뉴를 골라보시는 걸 추천해요.' },
             { name: '양파', amount: '1/2개', required: true },
             { name: '팽이버섯', amount: '1/2봉', required: false },
@@ -670,7 +670,7 @@ const recipes = {
         difficulty: '어려움',
         cookTime: '40분',
         ingredients: [
-            { name: '타르트지', amount: '6개', required: true },
+            { name: '타르트지', amount: '6개', required: true, noSubstituteHere: '타르트지에 밀가루가 들어 있어 글루텐 대체가 어려워요. 다른 디저트를 골라보시는 걸 추천해요.' },
             { name: '계란노른자', amount: '4개', required: true, noSubstituteHere: '계란 커스터드가 이 요리 그 자체라, 대체하면 다른 디저트가 돼요. 타르트지에도 계란이 들어갈 수 있으니 다른 디저트를 골라보시는 걸 추천해요.' },
             { name: '생크림', amount: '200ml', required: true },
             { name: '우유', amount: '100ml', required: true },
@@ -1089,7 +1089,7 @@ const recipes = {
         difficulty: '보통',
         cookTime: '25분',
         ingredients: [
-            { name: '돈가스', amount: '1장', required: true },
+            { name: '돈가스', amount: '1장', required: true, noSubstituteHere: '돈가스는 돼지고기가 주재료이고 튀김옷에 밀가루·계란이 쓰여서 대체하기 어려워요. 다른 메뉴를 골라보시는 걸 추천해요.' },
             { name: '계란', amount: '2개', required: true, noSubstituteHere: true },
             { name: '양파', amount: '1/2개', required: true },
             { name: '쯔유', amount: '4큰술', required: true },
