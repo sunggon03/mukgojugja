@@ -966,10 +966,10 @@
     </div>
 
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
-    <script src="diet-data.js?v=20260920c"></script>
-    <script src="recipes-data.js?v=20260920c"></script>
-    <script src="substitute-logic.js?v=20260920c"></script>
-    <script>
+    <script src="diet-data.js?v=20260921c"></script>
+    <script src="diet-data.js?v=20260921b"></script>
+<script src="recipes-data.js?v=20260921b"></script>
+<script src="substitute-logic.js?v=20260921b"></script>
 
 
 
@@ -1720,13 +1720,7 @@
             const diseases = getHealthDiseases();
 
             // 알레르기 + 기저질환을 하나의 목록으로 합침
-            const avoidSources = [
-                ...allergyObjects.map(a => ({ avoidFoods: a.avoidFoods, safeFoods: a.safeFoods, tips: a.tips, reason: a.reason, substitutes: a.substitutes || null })),
-                ...diseases.map(d => {
-                    const dObj = diseaseMapping[d];
-                    return { avoidFoods: dObj.avoidIngredients || [], safeFoods: dObj.safeIngredients || [], tips: dObj.tips, reason: dObj.reason, substitutes: dObj.substitutes || null };
-                })
-            ];
+           const avoidSources = buildAvoidSources(allergyObjects, diseases);
 
             // 모든 피해야할 음식 수집 (알레르기 + 기저질환)
             const allAvoidFoods = [];
@@ -1777,7 +1771,7 @@
             
             recipe.ingredients.forEach((ing, ingIdx) => {
                 const ingNameLower = ing.name.toLowerCase();
-                const { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage } = resolveSubstitutes(ing, avoidSources);
+                const { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
 
                 const className = hasAllergy ? 'ingredient-warning' : 'ingredient-normal';
                 const requiredText = ing.required ? '' : '(선택)';
@@ -1805,7 +1799,7 @@
                     }
                 }
 
-                const expandable = alternativeFoods.length > 0 || noSubMessage;
+                const expandable = alternativeFoods.length > 0 || noSubMessage || noAlternative;
 
                 html += `<div class="ingredient-item ${className}" style="cursor: ${expandable ? 'pointer' : 'default'};padding-bottom: 0;">
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; ${expandable ? 'border-bottom: 1px solid #e0e0e0;' : ''}" onclick="${expandable && !cartModeOn ? `document.getElementById('${alternativeId}').style.display = document.getElementById('${alternativeId}').style.display === 'none' ? 'block' : 'none'` : ''}">
@@ -1826,6 +1820,12 @@
                                         : ing.required
                                         ? `🙅 이 요리는 <strong>${ing.name}</strong>이(가) 맛과 식감의 핵심이라 마땅한 대체품이 없어요. 다른 메뉴를 골라보시는 걸 추천해요.`
                                         : `✂️ <strong>${ing.name}</strong>은(는) 선택 재료예요. 대체할 필요 없이 그냥 빼고 만들어도 괜찮아요.`}
+                                                                </div>
+                            ` : noAlternative ? `
+                                <div style="font-size: 12px; color: #2B3E2F; background: white; padding: 8px; border-radius: 4px;">
+                                    🙅 고르신 제약을 모두 지키면서 <strong>${ing.name}</strong>을(를) 대신할 수 있는 대체품이 없어요.
+                                    ${ing.required ? '다른 메뉴를 골라보시는 걸 추천해요.' : '선택 재료라면 빼고 만들어 보세요.'}
+                                    <div style="font-size: 11px; color: #888; margin-top: 4px;">다른 제약과 겹쳐서 뺀 대체품: ${excludedFoods.map(e => `${e.food} (${e.by}와 겹침)`).join(', ')}</div>
                                 </div>
                             ` : `
                             <div style="font-size: 12px; font-weight: 600; color: #3B6D11; margin-bottom: 8px;">✅ 대체 음식 (클릭하면 팁이 보여요):</div>
@@ -1836,7 +1836,8 @@
                                 <div id="${alternativeId}_tip_${foodIdx}" style="display: none; font-size: 11px; color: #2B3E2F; background: white; padding: 8px; border-radius: 4px; margin-bottom: 6px;">
                                     💡 <strong>${food}</strong>: ${getSubstituteInfo(food) || allergyTip}
                                 </div>
-                            `).join('')}
+                                                        `).join('')}${excludedFoods.length ? `
+                            <div style="font-size: 11px; color: #888;">다른 제약과 겹쳐서 뺀 대체품: ${excludedFoods.map(e => `${e.food} (${e.by}와 겹침)`).join(', ')}</div>` : ''}
                             `}
                         </div>
                     ` : ''}
