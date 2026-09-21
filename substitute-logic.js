@@ -107,4 +107,14 @@ function resolveSubstitutes(ing, avoidSources) {
     return { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative };
 }
 
-// 알레르기 객체 목록 + 기저질환 이름 목록 → resolveSubstitutes()가 받는 avoidSources 모양으로
+   // 알레르기 객체 목록 + 기저질환 이름 목록 → resolveSubstitutes()가 받는 avoidSources 모양으로 변환
+   // (레시피 모달과 검토 도구가 같은 방식으로 만들도록 여기 한 곳에 둠)
+   function buildAvoidSources(allergyObjects, diseaseKeys) {
+       return [
+           ...allergyObjects.map(a => ({ label: a.name, avoidFoods: a.avoidFoods, safeFoods: a.safeFoods, tips: a.tips, reason: a.reason, substitutes: a.substitutes || null })),
+           ...diseaseKeys.map(d => {
+               const dObj = diseaseMapping[d];
+               return { label: d, avoidFoods: dObj.avoidIngredients || [], safeFoods: dObj.safeIngredients || [], tips: dObj.tips, reason: dObj.reason, substitutes: dObj.substitutes || null };
+           })
+       ];
+   }
