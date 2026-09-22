@@ -432,7 +432,7 @@ const recipes = {
             { name: '오징어(또는 베이컨)', amount: '100g', required: true },
             { name: '계란', amount: '2개', required: true, substituteOverride: ['계란 빼고 부치기'] },
             { name: '데리야끼소스', amount: '3큰술', required: true },
-            { name: '가쓰오부시', amount: '약간', required: false }
+            { name: '가쓰오부시', amount: '약간', required: false, noSubstituteHere: true }
         ],
         steps: [
             { step: 1, instruction: '양배추는 가늘게 채 썬다.' },
@@ -477,7 +477,7 @@ const recipes = {
         cookTime: '20분',
         ingredients: [
             { name: '우동면', amount: '2인분', required: true },
-            { name: '명란젓', amount: '1개', required: true },
+            { name: '명란젓', amount: '1개', required: true, noSubstituteHere: '명란젓이 이 요리의 정체성이라 마땅한 대체품이 없어요. 다른 메뉴를 골라보시는 걸 추천해요.' },
             { name: '생크림', amount: '150ml', required: true },
             { name: '우유', amount: '100ml', required: true },
             { name: '마늘', amount: '2쪽', required: true },
@@ -528,7 +528,7 @@ const recipes = {
         ingredients: [
             { name: '토마토소스', amount: '2컵', required: true },
             { name: '계란', amount: '3개', required: true, noSubstituteHere: true },
-            { name: '소세지', amount: '2개', required: false },
+            { name: '소세지', amount: '2개', required: false, noSubstituteHere: true },
             { name: '피망', amount: '1개', required: true },
             { name: '치즈', amount: '50g', required: false },
             { name: '양파', amount: '1/2개', required: true }
@@ -730,7 +730,7 @@ const recipes = {
             { step: 4, instruction: '녹인 버터와 레몬즙을 넣고 섞은 뒤 냉장고에서 반죽을 휴지시킨다.' },
             { step: 5, instruction: '조개모양 틀에 부어 오븐에서 굽는다.' }
         ],
-        source: null
+        source: "https://www.10000recipe.com/recipe/577683"
     },
     '바스크 치즈케이크': {
         category: '디저트',
@@ -944,7 +944,7 @@ const recipes = {
             { step: 4, instruction: '물을 붓고 끓어오르면 다진마늘, 국간장을 넣는다.' },
             { step: 5, instruction: '무가 투명하게 익을 때까지 끓인 뒤 대파를 올려 마무리한다.' }
         ],
-        source: null
+        source: "https://www.kurly.com/recipe/671764624701d5e8aa02eee6"
     },
     '계란볶음밥': {
         category: '중식',
@@ -1147,7 +1147,7 @@ const recipes = {
             { name: '당근', amount: '약간', required: false },
             { name: '야키소바소스', amount: '4큰술', required: true },
             { name: '식용유', amount: '2큰술', required: true },
-            { name: '가쓰오부시', amount: '약간', required: false }
+            { name: '가쓰오부시', amount: '약간', required: false, noSubstituteHere: true }
         ],
         steps: [
             { step: 1, instruction: '양배추와 당근은 채 썰고 돼지고기는 한입 크기로 썬다.' },
@@ -1524,7 +1524,7 @@ const recipes = {
         cookTime: '20분',
         source: "https://m.cafe.daum.net/kangneungedu/IQ2n/1579",
         ingredients: [
-            { name: '사각어묵', amount: '300g', required: true },
+            { name: '사각어묵', amount: '300g', required: true, noSubstituteHere: '어묵이 이 탕의 주재료라 대체하기 어려워요. 다른 메뉴를 골라보시는 걸 추천해요.' },
             { name: '무', amount: '1/4개', required: true },
             { name: '대파', amount: '1대', required: true },
             { name: '다시마', amount: '2장', required: true },
@@ -1734,7 +1734,7 @@ const recipes = {
         cookTime: '20분',
         source: "https://m.cafe.daum.net/subdued20club/WI6v/5219",
         ingredients: [
-            { name: '꽁치통조림', amount: '1캔', required: true },
+            { name: '꽁치통조림', amount: '1캔', required: true, noSubstituteHere: '꽁치가 이 찌개의 주재료라 대체하기 어려워요. 다른 메뉴를 골라보시는 걸 추천해요.' },
             { name: '신김치', amount: '300g', required: true },
             { name: '두부', amount: '1/2모', required: false },
             { name: '대파', amount: '1대', required: false },
@@ -1901,7 +1901,7 @@ const recipes = {
             { name: '파', amount: '1줄기', required: true },
             { name: '계란', amount: '1개', required: false, noSubstituteHere: true },
             { name: '미나리', amount: '한 줌', required: false },
-            { name: '튀김(천우라)', amount: '2개', required: false }
+            { name: '튀김(천우라)', amount: '2개', required: false, noSubstituteHere: true }
         ],
         steps: [
             { step: 1, instruction: '냄비에 물을 끓이고 우동면을 넣는다. 3-4분 정도 끓인다.' },
