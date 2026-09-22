@@ -971,7 +971,7 @@
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
        <script src="diet-data.js?v=20260922"></script>
 <script src="recipes-data.js?v=20260922"></script>
-<script src="substitute-logic.js?v=20260922"></script>
+<script src="substitute-logic.js?v=20260922b"></script>
     <script>
 
 
@@ -1782,7 +1782,8 @@
             
             recipe.ingredients.forEach((ing, ingIdx) => {
                 const ingNameLower = ing.name.toLowerCase();
-                const { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
+                               const { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
+                const maybeHint = !hasAllergy && avoidSources.length > 0 ? getMaybeHint(ing.name, avoidSources) : null;
 
                 const className = hasAllergy ? 'ingredient-warning' : 'ingredient-normal';
                 const requiredText = ing.required ? '' : '(선택)';
@@ -1819,8 +1820,9 @@
                             <span>${warningMark}${ing.name} ${requiredText}</span>
                             ${expandable && !cartModeOn ? `<span style="color: #5A8B4A; font-weight: 600; font-size: 16px;">ℹ️</span>` : ''}
                         </div>
-                        <div style="text-align: right;" data-base-amount="${ing.amount}">${scaledAmount}</div>
+                       <div style="text-align: right;" data-base-amount="${ing.amount}">${scaledAmount}</div>
                     </div>
+                    ${maybeHint ? `<div style="font-size: 11px; color: #999; padding: 0 0 10px 32px; margin-top: -8px;">🔍 ${maybeHint}</div>` : ''}
                     ${expandable && !cartModeOn ? `
                         <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
                             ${allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-bottom: 8px;">⚠️ <strong>왜 피해야 하나요?</strong> ${allergyReason}</div>` : ''}
