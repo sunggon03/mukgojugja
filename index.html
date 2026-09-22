@@ -733,10 +733,13 @@
             <div class="more-cat-label">도구</div>
             <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('shoppingList');"><span class="more-ic">🛒</span>장보기 리스트</div>
 
-            <div class="more-cat-label">기타</div>
+                        <div class="more-cat-label">기타</div>
             <div class="more-menu-row" onclick="comingSoon('서비스 소개');"><span class="more-ic">ℹ️</span>서비스 소개</div>
             <div class="more-menu-row" onclick="comingSoon('의견 보내기');"><span class="more-ic">✉️</span>의견 보내기</div>
             <div class="more-menu-row" onclick="comingSoon('다크모드');"><span class="more-ic">🌙</span>다크모드</div>
+
+            <div class="more-cat-label">관리</div>
+            <div class="more-menu-row" onclick="toggleMoreMenu(); openAdminReview();"><span class="more-ic">🔧</span>관리</div>
         </div>
     </div>
 
@@ -1250,10 +1253,18 @@
             document.getElementById('moreOverlay').classList.toggle('active');
         }
 
-        // 아직 준비되지 않은 기능 안내
+                // 아직 준비되지 않은 기능 안내
         function comingSoon(featureName) {
             toggleMoreMenu();
             alert(featureName + ' 기능은 곧 추가될 예정이에요!');
+        }
+
+        // 팀 검토 도구로 이동 (진짜 보안 아님 — 팀 외 사람이 실수로 안 들어오게 막는 용도)
+        function openAdminReview() {
+            const pw = prompt('관리자 비밀번호를 입력하세요');
+            if (pw === null) return;
+            if (pw !== '김성곤03') { alert('비밀번호가 틀렸어요.'); return; }
+            window.open('review.html', '_blank');
         }
 
         // ===== 즐겨찾기 =====
