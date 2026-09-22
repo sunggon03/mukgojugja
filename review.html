@@ -194,6 +194,14 @@ function renderSummary() {
         ${cnt.stale ? `<span class="pill p-stale">재검토 필요 ${cnt.stale}</span>` : ''}</div>
         <div class="muted" style="margin-top:6px">시식 기록이 있는 레시피 ${cnt.taste}개 / 시식 미확인 ${noTaste}개 · 출처 미확인 ${names.filter(n => !recipes[n].source).length}개</div></div>`;
 
+    const noneNames = names.filter(n => !stateOf(n).status);
+    const noneClean = noneNames.filter(n => issueCounts(n).error === 0);
+    if (noneNames.length) {
+        html += `<div class="card"><h3>일괄 승인</h3>
+            <div class="muted" style="margin-bottom:6px">미검토 ${noneNames.length}개 중 안전 문제(🔴) 없는 건 ${noneClean.length}개예요.</div>
+            <button class="btn" id="bulkApproveClean" ${noneClean.length ? '' : 'disabled'}>문제없는 ${noneClean.length}개만 일괄 승인</button>
+            <button class="btn sub" id="bulkApproveAll">미검토 ${noneNames.length}개 전체 일괄 승인 (🔴 있는 것 포함)</button></div>`;
+    }
     html += `<div class="card"><h2>자동 점검 결과 <span class="muted">— 같은 원인끼리 묶었어요. 원인 하나를 고치면 여러 레시피가 함께 정리돼요.</span></h2>
         <div style="margin-bottom:8px">${['error', 'warn', 'info'].map(s => `<label class="rd"><input type="checkbox" data-sev="${s}" ${sevShow[s] ? 'checked' : ''}> ${SEV_LABEL[s]} ${sevTotals[s]}묶음</label>`).join('')}</div>`;
 
@@ -216,6 +224,15 @@ function renderSummary() {
     html += `</div>`;
     $('tab-summary').innerHTML = html;
     $('tab-summary').querySelectorAll('input[data-sev]').forEach(cb => cb.addEventListener('change', () => { sevShow[cb.dataset.sev] = cb.checked; renderSummary(); }));
+    const bulk = (names, label) => {
+        if (!names.length) return;
+        if (!confirm(`${names.length}개 레시피를 "${label}"로 일괄 승인할까요? 되돌리려면 레시피를 하나씩 다시 검토해야 해요.`)) return;
+        const reviewer = $('reviewerName').value.trim();
+        names.forEach(n => entries.push({ id: newId(), recipe: n, status: 'approved', taste: null, note: '[일괄 승인] ' + label, reviewer, at: new Date().toISOString(), hash: reviewHash(recipes[n]) }));
+        saveEntries(); renderSummary(); renderList();
+    };
+    const bc = $('bulkApproveClean'); if (bc) bc.onclick = () => bulk(names.filter(n => !stateOf(n).status && issueCounts(n).error === 0), '문제없음 일괄 승인');
+    const ba = $('bulkApproveAll'); if (ba) ba.onclick = () => bulk(names.filter(n => !stateOf(n).status), '전체 일괄 승인');
 }
 
 /* ============================================================
