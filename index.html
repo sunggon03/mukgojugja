@@ -1217,31 +1217,34 @@
             }
         }
 
-        // 페이지 전환
-                function toggleShoppingItemChecked(itemName) {
-            let list = getShoppingList();
-            const currentlyAllChecked = list.filter(i => i.name === itemName).every(i => i.checked);
-            list.forEach(item => {
-                if (item.name === itemName) item.checked = !currentlyAllChecked;
-            });
-            try {
-                localStorage.setItem('shoppingList', JSON.stringify(list));
-            } catch (e) {
-                console.warn('localStorage 사용 불가:', e.message);
-            }
-            renderShoppingList();
-        }
+                // 페이지 전환
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageName).classList.add('active');
 
-        // 장바구니 전체 선택/해제 (checked=true면 "다 샀어요" 표시로 전부 체크, false면 전부 해제)
-        function setAllShoppingChecked(checked) {
-            const list = getShoppingList();
-            list.forEach(item => { item.checked = checked; });
-            try {
-                localStorage.setItem('shoppingList', JSON.stringify(list));
-            } catch (e) {
-                console.warn('localStorage 사용 불가:', e.message);
+            document.querySelectorAll('.bottom-nav-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.page === pageName);
+            });
+
+            const cartFab = document.getElementById('cartFab');
+            if (cartFab) cartFab.style.display = pageName === 'shoppingList' ? 'none' : 'flex';
+
+            if (pageName === 'recipeBook') {
+                initializeRecipeBook();
             }
-            renderShoppingList();
+            
+            if (pageName === 'search') {
+                loadAvoidFoods();
+            }
+
+            if (pageName === 'home') {
+                renderCarousel();
+                renderHomeRecipeGrid();
+            }
+
+            if (pageName === 'shoppingList') {
+                renderShoppingList();
+            }
         }
 
         // 더보기 패널 토글
@@ -1354,12 +1357,24 @@
             }
         }
 
-        function toggleShoppingItemChecked(itemName) {
+                function toggleShoppingItemChecked(itemName) {
             let list = getShoppingList();
             const currentlyAllChecked = list.filter(i => i.name === itemName).every(i => i.checked);
             list.forEach(item => {
                 if (item.name === itemName) item.checked = !currentlyAllChecked;
             });
+            try {
+                localStorage.setItem('shoppingList', JSON.stringify(list));
+            } catch (e) {
+                console.warn('localStorage 사용 불가:', e.message);
+            }
+            renderShoppingList();
+        }
+
+        // 장바구니 전체 선택/해제 (checked=true면 "다 샀어요" 표시로 전부 체크, false면 전부 해제)
+        function setAllShoppingChecked(checked) {
+            const list = getShoppingList();
+            list.forEach(item => { item.checked = checked; });
             try {
                 localStorage.setItem('shoppingList', JSON.stringify(list));
             } catch (e) {
