@@ -3,23 +3,8 @@
 //              isIngredientMatch, resolveSubstitutes, getSubstituteInfo, buildAvoidSources (substitute-logic.js)
 // 이 파일은 화면 코드가 없어서 Node에서도 그대로 돌려 볼 수 있어요.
 
-const REVIEW_HIDDEN_RULES = [
-    { words: ['청국장', '고추장', '쌈장', '춘장', '두반장', '쯔유', '데리야끼'], allergens: ['대두 알레르기'], level: 'high', note: '콩(메주·간장 등)이 주원료예요' },
-    { words: ['마라소스', '우스터', '야키소바소스', '굴소스', '콩나물'], allergens: ['대두 알레르기'], level: 'maybe', note: '대두(간장·콩)가 들어가는 제품이 많아요' },
-    { words: ['우동면', '파스타면', '라자냐면', '소면', '중화면', '칼국수', '수제비', '마카로니', '식빵', '바게트', '치아바타', '빵가루', '부침가루', '튀김가루', '팬케이크 가루', '팬케이크가루', '튀김(천우라)', '타르트지', '돈가스', '레이디핑거', '고체카레', '박력분', '중력분', '강력분'], allergens: ['글루텐 불내증'], level: 'high', note: '밀가루가 주원료예요' },
-    { words: ['간장', '고추장', '쌈장', '춘장', '두반장', '쯔유', '데리야끼', '우스터', '야키소바소스', '굴소스', '마라소스', '메밀면', '어묵'], allergens: ['글루텐 불내증'], level: 'maybe', note: '밀이 섞이는 제품이 많아요(무밀 제품은 예외)' },
-    { words: ['연유', '분유', '휘핑'], allergens: ['우유 알레르기', '유당불내증'], level: 'high', note: '우유 성분 그 자체예요' },
-    { words: ['고체카레', '다크초콜릿', '초콜릿'], allergens: ['우유 알레르기'], level: 'maybe', note: '우유가 들어가는 제품이 많아요' },
-    { words: ['마요네즈', '머랭'], allergens: ['계란 알레르기'], level: 'high', note: '계란이 주원료예요' },
-    { words: ['돈가스', '튀김(천우라)', '팬케이크 가루', '팬케이크가루', '타르트지', '라자냐면', '식빵'], allergens: ['계란 알레르기'], level: 'maybe', note: '튀김옷·반죽·믹스에 계란이 들어가는 제품이 있어요' },
-    { words: ['어묵', '꽁치', '가쓰오부시', '명란', '멸치', '액젓', '북어', '황태', '고기 또는 생선'], allergens: ['생선 알레르기'], level: 'high', note: '생선이 원료예요' },
-    { words: ['쯔유', '우스터', '해산물'], allergens: ['생선 알레르기'], level: 'maybe', note: '생선 육수·앤초비·해산물 혼합일 수 있어요' },
-    { words: ['크래미', '게맛살', '해산물'], allergens: ['갑각류 알레르기'], level: 'maybe', note: '게살·새우가 섞일 수 있어요' },
-    { words: ['굴소스'], allergens: ['조개류 알레르기'], level: 'high', note: '굴 추출물이 원료예요' },
-    { words: ['해산물'], allergens: ['조개류 알레르기'], level: 'maybe', note: '조개류가 섞일 수 있어요' },
-    { words: ['돈가스', '소세지', '소시지', '스팸', '라드'], allergens: ['돼지고기 알레르기'], level: 'high', note: '돼지고기가 원료예요' },
-    { words: ['젤라틴', '판젤라틴'], allergens: ['돼지고기 알레르기'], level: 'maybe', note: '돼지 유래 젤라틴이 흔해요' }
-];
+// MAYBE_ALLERGEN_HINTS는 substitute-logic.js에 있어요(index.html과 같이 쓰려고 옮김). 여기서는 이름만 그대로 씀.
+const REVIEW_HIDDEN_RULES = MAYBE_ALLERGEN_HINTS;
 
 const REVIEW_PREFERRED_KEYS = ['계란', '우유', '밀가루', '대두', '갑각류', '당뇨병'];
 
