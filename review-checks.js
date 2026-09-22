@@ -1,245 +1,472 @@
-// 먹고죽자! 검토 도구 점검 규칙 (review.html 전용 — index.html은 이 파일을 읽지 않아요)
-// 필요한 전역: recipes, allergyMapping, diseaseMapping, substituteInfo (데이터 파일들)
-//              isIngredientMatch, resolveSubstitutes, getSubstituteInfo, buildAvoidSources (substitute-logic.js)
-// 이 파일은 화면 코드가 없어서 Node에서도 그대로 돌려 볼 수 있어요.
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>먹고죽자! 레시피 검토 도구</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%8D%3C/text%3E%3C/svg%3E">
+<style>
+    :root { --green:#5A8B4A; --green-d:#3B6D11; --cream:#FAF8F5; --line:#E8E3DD; --ink:#2B3E2F; --red:#DC3545; --amber:#B7791F; --gray:#8a8a8a; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--cream); color:var(--ink); font:14px/1.5 -apple-system,'Malgun Gothic','Apple SD Gothic Neo',sans-serif; }
+    header { background:#fff; border-bottom:1px solid var(--line); padding:10px 16px; position:sticky; top:0; z-index:10; }
+    header h1 { margin:0 0 6px; font-size:17px; }
+    .bar { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .tabs button { border:1px solid var(--line); background:#fff; padding:6px 12px; border-radius:8px; cursor:pointer; font:inherit; }
+    .tabs button.on { background:var(--green); color:#fff; border-color:var(--green); }
+    input, select, textarea, button { font:inherit; }
+    input[type=text], input[type=search], select, textarea { border:1px solid #ccc; border-radius:6px; padding:5px 8px; background:#fff; }
+    textarea { width:100%; min-height:70px; }
+    main { padding:14px 16px 60px; max-width:1200px; margin:0 auto; }
+    .hidden { display:none !important; }
+    .card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 14px; margin-bottom:12px; }
+    .card h2, .card h3 { margin:0 0 8px; font-size:15px; }
+    .muted { color:var(--gray); font-size:12px; }
+    .pill { display:inline-block; padding:1px 8px; border-radius:20px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .p-approved { background:#E8F5E9; color:#2E7D32; } .p-revise { background:#FFEBEE; color:var(--red); }
+    .p-hold { background:#FFF4DC; color:var(--amber); } .p-none { background:#eee; color:#666; }
+    .p-stale { background:#EDE7F6; color:#5E35B1; }
+    .sev-error { color:var(--red); } .sev-warn { color:var(--amber); } .sev-info { color:var(--gray); }
+    .chip { display:inline-block; padding:2px 8px; margin:2px 3px 2px 0; border-radius:14px; border:1px solid #ccc; font-size:12px; background:#fff; cursor:pointer; user-select:none; }
+    .chip.on { outline:2px solid var(--green); }
+    .st-none { background:#f3f3f3; color:#999; } .st-sub { background:#EAF3DE; border-color:var(--green); color:var(--green-d); }
+    .st-omit { background:#FFF4DC; border-color:#e0b04a; color:var(--amber); } .st-block { background:#FFEBEE; border-color:#e58; color:var(--red); }
+    .layout { display:grid; grid-template-columns:300px 1fr; gap:14px; align-items:start; }
+    #list { max-height:calc(100vh - 210px); overflow:auto; }
+    .item { padding:8px 10px; border-bottom:1px solid var(--line); cursor:pointer; display:flex; justify-content:space-between; gap:6px; align-items:center; }
+    .item:hover { background:#f4f8f1; } .item.on { background:#EAF3DE; }
+    .issue { padding:6px 0; border-bottom:1px dashed var(--line); }
+    .issue:last-child { border-bottom:none; }
+    .ing { padding:8px 0; border-bottom:1px solid var(--line); }
+    .ing.warn { background:#FFF5F5; margin:0 -14px; padding:8px 14px; }
+    .alt { background:#EAF3DE; border-left:3px solid var(--green); border-radius:4px; padding:8px 10px; margin-top:6px; font-size:12px; }
+    .alt .reason { color:var(--red); margin-bottom:4px; }
+    .banner { background:#FFEBEE; border-left:4px solid var(--red); border-radius:6px; padding:10px 12px; margin-bottom:10px; color:#c5192d; font-weight:600; }
+    .warnbox { background:#FFF4DC; border-left:4px solid #e0b04a; padding:8px 12px; border-radius:6px; margin-bottom:10px; font-size:13px; }
+    .grp { padding:8px 0; border-bottom:1px solid var(--line); }
+    .rec-link { color:var(--green-d); cursor:pointer; text-decoration:underline; margin-right:8px; white-space:nowrap; font-size:12px; }
+    .btn { border:1px solid var(--green); background:var(--green); color:#fff; padding:6px 12px; border-radius:8px; cursor:pointer; }
+    .btn.sub { background:#fff; color:var(--green-d); }
+    .btn:disabled { opacity:.5; cursor:default; }
+    label.rd { margin-right:10px; white-space:nowrap; }
+    details summary { cursor:pointer; color:var(--green-d); }
+    .fatal { background:#FFEBEE; color:var(--red); padding:14px; border-radius:8px; }
+    @media (max-width:860px){ .layout { grid-template-columns:1fr; } #list { max-height:34vh; } }
+</style>
+</head>
+<body>
+<header>
+    <h1>🔍 먹고죽자! 레시피 검토 도구 <span class="muted">(팀 내부용 · 기록은 이 브라우저에만 저장돼요)</span></h1>
+    <div class="bar">
+        <span class="tabs">
+            <button data-tab="summary" class="on">① 전체 요약</button>
+            <button data-tab="review">② 레시피 검토</button>
+            <button data-tab="records">③ 기록 · 내보내기</button>
+        </span>
+        <span style="margin-left:auto">검토자 <input type="text" id="reviewerName" placeholder="이름" size="8"></span>
+    </div>
+</header>
+<main>
+    <div id="fatal" class="fatal hidden"></div>
+    <div id="storageWarn" class="warnbox hidden"></div>
 
-const REVIEW_HIDDEN_RULES = [
-    { words: ['청국장', '고추장', '쌈장', '춘장', '두반장', '쯔유', '데리야끼'], allergens: ['대두 알레르기'], level: 'high', note: '콩(메주·간장 등)이 주원료예요' },
-    { words: ['마라소스', '우스터', '야키소바소스', '굴소스', '콩나물'], allergens: ['대두 알레르기'], level: 'maybe', note: '대두(간장·콩)가 들어가는 제품이 많아요' },
-    { words: ['우동면', '파스타면', '라자냐면', '소면', '중화면', '칼국수', '수제비', '마카로니', '식빵', '바게트', '치아바타', '빵가루', '부침가루', '튀김가루', '팬케이크 가루', '팬케이크가루', '튀김(천우라)', '타르트지', '돈가스', '레이디핑거', '고체카레', '박력분', '중력분', '강력분'], allergens: ['글루텐 불내증'], level: 'high', note: '밀가루가 주원료예요' },
-    { words: ['간장', '고추장', '쌈장', '춘장', '두반장', '쯔유', '데리야끼', '우스터', '야키소바소스', '굴소스', '마라소스', '메밀면', '어묵'], allergens: ['글루텐 불내증'], level: 'maybe', note: '밀이 섞이는 제품이 많아요(무밀 제품은 예외)' },
-    { words: ['연유', '분유', '휘핑'], allergens: ['우유 알레르기', '유당불내증'], level: 'high', note: '우유 성분 그 자체예요' },
-    { words: ['고체카레', '다크초콜릿', '초콜릿'], allergens: ['우유 알레르기'], level: 'maybe', note: '우유가 들어가는 제품이 많아요' },
-    { words: ['마요네즈', '머랭'], allergens: ['계란 알레르기'], level: 'high', note: '계란이 주원료예요' },
-    { words: ['돈가스', '튀김(천우라)', '팬케이크 가루', '팬케이크가루', '타르트지', '라자냐면', '식빵'], allergens: ['계란 알레르기'], level: 'maybe', note: '튀김옷·반죽·믹스에 계란이 들어가는 제품이 있어요' },
-    { words: ['어묵', '꽁치', '가쓰오부시', '명란', '멸치', '액젓', '북어', '황태', '고기 또는 생선'], allergens: ['생선 알레르기'], level: 'high', note: '생선이 원료예요' },
-    { words: ['쯔유', '우스터', '해산물'], allergens: ['생선 알레르기'], level: 'maybe', note: '생선 육수·앤초비·해산물 혼합일 수 있어요' },
-    { words: ['크래미', '게맛살', '해산물'], allergens: ['갑각류 알레르기'], level: 'maybe', note: '게살·새우가 섞일 수 있어요' },
-    { words: ['굴소스'], allergens: ['조개류 알레르기'], level: 'high', note: '굴 추출물이 원료예요' },
-    { words: ['해산물'], allergens: ['조개류 알레르기'], level: 'maybe', note: '조개류가 섞일 수 있어요' },
-    { words: ['돈가스', '소세지', '소시지', '스팸', '라드'], allergens: ['돼지고기 알레르기'], level: 'high', note: '돼지고기가 원료예요' },
-    { words: ['젤라틴', '판젤라틴'], allergens: ['돼지고기 알레르기'], level: 'maybe', note: '돼지 유래 젤라틴이 흔해요' }
-];
+    <section id="tab-summary"></section>
 
-const REVIEW_PREFERRED_KEYS = ['계란', '우유', '밀가루', '대두', '갑각류', '당뇨병'];
+    <section id="tab-review" class="hidden">
+        <div class="layout">
+            <aside class="card" style="padding:0">
+                <div style="padding:10px; border-bottom:1px solid var(--line)">
+                    <input type="search" id="q" placeholder="레시피 검색" style="width:100%; margin-bottom:6px">
+                    <div class="bar">
+                        <select id="fStatus">
+                            <option value="all">상태: 전체</option><option value="none">미검토</option>
+                            <option value="approved">승인</option><option value="revise">수정 필요</option>
+                            <option value="hold">보류</option><option value="stale">재검토 필요(레시피 바뀜)</option>
+                        </select>
+                        <select id="fSev">
+                            <option value="all">점검: 전체</option><option value="error">🔴 안전 문제 있음</option>
+                            <option value="warn">🟡 확인 필요 있음</option><option value="clean">문제 없음</option>
+                        </select>
+                        <select id="fCat"><option value="all">분류: 전체</option></select>
+                    </div>
+                    <div class="muted" id="listCount" style="margin-top:6px"></div>
+                </div>
+                <div id="list"></div>
+            </aside>
+            <article id="detail"></article>
+        </div>
+    </section>
 
-function reviewProfiles() {
-    const list = [];
-    const groups = new Map();
-    for (const [key, obj] of Object.entries(allergyMapping)) {
-        if (!groups.has(obj.name)) groups.set(obj.name, []);
-        groups.get(obj.name).push(key);
+    <section id="tab-records" class="hidden"></section>
+</main>
+
+<script>
+/* ============================================================
+   데이터·로직 파일 불러오기 (?r=지금시각 → 항상 최신 파일. index.html의 ?v= 올리기와 별개예요)
+   ============================================================ */
+const REVIEW_FILES = ['diet-data.js', 'recipes-data.js', 'substitute-logic.js', 'review-checks.js'];
+function showFatal(msg) { const el = document.getElementById('fatal'); el.textContent = msg; el.classList.remove('hidden'); }
+
+/* ============================================================
+   공통 도우미
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const STATUS_LABEL = { approved: '승인', revise: '수정 필요', hold: '보류' };
+const TASTE_LABEL = { good: '맛있음', ok: '보통', bad: '별로' };
+const SEV_LABEL = { error: '🔴 안전', warn: '🟡 확인', info: '⚪ 참고' };
+const RULE_LABEL = {
+    'hidden-allergen': '숨은 알레르겐(경고가 안 뜸)', 'sub-conflict': '대체품이 다른 제약과 충돌', 'optional-no-omit': '선택 재료인데 "빼도 됨" 없음',
+    'sub-in-recipe': '대체품이 이미 레시피에 있음', 'step-mention': '조리 단계에만 나오는 알레르겐', 'no-source': '출처 미확인', 'bad-source': '출처 형식 이상',
+    'no-tip': '대체품 설명 없음', 'dead-flag': '쓸모없는 옵션', 'dup-ingredient': '재료 중복', 'steps-empty': '조리 단계 없음', 'required-missing': '필수/선택 값 없음',
+    'alias-mismatch': '같은 알레르기인데 별칭마다 내용이 다름', 'no-tip-data': '대체품 설명 누락', 'no-alt-combo': '제약 조합에서 대체품이 안 남음'
+};
+const RULE_ORDER = ['alias-mismatch', 'hidden-allergen', 'no-alt-combo', 'sub-conflict', 'optional-no-omit', 'sub-in-recipe', 'step-mention', 'no-source', 'bad-source', 'dup-ingredient', 'steps-empty', 'required-missing', 'no-tip', 'no-tip-data', 'dead-flag'];
+
+let ctx, results, selected = null;
+let previewIds = new Set();
+const filters = { status: 'all', sev: 'all', cat: 'all', q: '' };
+let sevShow = { error: true, warn: true, info: false };
+
+/* ============================================================
+   기록 저장소 (localStorage). 기록은 "덧붙이기만" 해서 JSON 병합 때 충돌이 안 나요.
+   entry = { id, recipe, status, taste, note, reviewer, at, hash }
+   ============================================================ */
+const KEY = 'mukgo_review_v1', KEY_EXPORT = 'mukgo_review_exported_at', KEY_NAME = 'mukgo_review_name';
+let entries = [], storageOK = true;
+function lsGet(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { storageOK = false; return d; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { storageOK = false; } }
+function loadEntries() { try { const arr = JSON.parse(lsGet(KEY, '[]')); return Array.isArray(arr) ? arr : []; } catch (e) { return []; } }
+function saveEntries() { lsSet(KEY, JSON.stringify(entries)); }
+function entriesOf(name) { return entries.filter(e => e.recipe === name).sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0)); }
+function stateOf(name) {
+    const list = entriesOf(name);
+    const lastStatus = [...list].reverse().find(e => e.status);
+    const lastTaste = [...list].reverse().find(e => e.taste);
+    const hash = reviewHash(recipes[name]);
+    return { status: lastStatus ? lastStatus.status : null, taste: lastTaste || null, stale: !!lastStatus && lastStatus.hash !== hash, count: list.length, statusEntry: lastStatus || null };
+}
+function newId() { return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
+function unexportedCount() { const t = lsGet(KEY_EXPORT, ''); return entries.filter(e => !t || e.at > t).length; }
+/* ============================================================
+   시작
+   ============================================================ */
+function boot() {
+    if (typeof recipes === 'undefined' || typeof reviewRunAll !== 'function') { if (!$('fatal').textContent) showFatal('데이터를 불러오지 못했어요.'); return; }
+    ctx = reviewMakeContext();
+    results = reviewRunAll(ctx);
+    entries = loadEntries();
+    $('reviewerName').value = lsGet(KEY_NAME, '');
+    $('reviewerName').addEventListener('input', e => lsSet(KEY_NAME, e.target.value.trim()));
+    if (!storageOK) { $('storageWarn').textContent = '⚠️ 이 브라우저에서는 기록이 저장되지 않을 수 있어요(카톡 등 앱 내장 브라우저·시크릿 모드). 크롬/사파리에서 열거나, 기록을 남긴 뒤 바로 ③에서 내보내기 하세요.'; $('storageWarn').classList.remove('hidden'); }
+    const cats = [...new Set(Object.values(recipes).map(r => r.category))];
+    $('fCat').innerHTML += cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+    document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+    ['q', 'fStatus', 'fSev', 'fCat'].forEach(id => $(id).addEventListener('input', () => { filters.q = $('q').value.trim().toLowerCase(); filters.status = $('fStatus').value; filters.sev = $('fSev').value; filters.cat = $('fCat').value; renderList(); }));
+    $('list').addEventListener('click', e => { const el = e.target.closest('[data-r]'); if (el) selectRecipe(el.dataset.r); });
+    document.body.addEventListener('click', e => { const el = e.target.closest('[data-goto]'); if (el) { showTab('review'); selectRecipe(el.dataset.goto); } });
+    renderAll();
+}
+function showTab(t) {
+    ['summary', 'review', 'records'].forEach(n => $('tab-' + n).classList.toggle('hidden', n !== t));
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+    if (t === 'summary') renderSummary(); if (t === 'records') renderRecords(); if (t === 'review') { renderList(); if (!selected) renderDetail(); }
+    window.scrollTo(0, 0);
+}
+function renderAll() { renderSummary(); renderList(); renderDetail(); renderRecords(); }
+
+/* ============================================================
+   ① 전체 요약
+   ============================================================ */
+function issueCounts(name) { const c = { error: 0, warn: 0, info: 0 }; results.byRecipe[name].forEach(i => c[i.severity]++); return c; }
+function renderSummary() {
+    const names = Object.keys(recipes);
+    const cnt = { approved: 0, revise: 0, hold: 0, none: 0, stale: 0, taste: 0 };
+    names.forEach(n => { const s = stateOf(n); cnt[s.status || 'none']++; if (s.stale) cnt.stale++; if (s.taste) cnt.taste++; });
+    const sevTotals = { error: 0, warn: 0, info: 0 };
+    results.groups.forEach(g => sevTotals[g.severity]++);
+    const noTaste = names.length - cnt.taste;
+
+    let html = `<div class="card"><h2>진행 현황</h2>
+        <div>레시피 ${names.length}개 · <span class="pill p-approved">승인 ${cnt.approved}</span> <span class="pill p-revise">수정 필요 ${cnt.revise}</span>
+        <span class="pill p-hold">보류 ${cnt.hold}</span> <span class="pill p-none">미검토 ${cnt.none}</span>
+        ${cnt.stale ? `<span class="pill p-stale">재검토 필요 ${cnt.stale}</span>` : ''}</div>
+        <div class="muted" style="margin-top:6px">시식 기록이 있는 레시피 ${cnt.taste}개 / 시식 미확인 ${noTaste}개 · 출처 미확인 ${names.filter(n => !recipes[n].source).length}개</div></div>`;
+
+    html += `<div class="card"><h2>자동 점검 결과 <span class="muted">— 같은 원인끼리 묶었어요. 원인 하나를 고치면 여러 레시피가 함께 정리돼요.</span></h2>
+        <div style="margin-bottom:8px">${['error', 'warn', 'info'].map(s => `<label class="rd"><input type="checkbox" data-sev="${s}" ${sevShow[s] ? 'checked' : ''}> ${SEV_LABEL[s]} ${sevTotals[s]}묶음</label>`).join('')}</div>`;
+
+    const dataIssues = results.dataIssues.filter(d => sevShow[d.severity]);
+    if (dataIssues.length) {
+        html += `<div class="grp"><b>데이터 파일 자체 점검</b> <span class="muted">(diet-data.js · 레시피 채팅 몫)</span>${dataIssues.map(d => `<div class="issue"><span class="sev-${d.severity}">${SEV_LABEL[d.severity]}</span> ${esc(d.text)}</div>`).join('')}</div>`;
     }
-    for (const [name, keys] of groups) {
-        const key = keys.find(k => REVIEW_PREFERRED_KEYS.includes(k)) || keys.find(k => k === name) || keys[0];
-        list.push({ id: 'a:' + key, kind: 'allergy', key, label: name, aliases: keys });
-    }
-    const dGroups = new Map();
-    for (const [key, obj] of Object.entries(diseaseMapping)) {
-        const sig = JSON.stringify(obj);
-        if (!dGroups.has(sig)) dGroups.set(sig, []);
-        dGroups.get(sig).push(key);
-    }
-    for (const keys of dGroups.values()) {
-        const key = keys.find(k => REVIEW_PREFERRED_KEYS.includes(k)) || keys[keys.length - 1];
-        list.push({ id: 'd:' + key, kind: 'disease', key, label: key, aliases: keys });
-    }
-    return list;
+    RULE_ORDER.forEach(rule => {
+        const gs = results.groups.filter(g => g.rule === rule && sevShow[g.severity]);
+        if (!gs.length) return;
+        gs.sort((a, b) => ({ error: 0, warn: 1, info: 2 }[a.severity] - { error: 0, warn: 1, info: 2 }[b.severity]) || b.recipes.length - a.recipes.length);
+        html += `<div class="grp"><b>${esc(RULE_LABEL[rule] || rule)}</b> <span class="muted">${gs.length}묶음</span>`;
+        gs.forEach(g => {
+            html += `<div class="issue"><span class="sev-${g.severity}">${SEV_LABEL[g.severity]}</span> ${esc(g.text)}
+                <div class="muted">${g.profiles.length ? '관련 제약: ' + esc(g.profiles.join(', ')) + ' · ' : ''}레시피 ${g.recipes.length}개</div>
+                <div>${g.recipes.map(n => `<span class="rec-link" data-goto="${esc(n)}">${esc(n)}</span>`).join('')}</div></div>`;
+        });
+        html += `</div>`;
+    });
+    html += `</div>`;
+    $('tab-summary').innerHTML = html;
+    $('tab-summary').querySelectorAll('input[data-sev]').forEach(cb => cb.addEventListener('change', () => { sevShow[cb.dataset.sev] = cb.checked; renderSummary(); }));
 }
 
-function reviewSourcesFor(profiles) {
-    const allergyObjs = profiles.filter(p => p.kind === 'allergy').map(p => allergyMapping[p.key]);
-    const diseaseKeys = profiles.filter(p => p.kind === 'disease').map(p => p.key);
-    return buildAvoidSources(allergyObjs, diseaseKeys);
+/* ============================================================
+   ② 레시피 검토 — 목록
+   ============================================================ */
+function statusPill(s) {
+    if (!s.status) return '<span class="pill p-none">미검토</span>';
+    return `<span class="pill p-${s.status}">${STATUS_LABEL[s.status]}</span>` + (s.stale ? ' <span class="pill p-stale">재검토</span>' : '');
+}
+function filteredNames() {
+    return Object.keys(recipes).filter(n => {
+        const r = recipes[n], s = stateOf(n), c = issueCounts(n);
+        if (filters.q && !(n.toLowerCase().includes(filters.q) || (r.keywords || []).some(k => k.toLowerCase().includes(filters.q)))) return false;
+        if (filters.cat !== 'all' && r.category !== filters.cat) return false;
+        if (filters.status === 'none' && s.status) return false;
+        if (['approved', 'revise', 'hold'].includes(filters.status) && s.status !== filters.status) return false;
+        if (filters.status === 'stale' && !s.stale) return false;
+        if (filters.sev === 'error' && !c.error) return false;
+        if (filters.sev === 'warn' && !c.warn) return false;
+        if (filters.sev === 'clean' && (c.error || c.warn)) return false;
+        return true;
+    });
+}
+function renderList() {
+    const names = filteredNames();
+    $('listCount').textContent = `${names.length}개 표시 중`;
+    $('list').innerHTML = names.map(n => {
+        const c = issueCounts(n), s = stateOf(n);
+        return `<div class="item ${n === selected ? 'on' : ''}" data-r="${esc(n)}"><span>${esc(n)}
+            <span class="muted">${c.error ? '🔴' + c.error : ''}${c.warn ? ' 🟡' + c.warn : ''}</span></span>${statusPill(s)}</div>`;
+    }).join('') || '<div class="item muted">조건에 맞는 레시피가 없어요</div>';
+}
+function selectRecipe(name) {
+    selected = name;
+    renderList(); renderDetail(); // 미리보기에서 고른 제약은 레시피를 바꿔도 유지돼요
+    if (window.innerWidth <= 860) $('detail').scrollIntoView({ behavior: 'smooth' });
 }
 
-function reviewMakeContext() {
-    const profiles = reviewProfiles();
-    const sourceById = {};
-    profiles.forEach(p => { sourceById[p.id] = reviewSourcesFor([p])[0]; });
-    return { profiles, sourceById };
+/* ============================================================
+   ② 레시피 검토 — 상세 (점검 결과 / 사용자 시점 미리보기 / 기록)
+   ============================================================ */
+function renderDetail() {
+    if (!selected || !recipes[selected]) { $('detail').innerHTML = '<div class="card muted">왼쪽에서 레시피를 골라 주세요. 요약 화면에서 이름을 눌러도 와요.</div>'; return; }
+    const name = selected, r = recipes[name], s = stateOf(name);
+    const issues = results.byRecipe[name];
+    const bySev = sev => issues.filter(i => i.severity === sev);
+    const srcHtml = r.source && /^https?:\/\//.test(r.source) ? `<a href="${esc(r.source)}" target="_blank" rel="noopener noreferrer">출처 열기</a>` : (r.teamSubmitted ? '팀원 제출' : '<span class="sev-warn">출처 없음</span>');
+
+    let html = `<div class="card"><h2>${esc(name)} ${statusPill(s)}</h2>
+        <div class="muted">${esc(r.category)} · 난이도 ${esc(r.difficulty)} · ${esc(r.cookTime)} · 약 ${esc(r.calories)}kcal · ${srcHtml}
+        ${s.taste ? ' · 시식 ' + esc(TASTE_LABEL[s.taste.taste]) : ' · <span class="sev-info">시식 미확인</span>'}</div>
+        ${s.stale ? '<div class="warnbox" style="margin-top:8px">이 레시피는 마지막 검토 이후 내용이 바뀌었어요. 다시 확인해 주세요.</div>' : ''}</div>`;
+
+    html += `<div class="card"><h3>자동 점검 (${issues.length}건)</h3>`;
+    if (!issues.length) html += '<div class="muted">걸린 항목이 없어요 👍</div>';
+    ['error', 'warn', 'info'].forEach(sev => bySev(sev).forEach(i => {
+        html += `<div class="issue"><span class="sev-${sev}">${SEV_LABEL[sev]}</span> ${esc(i.text)}
+            ${i.profiles.length ? `<div class="muted">관련 제약: ${esc(i.profiles.join(', '))}</div>` : ''}</div>`;
+    }));
+    html += `</div>`;
+
+    html += `<div class="card"><h3>사용자 시점 미리보기</h3>
+        <div class="muted" style="margin-bottom:6px">아래 칩을 눌러 알레르기/기저질환을 골라 보세요(여러 개 가능). 칩 색은 이 레시피가 그 제약 사용자에게 어떻게 보이는지 뜻해요.</div>
+        <div id="matrix"></div>
+        <div class="muted" style="margin:4px 0 8px"><span class="chip st-none">해당 없음</span><span class="chip st-sub">대체품 안내</span><span class="chip st-omit">빼도 됨</span><span class="chip st-block">대체 불가</span>
+        <button class="btn sub" id="clearPreview" style="padding:2px 8px">선택 해제</button>
+        <button class="btn sub" id="topPreview" style="padding:2px 8px">"내 정보" 상위 5개 알레르기</button></div>
+        <div id="preview"></div></div>`;
+
+    const hist = entriesOf(name).slice().reverse();
+    html += `<div class="card"><h3>검토 기록 남기기</h3>
+        <div style="margin-bottom:6px">
+            <label class="rd"><input type="radio" name="fStatusIn" value="approved"> 승인</label>
+            <label class="rd"><input type="radio" name="fStatusIn" value="revise"> 수정 필요</label>
+            <label class="rd"><input type="radio" name="fStatusIn" value="hold"> 보류</label>
+            <label class="rd"><input type="radio" name="fStatusIn" value="" checked> 상태 변경 없음</label></div>
+        <div style="margin-bottom:6px">시식:
+            <label class="rd"><input type="radio" name="fTasteIn" value="good"> 맛있음</label>
+            <label class="rd"><input type="radio" name="fTasteIn" value="ok"> 보통</label>
+            <label class="rd"><input type="radio" name="fTasteIn" value="bad"> 별로</label>
+            <label class="rd"><input type="radio" name="fTasteIn" value="" checked> 안 함</label></div>
+        <textarea id="fNote" placeholder="메모 (예: 계란물 대신 전분물 넣었더니 튀김옷이 잘 안 붙음 / 재료 OO 추가 필요)"></textarea>
+        <div style="margin-top:6px"><button class="btn" id="saveEntry">기록 저장</button>
+        <button class="btn sub" id="saveNext">저장하고 다음 미검토로 →</button> <span class="muted" id="saveMsg"></span></div>
+        ${hist.length ? `<details style="margin-top:10px"><summary>이전 기록 ${hist.length}개</summary>${hist.map(e => `<div class="issue"><span class="muted">${esc(e.at.slice(0, 16).replace('T', ' '))} · ${esc(e.reviewer || '이름 없음')}</span>
+            ${e.status ? `<span class="pill p-${e.status}">${STATUS_LABEL[e.status]}</span>` : ''} ${e.taste ? `<span class="pill p-none">시식 ${TASTE_LABEL[e.taste]}</span>` : ''}
+            ${e.hash !== reviewHash(r) ? '<span class="pill p-stale">이전 버전</span>' : ''}<div>${esc(e.note)}</div></div>`).join('')}</details>` : ''}</div>`;
+
+    html += `<details class="card"><summary>재료·조리 단계 원문 보기</summary>
+        <div style="margin-top:8px">${r.ingredients.map(i => `<div>${esc(i.name)}${i.required ? '' : ' (선택)'} — ${esc(i.amount)}${i.noSubstituteHere ? ` <span class="muted">[noSubstituteHere${typeof i.noSubstituteHere === 'string' ? ': ' + esc(i.noSubstituteHere) : ''}]</span>` : ''}${i.substituteOverride ? ` <span class="muted">[override: ${esc(i.substituteOverride.join(', '))}]</span>` : ''}</div>`).join('')}</div>
+        <ol>${r.steps.map(st => `<li>${esc(st.instruction)}</li>`).join('')}</ol></details>`;
+
+    $('detail').innerHTML = html;
+    renderMatrix(); renderPreview();
+    $('clearPreview').onclick = () => { previewIds.clear(); renderMatrix(); renderPreview(); };
+    $('topPreview').onclick = () => { previewIds = new Set(['계란', '우유', '밀가루', '대두', '갑각류'].map(k => 'a:' + k).filter(id => ctx.profiles.some(p => p.id === id))); renderMatrix(); renderPreview(); };
+    $('saveEntry').onclick = () => saveEntry(false);
+    $('saveNext').onclick = () => saveEntry(true);
 }
 
-function reviewHash(recipe) {
-    const s = JSON.stringify(recipe);
-    let h = 5381;
-    for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
-    return (h >>> 0).toString(36);
+function renderMatrix() {
+    const m = reviewProfileMatrix(recipes[selected], ctx);
+    const chip = x => `<span class="chip st-${x.state} ${previewIds.has(x.profile.id) ? 'on' : ''}" data-pid="${esc(x.profile.id)}">${esc(x.profile.label)}</span>`;
+    $('matrix').innerHTML = `<div>${m.filter(x => x.profile.kind === 'allergy').map(chip).join('')}</div><div>${m.filter(x => x.profile.kind === 'disease').map(chip).join('')}</div>`;
+    $('matrix').onclick = e => {
+        const el = e.target.closest('[data-pid]'); if (!el) return;
+        const id = el.dataset.pid; previewIds.has(id) ? previewIds.delete(id) : previewIds.add(id);
+        renderMatrix(); renderPreview();
+    };
 }
 
-function reviewLooseSame(a, b) {
-    const norm = s => s.toLowerCase().replace(/\([^)]*\)/g, '').replace(/\s/g, '');
-    const x = norm(a), y = norm(b);
-    if (!x || !y) return false;
-    if (x === y) return true;
-    return Math.min(x.length, y.length) >= 2 && (x.includes(y) || y.includes(x));
-}
-
-function reviewCheckRecipe(name, recipe, ctx) {
-    const issues = [];
-    const add = (rule, severity, ingredient, text, groupKey, owner, profiles) =>
-        issues.push({ rule, severity, ingredient: ingredient || null, text, groupKey, owner: owner || 'recipe-chat', profiles: profiles || [] });
-    const ings = recipe.ingredients || [];
-
-    if (!recipe.steps || recipe.steps.length === 0) add('steps-empty', 'error', null, '조리 단계가 비어 있어요', 'steps-empty');
-    const seenNames = new Set();
-    ings.forEach(ing => {
-        if (typeof ing.required !== 'boolean') add('required-missing', 'error', ing.name, `'${ing.name}'에 필수/선택(required) 값이 없어요`, 'required-missing:' + ing.name);
-        if (seenNames.has(ing.name)) add('dup-ingredient', 'warn', ing.name, `'${ing.name}'이(가) 두 번 들어 있어요 (장바구니에서 합쳐질 수 있어요)`, 'dup:' + ing.name);
-        seenNames.add(ing.name);
-    });
-
-    if (!recipe.source) {
-        if (recipe.teamSubmitted) add('no-source', 'info', null, '팀원 제출 레시피라 출처 URL이 없어요', 'no-source-team');
-        else add('no-source', 'warn', null, '출처를 아직 확인하지 못했어요 (source 없음)', 'no-source');
-    } else if (!/^https?:\/\//.test(recipe.source)) {
-        add('bad-source', 'warn', null, `출처가 URL 형식이 아니에요: ${recipe.source}`, 'bad-source');
-    }
-
-    const per = {};
-    ctx.profiles.forEach(p => {
-        per[p.id] = ings.map(ing => resolveSubstitutes(ing, [ctx.sourceById[p.id]]));
-    });
-
-    ings.forEach((ing, idx) => {
-        if (ing.required !== false || ing.noSubstituteHere || ing.substituteOverride) return;
-        const hit = ctx.profiles.filter(p => per[p.id][idx].hasAllergy && per[p.id][idx].alternativeFoods.length > 0).map(p => p.label);
-        if (hit.length) add('optional-no-omit', 'warn', ing.name, `선택 재료 '${ing.name}'인데 "빼도 됨" 표시가 없어 대체품이 안내돼요`, 'optional:' + ing.name, 'recipe-chat', hit);
-    });
-
-    ings.forEach((ing, idx) => {
-        const merged = new Map();
-        ctx.profiles.forEach(p => {
-            per[p.id][idx].alternativeFoods.forEach(alt => {
-                if (!merged.has(alt)) merged.set(alt, []);
-                merged.get(alt).push(p.label);
-            });
-        });
-        merged.forEach((labels, alt) => {
-            const dup = ings.find((other, j) => j !== idx && reviewLooseSame(other.name, alt));
-            if (dup) add('sub-in-recipe', 'warn', ing.name, `'${ing.name}'의 대체품 '${alt}'이(가) 이미 레시피에 '${dup.name}'로 들어 있어요`, `subdup:${ing.name}:${alt}`, 'recipe-chat', labels);
-            if (!getSubstituteInfo(alt)) add('no-tip', 'info', ing.name, `대체품 '${alt}'의 설명(substituteInfo)이 없어 일반 문구가 나와요`, 'notip:' + alt, 'recipe-chat', labels);
-        });
-    });
-
-    ings.forEach(ing => {
-        ctx.profiles.forEach((p1, i) => {
-            ctx.profiles.forEach((p2, j) => {
-                if (j <= i) return;
-                const res = resolveSubstitutes(ing, [ctx.sourceById[p1.id], ctx.sourceById[p2.id]]);
-                const pair = `${p1.label}+${p2.label}`;
-                if (res.noAlternative) {
-                    add('no-alt-combo', 'warn', ing.name, `${pair} 조합: '${ing.name}'의 대체품이 하나도 안 남아요 (제외: ${res.excludedFoods.map(e => `${e.food}←${e.by}`).join(', ')}). 사용자에게는 "대체품 없음" 안내가 나가요`, `noalt:${ing.name}:${pair}`, 'recipe-chat', [p1.label, p2.label]);
-                } else {
-                    res.excludedFoods.forEach(e => add('sub-conflict', 'info', ing.name, `'${ing.name}' 대체품 '${e.food}'은(는) ${e.by}와 함께 가진 사용자에게 자동 제외돼요`, `conflict:${ing.name}:${e.food}->${e.by}`, 'recipe-chat', [p1.label, p2.label]));
-                }
-            });
-        });
-    });
-
-    const seenHidden = new Set();
-    ings.forEach(ing => {
-        REVIEW_HIDDEN_RULES.forEach(rule => {
-            if (!rule.words.some(w => ing.name.includes(w))) return;
-            rule.allergens.forEach(allergenName => {
-                const prof = ctx.profiles.find(p => p.kind === 'allergy' && p.label === allergenName);
-                if (!prof) return;
-                if (resolveSubstitutes({ name: ing.name }, [ctx.sourceById[prof.id]]).hasAllergy) return;
-                const key = ing.name + '|' + allergenName;
-                if (seenHidden.has(key)) return;
-                seenHidden.add(key);
-                add('hidden-allergen', rule.level === 'high' ? 'error' : 'warn', ing.name,
-                    `'${ing.name}'에 ${allergenName} 성분이 들어 있을 수 있는데(${rule.note}) 사이트에서는 경고가 안 떠요${rule.level === 'maybe' ? ' [제품에 따라 다름]' : ''}`,
-                    `hidden:${ing.name}:${allergenName}`, 'recipe-chat', [allergenName]);
-            });
-        });
-    });
-
-    const text = (recipe.steps || []).map(s => s.instruction).join(' ') + ' ' + (recipe.description || '');
-    const mentioned = new Map();
-    ctx.profiles.filter(p => p.kind === 'allergy').forEach(p => {
-        ctx.sourceById[p.id].avoidFoods.forEach(af => {
-            const word = af.replace(/\([^)]*\)/g, '').trim();
-            if (word.length < 2 || /류$|함유/.test(word) || !text.includes(word)) return;
-            if (ings.some(ing => ing.name.includes(word) || isIngredientMatch(ing.name, af))) return;
-            if (!mentioned.has(word)) mentioned.set(word, new Set());
-            mentioned.get(word).add(p.label);
-        });
-    });
-    mentioned.forEach((labels, word) => {
-        add('step-mention', 'warn', null, `조리 단계/설명에 '${word}'이(가) 나오는데 재료 목록에는 없어요`, 'stepmention:' + word, 'recipe-chat', [...labels]);
-    });
-
-    ings.forEach((ing, idx) => {
-        if (!ing.noSubstituteHere && !ing.substituteOverride) return;
-        if (!ctx.profiles.some(p => per[p.id][idx].hasAllergy)) {
-            add('dead-flag', 'info', ing.name, `'${ing.name}'에 대체/불가 옵션이 있는데 어떤 알레르기·질환에도 걸리지 않아 화면에 안 나와요`, 'dead:' + ing.name);
+function renderPreview() {
+    const r = recipes[selected];
+    const chosen = ctx.profiles.filter(p => previewIds.has(p.id));
+    const sources = reviewSourcesFor(chosen);
+    const rows = r.ingredients.map(ing => ({ ing, res: resolveSubstitutes(ing, sources) }));
+    let html = '';
+    if (!chosen.length) { html += '<div class="muted" style="margin-bottom:6px">제약을 고르지 않은 화면이에요.</div>'; }
+    else if (rows.some(x => x.res.hasAllergy)) html += `<div class="banner">🚨 주의! 당신의 알레르기/기저질환에 해당하는 재료가 포함되어 있습니다</div>`;
+    else html += `<div class="muted" style="margin-bottom:6px">✅ 선택한 제약에 걸리는 재료가 없어요(“안전” 배지).</div>`;
+    rows.forEach(({ ing, res }) => {
+        const flagged = res.hasAllergy && sources.length > 0;
+        html += `<div class="ing ${flagged ? 'warn' : ''}"><b>${flagged ? '⚠️ ' : ''}${esc(ing.name)}${ing.required ? '' : ' (선택)'}</b> <span class="muted">${esc(ing.amount)}</span>`;
+        if (res.hasAllergy && (res.alternativeFoods.length > 0 || res.noSubMessage || res.noAlternative)) {
+            html += `<div class="alt">${res.allergyReason ? `<div class="reason">⚠️ <b>왜 피해야 하나요?</b> ${esc(res.allergyReason)}</div>` : ''}`;
+            if (res.noSubMessage) {
+                html += typeof ing.noSubstituteHere === 'string' ? `🙅 ${esc(ing.noSubstituteHere)}`
+                    : ing.required ? `🙅 이 요리는 <b>${esc(ing.name)}</b>이(가) 맛과 식감의 핵심이라 마땅한 대체품이 없어요. 다른 메뉴를 골라보시는 걸 추천해요.`
+                        : `✂️ <b>${esc(ing.name)}</b>은(는) 선택 재료예요. 대체할 필요 없이 그냥 빼고 만들어도 괜찮아요.`;
+            } else if (res.noAlternative) {
+                html += `🙅 고르신 제약을 모두 지키면서 <b>${esc(ing.name)}</b>을(를) 대신할 수 있는 대체품이 없어요. ${ing.required ? '다른 메뉴를 골라보시는 걸 추천해요.' : '선택 재료라면 빼고 만들어 보세요.'}`;
+            } else {
+                html += `<div>✅ <b>대체 음식</b></div>` + res.alternativeFoods.map(f => `<div style="margin-top:4px">💡 <b>${esc(f)}</b>: ${esc(getSubstituteInfo(f) || res.allergyTip)}</div>`).join('');
+            }
+            if (res.excludedFoods.length) html += `<div class="muted" style="margin-top:4px">다른 제약과 겹쳐서 뺀 대체품: ${esc(res.excludedFoods.map(e => e.food + ' (' + e.by + '와 겹침)').join(', '))}</div>`;
+            html += `</div>`;
+        } else if (res.hasAllergy) {
+            html += `<div class="alt" style="background:#FFEBEE;border-color:var(--red)">⚠️ 경고는 뜨는데 안내할 내용(대체품/불가/빼도 됨)이 없어요.</div>`;
         }
+        html += `</div>`;
     });
-
-    return issues;
+    $('preview').innerHTML = html;
 }
 
-function reviewProfileMatrix(recipe, ctx) {
-    return ctx.profiles.map(p => {
-        const results = recipe.ingredients.map(ing => resolveSubstitutes(ing, [ctx.sourceById[p.id]]));
-        const hits = results.filter(r => r.hasAllergy);
-        let state = 'none';
-        if (hits.length) {
-            const blocked = recipe.ingredients.some((ing, i) => results[i].noSubMessage && ing.required);
-            const subs = hits.some(r => r.alternativeFoods.length > 0);
-            state = blocked ? 'block' : subs ? 'sub' : 'omit';
+/* ============================================================
+   기록 저장
+   ============================================================ */
+function saveEntry(goNext) {
+    const status = document.querySelector('input[name=fStatusIn]:checked').value || null;
+    const taste = document.querySelector('input[name=fTasteIn]:checked').value || null;
+    const note = $('fNote').value.trim();
+    if (!status && !taste && !note) { $('saveMsg').textContent = '상태·시식·메모 중 하나는 적어 주세요.'; return; }
+    entries.push({ id: newId(), recipe: selected, status, taste, note, reviewer: $('reviewerName').value.trim(), at: new Date().toISOString(), hash: reviewHash(recipes[selected]) });
+    saveEntries();
+    const cur = selected;
+    if (goNext) {
+        const names = filteredNames(); const start = names.indexOf(cur);
+        const order = [...names.slice(start + 1), ...names.slice(0, Math.max(start, 0))];
+        const nxt = order.find(n => !stateOf(n).status);
+        renderList(); if (nxt) { selectRecipe(nxt); return; }
+    }
+    renderList(); renderDetail(); $('saveMsg').textContent = '저장했어요 ✔';
+}
+
+/* ============================================================
+   ③ 기록 · 내보내기 · 가져오기
+   ============================================================ */
+function buildExport() { return { app: 'mukgojugja-review', version: 1, exportedAt: new Date().toISOString(), entries }; }
+function download(filename, text, mime) {
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: mime })); a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function mergeEntries(incoming) {
+    const have = new Set(entries.map(e => e.id)); let added = 0, unknown = new Set(), bad = 0;
+    (incoming || []).forEach(e => {
+        if (!e || typeof e.id !== 'string' || typeof e.recipe !== 'string' || typeof e.at !== 'string') { bad++; return; }
+        if (have.has(e.id)) return;
+        entries.push({ id: e.id, recipe: e.recipe, status: ['approved', 'revise', 'hold'].includes(e.status) ? e.status : null, taste: ['good', 'ok', 'bad'].includes(e.taste) ? e.taste : null, note: String(e.note || ''), reviewer: String(e.reviewer || ''), at: e.at, hash: String(e.hash || '') });
+        have.add(e.id); added++; if (!recipes[e.recipe]) unknown.add(e.recipe);
+    });
+    saveEntries(); return { added, bad, unknown: [...unknown] };
+}
+function buildHandoff() {
+    const today = new Date().toISOString().slice(0, 10);
+    const lines = [`# 레시피 채팅에서 할 일 (검토 도구 자동 생성 ${today})`, ''];
+    const names = Object.keys(recipes);
+    const pick = st => names.filter(n => stateOf(n).status === st);
+    const noteOf = n => { const notes = entriesOf(n).filter(x => x.note).map(x => `${x.reviewer ? x.reviewer + ': ' : ''}${x.note}`); return notes.length ? ' — ' + notes.join(' / ') : ''; };
+    const rv = pick('revise'), hd = pick('hold');
+    const badTaste = names.filter(n => { const t = stateOf(n).taste; return t && t.taste === 'bad'; });
+    lines.push(`## 검토자가 "수정 필요"로 남긴 레시피 (${rv.length})`); rv.forEach(n => lines.push(`- ${n}${noteOf(n)}`)); if (!rv.length) lines.push('- (없음)');
+    lines.push('', `## 보류 (${hd.length})`); hd.forEach(n => lines.push(`- ${n}${noteOf(n)}`)); if (!hd.length) lines.push('- (없음)');
+    lines.push('', `## 시식 결과 "별로" (${badTaste.length})`); badTaste.forEach(n => lines.push(`- ${n}${noteOf(n)}`)); if (!badTaste.length) lines.push('- (없음)');
+    const stale = names.filter(n => stateOf(n).stale);
+    if (stale.length) { lines.push('', `## 검토 후 내용이 바뀐 레시피 — 재검토 필요 (${stale.length})`); stale.forEach(n => lines.push(`- ${n}`)); }
+    [['error', '자동 점검 — 안전 관련(경고가 안 뜨는 알레르겐 등)'], ['warn', '자동 점검 — 확인 필요']].forEach(([sev, title]) => {
+        lines.push('', `## ${title}`);
+        const gs = results.groups.filter(g => g.severity === sev);
+        if (!gs.length) lines.push('- (없음)');
+        RULE_ORDER.forEach(rule => gs.filter(g => g.rule === rule).forEach(g => lines.push(`- [${RULE_LABEL[rule] || rule}] ${g.text} → ${g.recipes.length}개: ${g.recipes.join(', ')}`)));
+    });
+    results.dataIssues.filter(d => d.severity !== 'info').forEach(d => { if (!lines.includes('## 데이터 파일(diet-data.js) 점검')) lines.push('', '## 데이터 파일(diet-data.js) 점검'); lines.push(`- ${d.text}`); });
+    return lines.join('\n');
+}
+function renderRecords() {
+    const total = entries.length, un = unexportedCount();
+    const reviewers = [...new Set(entries.map(e => e.reviewer).filter(Boolean))];
+    $('tab-records').innerHTML = `
+        <div class="card"><h2>내 기록</h2>
+            <div>기록 ${total}개${reviewers.length ? ' · 검토자: ' + esc(reviewers.join(', ')) : ''}</div>
+            <div class="${un ? 'sev-warn' : 'muted'}" style="margin:4px 0 8px">${un ? `⚠️ 아직 내보내지 않은 기록이 ${un}개 있어요. 브라우저 데이터가 지워지면 사라져요.` : '내보내기까지 완료된 상태예요.'}</div>
+            <button class="btn" id="btnExport" ${total ? '' : 'disabled'}>JSON 내보내기</button>
+            <span class="muted">파일 이름에 검토자 이름과 날짜가 들어가요. 팀원에게 이 파일을 받아 아래에서 가져오면 병합돼요.</span></div>
+        <div class="card"><h2>팀원 기록 가져오기(병합)</h2>
+            <input type="file" id="fileImport" accept="application/json,.json" multiple>
+            <div class="muted" style="margin-top:6px">기록마다 고유 번호가 있어서, 같은 파일을 여러 번 가져오거나 서로 겹쳐도 중복되지 않고 덮어쓰지도 않아요. 같은 레시피에 여러 사람이 남긴 기록은 모두 남고, "현재 상태"는 가장 늦게 남긴 기록을 따라가요.</div>
+            <div id="importMsg" style="margin-top:6px"></div></div>
+        <div class="card"><h2>레시피 채팅에 넘길 요약</h2>
+            <div class="muted" style="margin-bottom:6px">수정 요청·보류·시식 결과와 자동 점검을 원인별로 묶은 텍스트예요. 복사해서 레시피 채팅에 붙여 넣으면 돼요.</div>
+            <button class="btn" id="btnHandoff">요약 만들기</button> <button class="btn sub" id="btnCopy">복사</button>
+            <textarea id="handoff" style="min-height:220px; margin-top:8px" readonly></textarea></div>`;
+    $('btnExport').onclick = () => {
+        const who = ($('reviewerName').value.trim() || 'anon').replace(/[^\w가-힣-]/g, '');
+        download(`mukgojugja-review-${new Date().toISOString().slice(0, 10)}-${who}.json`, JSON.stringify(buildExport(), null, 2), 'application/json');
+        lsSet(KEY_EXPORT, new Date().toISOString()); setTimeout(renderRecords, 600);
+    };
+    $('fileImport').onchange = async ev => {
+        const msgs = [];
+        for (const f of ev.target.files) {
+            try {
+                const data = JSON.parse(await f.text());
+                if (data.app !== 'mukgojugja-review' || !Array.isArray(data.entries)) throw new Error('검토 도구에서 내보낸 파일이 아니에요');
+                const r = mergeEntries(data.entries);
+                msgs.push(`✔ ${esc(f.name)}: 새 기록 ${r.added}개 추가${r.bad ? `, 형식이 이상해 건너뜀 ${r.bad}개` : ''}${r.unknown.length ? `, 지금 없는 레시피 이름 ${r.unknown.length}개(${esc(r.unknown.join(', '))})` : ''}`);
+            } catch (e) { msgs.push(`✖ ${esc(f.name)}: ${esc(e.message)}`); }
         }
-        return { profile: p, state, hitCount: hits.length };
-    });
+        $('importMsg').innerHTML = msgs.join('<br>'); renderList(); renderDetail(); renderSummary();
+        $('fileImport').value = '';
+    };
+    $('btnHandoff').onclick = () => { $('handoff').value = buildHandoff(); };
+    $('btnCopy').onclick = async () => { if (!$('handoff').value) $('handoff').value = buildHandoff(); try { await navigator.clipboard.writeText($('handoff').value); } catch (e) { $('handoff').select(); document.execCommand('copy'); } };
 }
 
-function reviewRunAll(ctx) {
-    ctx = ctx || reviewMakeContext();
-    const byRecipe = {};
-    const groups = new Map();
-    Object.entries(recipes).forEach(([name, recipe]) => {
-        const issues = reviewCheckRecipe(name, recipe, ctx);
-        byRecipe[name] = issues;
-        issues.forEach(is => {
-            const gk = is.rule + '|' + is.groupKey;
-            if (!groups.has(gk)) groups.set(gk, { rule: is.rule, severity: is.severity, owner: is.owner, groupKey: is.groupKey, text: is.text, recipes: [], profiles: new Set() });
-            const g = groups.get(gk);
-            if (!g.recipes.includes(name)) g.recipes.push(name);
-            is.profiles.forEach(l => g.profiles.add(l));
-        });
-    });
-    return { ctx, byRecipe, groups: [...groups.values()].map(g => ({ ...g, profiles: [...g.profiles] })), dataIssues: reviewDataChecks() };
-}
-
-function reviewDataChecks() {
-    const out = [];
-    const groups = new Map();
-    for (const [key, obj] of Object.entries(allergyMapping)) {
-        if (!groups.has(obj.name)) groups.set(obj.name, []);
-        groups.get(obj.name).push(key);
-    }
-    const sortedJson = v => JSON.stringify(Array.isArray(v) ? [...v].sort() : v || null);
-    for (const [name, keys] of groups) {
-        if (keys.length < 2) continue;
-        const base = allergyMapping[keys[0]];
-        keys.slice(1).forEach(k => {
-            const o = allergyMapping[k];
-            const diffs = [];
-            if (sortedJson(base.avoidFoods) !== sortedJson(o.avoidFoods)) diffs.push('피해야 할 식품');
-            if (sortedJson(base.safeFoods) !== sortedJson(o.safeFoods)) diffs.push('안전 식품');
-            if (JSON.stringify(base.substitutes || null) !== JSON.stringify(o.substitutes || null)) diffs.push('재료별 대체품');
-            if (base.tips !== o.tips) diffs.push('팁 문구');
-            if (diffs.length) out.push({ rule: 'alias-mismatch', severity: 'error', text: `'${keys[0]}'와 '${k}'는 같은 "${name}"인데 내용이 달라요 (${diffs.join(', ')}). 입력한 표기에 따라 결과가 달라져요` });
-        });
-    }
-    const noInfo = new Set();
-    const collect = arr => (arr || []).forEach(n => { if (!getSubstituteInfo(n)) noInfo.add(n); });
-    Object.values(allergyMapping).forEach(o => { collect(o.safeFoods); Object.values(o.substitutes || {}).forEach(collect); });
-    Object.values(diseaseMapping).forEach(o => { collect(o.safeIngredients); Object.values(o.substitutes || {}).forEach(collect); });
-    Object.values(recipes).forEach(r => r.ingredients.forEach(i => collect(i.substituteOverride)));
-    if (noInfo.size) out.push({ rule: 'no-tip-data', severity: 'info', text: `substituteInfo에 설명이 없는 대체품 ${noInfo.size}개: ${[...noInfo].join(', ')}` });
-    return out;
-}
-
-if (typeof module !== 'undefined') module.exports = { reviewProfiles, reviewMakeContext, reviewCheckRecipe, reviewProfileMatrix, reviewRunAll, reviewDataChecks, reviewHash, REVIEW_HIDDEN_RULES };
+(function loadAll(i) {
+    if (typeof recipes !== 'undefined' && typeof reviewRunAll === 'function') { boot(); return; }
+    if (i >= REVIEW_FILES.length) { boot(); return; }
+    const s = document.createElement('script');
+    s.src = REVIEW_FILES[i] + '?r=' + Date.now();
+    s.onload = () => loadAll(i + 1);
+    s.onerror = () => showFatal(REVIEW_FILES[i] + ' 파일을 불러오지 못했어요. review.html과 같은 폴더에 있는지 확인해 주세요.');
+    document.head.appendChild(s);
+})(0);
+</script>
+</body>
+</html>
