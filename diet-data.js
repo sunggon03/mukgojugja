@@ -9,7 +9,8 @@ const GLUTEN_AVOID = [
     '밀가루', '밀', '보리', '호밀', '일반 파스타', '일반 빵',
     '중력분', '강력분', '박력분', '부침가루', '튀김가루', '팬케이크 가루', '핫케이크가루',
     '우동면', '소면', '라면', '파스타면', '스파게티면', '라자냐면', '야키소바면',
-    '빵가루', '식빵', '치아바타빵', '타르트지', '고체카레', '돈가스', '돈까스', '레이디핑거'
+    '빵가루', '식빵', '치아바타빵', '타르트지', '고체카레', '돈가스', '돈까스', '레이디핑거',
+    '마카로니', '바게트', '튀김'
 ];
 const GLUTEN_SUBSTITUTES = {
     '밀가루': ['글루텐프리 밀가루', '쌀가루'],
@@ -39,7 +40,10 @@ const GLUTEN_SUBSTITUTES = {
     '고체카레': ['글루텐프리 카레루(성분표 확인)'],
     '돈가스': ['글루텐프리 돈가스(성분표 확인)'],
     '돈까스': ['글루텐프리 돈가스(성분표 확인)'],
-    '레이디핑거': ['글루텐프리 비스킷·스펀지(성분표 확인)']
+    '레이디핑거': ['글루텐프리 비스킷·스펀지(성분표 확인)'],
+    '마카로니': ['글루텐프리 파스타(쌀·옥수수)'],
+    '바게트': ['글루텐프리 빵'],
+    '튀김': ['쌀 튀김가루로 만든 튀김']
 };
 
 // 알레르기 매핑 (상세 객체 구조)
@@ -60,23 +64,6 @@ const allergyMapping = {
             '고체카레': ['유제품 무첨가 카레루(성분표 확인)']
         },
         tips: '버터·숙성치즈는 유당 함량이 매우 낮아 소량은 대부분 문제없이 섭취 가능. 우유·크림처럼 유당이 많은 것 위주로 주의하세요.',
-        source: "https://doctornow.co.kr/content/magazine/b48b909b5091430182dfd4cd0bd3837f"
-    },
-    '유당': {
-        name: '유당불내증',
-        type: 'intolerance',
-        reason: '유당을 분해하는 소화효소(락타아제)가 부족해 복통·가스·설사를 유발함',
-        avoidFoods: ['우유', '버터', '치즈', '크림', '연유', '고체카레'],
-        safeFoods: ['락토스프리 우유', '저유당 우유', '두유'],
-        substitutes: {
-            '우유': ['락토스프리 우유', '저유당 우유', '두유'],
-            '버터': ['버터(소량은 대부분 괜찮음)', '식물성 마가린'],
-            '치즈': ['저유당 치즈(숙성치즈)', '영양 효모(대체 치즈 맛)'],
-            '크림': ['코코넛 크림', '식물성 휘핑크림'],
-            '연유': ['비건 연유(코코넛 연유)'],
-            '고체카레': ['유제품 무첨가 카레루(성분표 확인)']
-        },
-        tips: '버터는 유당 함량이 매우 낮아 소량은 대부분 문제없이 섭취 가능',
         source: "https://doctornow.co.kr/content/magazine/b48b909b5091430182dfd4cd0bd3837f"
     },
     '유제품': {
@@ -117,53 +104,6 @@ const allergyMapping = {
         tips: '단순 불내증과 달리 우유 알레르기는 소량의 유단백도 위험할 수 있어 완전히 피해야 함. 버터·치즈도 예외 없이 모두 식물성으로 대체 필요',
         source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
     },
-    '우유': {
-        name: '우유 알레르기',
-        type: 'allergy',
-        reason: '우유 단백질에 면역계가 과민 반응해 두드러기·구토·호흡곤란 등을 일으킬 수 있음',
-        avoidFoods: ['우유', '버터', '치즈', '크림', '요구르트', '밀크파우더', '유제품', '연유', '고체카레'],
-        safeFoods: ['두유', '귀리 밀크', '아몬드 밀크', '코코넛 밀크', '쌀 음료'],
-        substitutes: {
-            '우유': ['두유', '귀리 밀크', '아몬드 밀크', '코코넛 밀크', '쌀 음료'],
-            '버터': ['식물성 마가린', '코코넛 오일'],
-            '치즈': ['비건 치즈(식물성 치즈)', '영양 효모(대체 치즈 맛)'],
-            '크림': ['코코넛 크림', '식물성 휘핑크림'],
-            '요구르트': ['두유 요구르트', '코코넛 요구르트'],
-            '밀크파우더': ['두유가루', '코코넛밀크가루'],
-            '유제품': ['식물성 대체식품 전반(두유·코코넛 제품 등)'],
-            '연유': ['비건 연유(코코넛 연유)'],
-            '고체카레': ['유제품 무첨가 카레루(성분표 확인)']
-        },
-        tips: '단순 불내증과 달리 우유 알레르기는 소량의 유단백도 위험할 수 있어 완전히 피해야 함. 버터·치즈도 예외 없이 모두 식물성으로 대체 필요',
-        source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
-    },
-    '버터': {
-        name: '유제품 불내증',
-        type: 'intolerance',
-        reason: '유제품 속 성분을 소화하기 어려워 소화기 불편감을 유발함',
-        avoidFoods: ['버터', '크림', '우유'],
-        safeFoods: ['올리브유', '포도씨유', '참기름'],
-        substitutes: {
-            '버터': ['식물성 마가린', '코코넛 오일', '올리브유'],
-            '크림': ['코코넛 크림', '식물성 휘핑크림'],
-            '우유': ['두유', '귀리 밀크', '아몬드 밀크']
-        },
-        tips: '버터는 유당 함량이 매우 낮아 유당불내증이라면 소량은 대부분 괜찮은 경우가 많음 (우유 알레르기는 예외이며 완전히 피해야 함)',
-        source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
-    },
-    '치즈': {
-        name: '유제품 불내증',
-        type: 'intolerance',
-        reason: '유제품 속 성분을 소화하기 어려워 소화기 불편감을 유발함',
-        avoidFoods: ['치즈', '우유'],
-        safeFoods: ['영양 효모(대체 치즈 맛)', '통곡물'],
-        substitutes: {
-            '치즈': ['비건 치즈(식물성 치즈)', '영양 효모(대체 치즈 맛)'],
-            '우유': ['두유', '귀리 밀크', '아몬드 밀크']
-        },
-        tips: '오래 숙성된 치즈(파마산 등)는 발효 과정에서 유당이 상당히 분해되어 있어 유당불내증이면 소량은 괜찮을 수 있음',
-        source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
-    },
     '계란': {
         name: '계란 알레르기',
         type: 'allergy',
@@ -182,23 +122,6 @@ const allergyMapping = {
         tips: '계란이 들어간 모든 음식 피하기, 성분표 확인 필수. ⚠️ 아쿠아파바·바나나·요구르트는 "베이킹에서 반죽을 뭉치는 역할"만 대체 가능 - 계란국·계란찜처럼 계란 자체가 주재료인 요리는 마땅한 대체품이 없어 다른 메뉴를 고르는 게 나을 수 있음. 게맛살(크래미)·레이디핑거처럼 이름에 계란이 없어도 계란이 들어 있는 재료가 있으니 성분표를 꼭 확인',
         source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
     },
-    '계란 알레르기': {
-        name: '계란 알레르기',
-        type: 'allergy',
-        reason: '계란 단백질에 대한 면역 과민반응으로 피부·소화기·호흡기 증상을 유발할 수 있음',
-        avoidFoods: ['계란', '계란 함유 음식', '크래미', '게맛살', '맛살', '레이디핑거'],
-        safeFoods: ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
-        substitutes: {
-            '계란': ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
-            '계란 함유 음식': ['아쿠아파바(베이킹용)', '바나나(베이킹용)'],
-            '크래미': ['닭가슴살(삶아 찢은 것)'],
-            '게맛살': ['닭가슴살(삶아 찢은 것)'],
-            '맛살': ['닭가슴살(삶아 찢은 것)'],
-            '레이디핑거': ['계란 없는 비스킷·스펀지(성분표 확인)']
-        },
-        tips: '계란 완전 피하기. ⚠️ 대체품은 "베이킹용"으로만 유효 - 계란국·계란찜처럼 계란이 주재료인 요리는 대체가 어려워 다른 메뉴를 고르는 게 나을 수 있음. 게맛살(크래미)·레이디핑거처럼 이름에 계란이 없어도 계란이 들어 있는 재료가 있으니 성분표를 꼭 확인',
-        source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
-    },
     '밀가루': {
         name: '글루텐 불내증',
         type: 'intolerance',
@@ -209,46 +132,7 @@ const allergyMapping = {
         tips: '교차오염 주의. 조리기구 별도 사용',
         source: "https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"
     },
-    '글루텐': {
-        name: '글루텐 불내증',
-        type: 'intolerance',
-        reason: '밀·보리 등에 든 글루텐이 소장 점막을 손상시켜 복통·설사·영양흡수 장애를 유발함',
-        avoidFoods: [...GLUTEN_AVOID, '글루텐 함유 식품'],
-        safeFoods: ['글루텐프리 밀가루', '쌀', '옥수수', '감자'],
-        substitutes: { ...GLUTEN_SUBSTITUTES },
-        tips: '교차오염 주의',
-        source: "https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"
-    },
-    '글루텐 불내증': {
-        name: '글루텐 불내증',
-        type: 'intolerance',
-        reason: '밀·보리 등에 든 글루텐이 소장 점막을 손상시켜 복통·설사·영양흡수 장애를 유발함',
-        avoidFoods: [...GLUTEN_AVOID],
-        safeFoods: ['글루텐프리 밀가루', '글루텐프리 파스타', '글루텐프리 빵', '쌀가루', '옥수수가루'],
-        substitutes: { ...GLUTEN_SUBSTITUTES },
-        tips: '글루텐프리 마크 확인. 교차오염 주의',
-        source: "https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"
-    },
-    '글루텐 알레르기': {
-        name: '글루텐 불내증',
-        type: 'intolerance',
-        reason: '밀·보리 등에 든 글루텐이 소장 점막을 손상시켜 복통·설사·영양흡수 장애를 유발함',
-        avoidFoods: [...GLUTEN_AVOID],
-        safeFoods: ['글루텐프리 밀가루', '글루텐프리 파스타', '글루텐프리 빵', '쌀가루', '옥수수가루'],
-        substitutes: { ...GLUTEN_SUBSTITUTES },
-        tips: '글루텐프리 마크 확인. 교차오염 주의',
-        source: "https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"
-    },
     '땅콩': {
-        name: '땅콩 알레르기',
-        type: 'allergy',
-        reason: '땅콩 단백질에 대한 면역 과민반응으로 심하면 아나필락시스(전신 쇼크)까지 유발할 수 있음',
-        avoidFoods: ['땅콩', '땅콩버터', '땅콩기름', '땅콩과자'],
-        safeFoods: ['해바라기씨버터', '두유', '씨앗류'],
-        tips: '아나필락시스(전신 알레르기 쇼크) 위험이 높은 대표 알레르겐. 가공식품 성분표의 땅콩 함유 여부 반드시 확인',
-        source: "https://www.sidae.com/article/2017053009448023036"
-    },
-    '땅콩 알레르기': {
         name: '땅콩 알레르기',
         type: 'allergy',
         reason: '땅콩 단백질에 대한 면역 과민반응으로 심하면 아나필락시스(전신 쇼크)까지 유발할 수 있음',
@@ -266,43 +150,7 @@ const allergyMapping = {
         tips: '한 가지 견과류에 알레르기가 있으면 다른 견과류도 함께 피하는 것이 안전 (견과류 간 교차반응 가능)',
         source: "https://www.sidae.com/article/2017053009448023036"
     },
-    '견과류 알레르기': {
-        name: '견과류 알레르기',
-        type: 'allergy',
-        reason: '견과류 단백질에 대한 면역 과민반응, 땅콩 알레르기와 별개로 발생할 수 있음',
-        avoidFoods: ['호두', '아몬드', '캐슈넛', '피스타치오', '헤이즐넛', '잣'],
-        safeFoods: ['해바라기씨', '호박씨'],
-        tips: '한 가지 견과류에 알레르기가 있으면 다른 견과류도 함께 피하는 것이 안전 (견과류 간 교차반응 가능)',
-        source: "https://www.sidae.com/article/2017053009448023036"
-    },
     '갑각류': {
-        name: '갑각류 알레르기',
-        type: 'allergy',
-        reason: '새우·게 등 갑각류 단백질에 대한 면역 과민반응, 성인 발병이 흔하고 증상이 심할 수 있음',
-        avoidFoods: ['새우', '게', '랍스터', '가재'],
-        safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
-        tips: '성인이 된 후 발생하면 잘 없어지지 않는 대표적 알레르겐. 같은 팬·기름을 사용한 조리도 교차오염 주의',
-        source: "https://www.sidae.com/article/2017053009448023036"
-    },
-    '갑각류 알레르기': {
-        name: '갑각류 알레르기',
-        type: 'allergy',
-        reason: '새우·게 등 갑각류 단백질에 대한 면역 과민반응, 성인 발병이 흔하고 증상이 심할 수 있음',
-        avoidFoods: ['새우', '게', '랍스터', '가재'],
-        safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
-        tips: '성인이 된 후 발생하면 잘 없어지지 않는 대표적 알레르겐. 같은 팬·기름을 사용한 조리도 교차오염 주의',
-        source: "https://www.sidae.com/article/2017053009448023036"
-    },
-    '새우': {
-        name: '갑각류 알레르기',
-        type: 'allergy',
-        reason: '새우·게 등 갑각류 단백질에 대한 면역 과민반응, 성인 발병이 흔하고 증상이 심할 수 있음',
-        avoidFoods: ['새우', '게', '랍스터', '가재'],
-        safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
-        tips: '성인이 된 후 발생하면 잘 없어지지 않는 대표적 알레르겐. 같은 팬·기름을 사용한 조리도 교차오염 주의',
-        source: "https://www.sidae.com/article/2017053009448023036"
-    },
-    '게': {
         name: '갑각류 알레르기',
         type: 'allergy',
         reason: '새우·게 등 갑각류 단백질에 대한 면역 과민반응, 성인 발병이 흔하고 증상이 심할 수 있음',
@@ -315,17 +163,11 @@ const allergyMapping = {
         name: '조개류 알레르기',
         type: 'allergy',
         reason: '조개·홍합 등 연체동물 단백질에 대한 면역 과민반응',
-        avoidFoods: ['굴', '전복', '홍합', '조개', '바지락'],
+        avoidFoods: ['굴', '전복', '홍합', '조개', '바지락', '굴소스'],
         safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
-        tips: '식약처 알레르기 표시 의무 대상 원재료(굴·전복·홍합 포함). 가공식품의 조개류 함유 여부 확인 필수',
-        source: "https://www.sidae.com/article/2017053009448023036"
-    },
-    '조개류 알레르기': {
-        name: '조개류 알레르기',
-        type: 'allergy',
-        reason: '조개·홍합 등 연체동물 단백질에 대한 면역 과민반응',
-        avoidFoods: ['굴', '전복', '홍합', '조개', '바지락'],
-        safeFoods: ['흰살생선(알레르기 없는 경우)', '닭고기', '두부'],
+        substitutes: {
+            '굴소스': ['간장 + 설탕 소량(굴소스 대용)', '비건 굴소스(버섯 베이스, 성분표 확인)']
+        },
         tips: '식약처 알레르기 표시 의무 대상 원재료(굴·전복·홍합 포함). 가공식품의 조개류 함유 여부 확인 필수',
         source: "https://www.sidae.com/article/2017053009448023036"
     },
@@ -333,7 +175,7 @@ const allergyMapping = {
         name: '대두 알레르기',
         type: 'allergy',
         reason: '대두 단백질에 대한 면역 과민반응',
-        avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)', '청국장', '낫토'],
+        avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)', '청국장', '낫토', '고추장', '쯔유', '데리야끼소스', '두반장'],
         safeFoods: ['쌀', '고기류', '달걀(알레르기 없는 경우)'],
         substitutes: {
             '두부': ['고기류(닭고기·소고기 등)'],
@@ -341,37 +183,11 @@ const allergyMapping = {
             '두유': ['아몬드 밀크', '귀리 밀크', '쌀 음료'],
             '간장(대두 함유)': ['코코넛 아미노스'],
             '청국장': ['고기류(닭고기·소고기 등)'],
-            '낫토': ['고기류(닭고기·소고기 등)']
-        },
-        tips: '된장·간장·두부 등 한식에 대두가 광범위하게 쓰이므로 성분표 확인이 특히 중요한 국내 5대 알레르기 원인 식품 중 하나',
-        source: "https://koreascience.or.kr/article/JAKO200203042151312.page?&lang=en"
-    },
-    '대두 알레르기': {
-        name: '대두 알레르기',
-        type: 'allergy',
-        reason: '대두 단백질에 대한 면역 과민반응',
-        avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)'],
-        safeFoods: ['쌀', '고기류', '달걀(알레르기 없는 경우)'],
-        substitutes: {
-            '두부': ['고기류(닭고기·소고기 등)'],
-            '콩': ['고기류(닭고기·소고기 등)'],
-            '두유': ['아몬드 밀크', '귀리 밀크', '쌀 음료'],
-            '간장(대두 함유)': ['코코넛 아미노스']
-        },
-        tips: '된장·간장·두부 등 한식에 대두가 광범위하게 쓰이므로 성분표 확인이 특히 중요한 국내 5대 알레르기 원인 식품 중 하나',
-        source: "https://koreascience.or.kr/article/JAKO200203042151312.page?&lang=en"
-    },
-    '콩': {
-        name: '대두 알레르기',
-        type: 'allergy',
-        reason: '대두 단백질에 대한 면역 과민반응',
-        avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)'],
-        safeFoods: ['쌀', '고기류', '달걀(알레르기 없는 경우)'],
-        substitutes: {
-            '두부': ['고기류(닭고기·소고기 등)'],
-            '콩': ['고기류(닭고기·소고기 등)'],
-            '두유': ['아몬드 밀크', '귀리 밀크', '쌀 음료'],
-            '간장(대두 함유)': ['코코넛 아미노스']
+            '낫토': ['고기류(닭고기·소고기 등)'],
+            '고추장': ['고춧가루 + 쌀조청(고추장 대용, 맛 차이 있음)'],
+            '쯔유': ['코코넛 아미노스 + 미림 + 다시마 육수(쯔유 대용)'],
+            '데리야끼소스': ['코코넛 아미노스 + 꿀(데리야끼 대용)'],
+            '두반장': ['고춧가루 + 고추기름(두반장 대용)']
         },
         tips: '된장·간장·두부 등 한식에 대두가 광범위하게 쓰이므로 성분표 확인이 특히 중요한 국내 5대 알레르기 원인 식품 중 하나',
         source: "https://koreascience.or.kr/article/JAKO200203042151312.page?&lang=en"
@@ -385,30 +201,19 @@ const allergyMapping = {
         tips: '소량 노출로도 심한 반응을 일으킬 수 있는 국내 5대 알레르기 원인 식품 중 하나. 냉면·막국수 등에 흔히 쓰이므로 주의',
         source: "https://koreascience.or.kr/article/JAKO200203042151312.page?&lang=en"
     },
-    '메밀 알레르기': {
-        name: '메밀 알레르기',
-        type: 'allergy',
-        reason: '메밀 단백질에 대한 면역 과민반응, 국내에서 비교적 흔하고 중증 반응 가능성이 있음',
-        avoidFoods: ['메밀', '메밀면', '냉면(메밀 함유)', '막국수'],
-        safeFoods: ['쌀국수', '밀면(밀 알레르기 없는 경우)'],
-        tips: '소량 노출로도 심한 반응을 일으킬 수 있는 국내 5대 알레르기 원인 식품 중 하나. 냉면·막국수 등에 흔히 쓰이므로 주의',
-        source: "https://koreascience.or.kr/article/JAKO200203042151312.page?&lang=en"
-    },
     '고등어': {
         name: '생선 알레르기',
         type: 'allergy',
         reason: '생선 단백질에 대한 면역 과민반응',
-        avoidFoods: ['고등어', '참치', '연어', '생선류'],
+        avoidFoods: ['고등어', '참치', '연어', '생선류', '가쓰오부시', '명란젓', '사각어묵', '꽁치통조림', '고기 또는 생선'],
         safeFoods: ['닭고기', '두부', '달걀(알레르기 없는 경우)'],
-        tips: '고등어는 국내 알레르기 원인 조사에서 가장 많이 보고된 식품. 신선도가 떨어지면 히스타민 중독(알레르기와 유사한 증상)도 유발 가능',
-        source: "https://www.koreascience.or.kr/article/JAKO199711921349210.page"
-    },
-    '생선 알레르기': {
-        name: '생선 알레르기',
-        type: 'allergy',
-        reason: '생선 단백질에 대한 면역 과민반응',
-        avoidFoods: ['고등어', '참치', '연어', '생선류'],
-        safeFoods: ['닭고기', '두부', '달걀(알레르기 없는 경우)'],
+        substitutes: {
+            '가쓰오부시': ['김가루', '다시마 가루'],
+            '명란젓': ['명란 없이 조리(대체 어려움)'],
+            '사각어묵': ['두부(대두 알레르기 없는 경우)'],
+            '꽁치통조림': ['닭고기', '두부(대두 알레르기 없는 경우)'],
+            '고기 또는 생선': ['고기(소고기·닭고기 등)만 사용']
+        },
         tips: '고등어는 국내 알레르기 원인 조사에서 가장 많이 보고된 식품. 신선도가 떨어지면 히스타민 중독(알레르기와 유사한 증상)도 유발 가능',
         source: "https://www.koreascience.or.kr/article/JAKO199711921349210.page"
     },
@@ -416,17 +221,12 @@ const allergyMapping = {
         name: '돼지고기 알레르기',
         type: 'allergy',
         reason: '돼지고기 단백질에 대한 면역 과민반응(비교적 드물지만 발생 가능)',
-        avoidFoods: ['돼지고기', '삼겹살', '베이컨', '햄', '돈가스', '돈까스'],
+        avoidFoods: ['돼지고기', '삼겹살', '베이컨', '햄', '돈가스', '돈까스', '소세지', '소시지'],
         safeFoods: ['닭고기', '소고기(알레르기 없는 경우)', '두부'],
-        tips: '국내 병력 조사에서 원인 식품 상위권으로 보고된 알레르겐. 가공육(햄·베이컨)에도 돼지고기가 포함되니 확인 필요',
-        source: "https://www.koreascience.or.kr/article/JAKO199711921349210.page"
-    },
-    '돼지고기 알레르기': {
-        name: '돼지고기 알레르기',
-        type: 'allergy',
-        reason: '돼지고기 단백질에 대한 면역 과민반응(비교적 드물지만 발생 가능)',
-        avoidFoods: ['돼지고기', '삼겹살', '베이컨', '햄', '돈가스', '돈까스'],
-        safeFoods: ['닭고기', '소고기(알레르기 없는 경우)', '두부'],
+        substitutes: {
+            '소세지': ['닭 소시지(돼지고기 미포함, 성분표 확인)'],
+            '소시지': ['닭 소시지(돼지고기 미포함, 성분표 확인)']
+        },
         tips: '국내 병력 조사에서 원인 식품 상위권으로 보고된 알레르겐. 가공육(햄·베이컨)에도 돼지고기가 포함되니 확인 필요',
         source: "https://www.koreascience.or.kr/article/JAKO199711921349210.page"
     },
@@ -439,16 +239,29 @@ const allergyMapping = {
         tips: '국내 병력 조사에서 가장 흔한 과일 알레르겐. 자작나무 꽃가루 알레르기가 있으면 복숭아 등과 교차반응(구강알레르기증후군)이 나타날 수 있음',
         source: "https://www.koreascience.or.kr/article/JAKO199711921349210.page"
     },
-    '복숭아 알레르기': {
-        name: '복숭아 알레르기',
-        type: 'allergy',
-        reason: '복숭아 등 장미과 과일 단백질에 대한 면역 과민반응, 입 주위 가려움 등으로 나타나기도 함',
-        avoidFoods: ['복숭아', '천도복숭아', '복숭아 통조림'],
-        safeFoods: ['사과', '배', '포도'],
-        tips: '국내 병력 조사에서 가장 흔한 과일 알레르겐. 자작나무 꽃가루 알레르기가 있으면 복숭아 등과 교차반응(구강알레르기증후군)이 나타날 수 있음',
-        source: "https://www.koreascience.or.kr/article/JAKO199711921349210.page"
-    }
 };
+
+// 같은 알레르기의 별칭 키는 정본 객체를 그대로 가리켜요(내용이 갈라지지 않게). 고칠 때는 정본만 고치면 돼요.
+allergyMapping['유당'] = allergyMapping['유당불내증'];
+allergyMapping['버터'] = allergyMapping['유제품'];
+allergyMapping['치즈'] = allergyMapping['유제품'];
+allergyMapping['우유'] = allergyMapping['우유 알레르기'];
+allergyMapping['계란 알레르기'] = allergyMapping['계란'];
+allergyMapping['글루텐'] = allergyMapping['밀가루'];
+allergyMapping['글루텐 불내증'] = allergyMapping['밀가루'];
+allergyMapping['글루텐 알레르기'] = allergyMapping['밀가루'];
+allergyMapping['땅콩 알레르기'] = allergyMapping['땅콩'];
+allergyMapping['견과류 알레르기'] = allergyMapping['견과류'];
+allergyMapping['갑각류 알레르기'] = allergyMapping['갑각류'];
+allergyMapping['새우'] = allergyMapping['갑각류'];
+allergyMapping['게'] = allergyMapping['갑각류'];
+allergyMapping['조개류 알레르기'] = allergyMapping['조개류'];
+allergyMapping['대두 알레르기'] = allergyMapping['대두'];
+allergyMapping['콩'] = allergyMapping['대두'];
+allergyMapping['메밀 알레르기'] = allergyMapping['메밀'];
+allergyMapping['생선 알레르기'] = allergyMapping['고등어'];
+allergyMapping['돼지고기 알레르기'] = allergyMapping['돼지고기'];
+allergyMapping['복숭아 알레르기'] = allergyMapping['복숭아'];
 
 // 기저질환 매핑
 const diseaseMapping = {
