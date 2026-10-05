@@ -684,6 +684,57 @@
             }
         }
 
+               .home-section {
+            border-radius: 16px;
+            padding: 24px 20px;
+            margin: 0 -20px 4px;
+        }
+
+        .home-section-a {
+            background: #FFFFFF;
+        }
+
+        .home-section-b {
+            background: #F5F3EE;
+        }
+
+        .home-intro {
+            display: none;
+            text-align: center;
+            padding: 36px 20px 28px;
+            margin-bottom: 8px;
+        }
+
+        .home-intro-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2B3E2F;
+            margin-bottom: 10px;
+        }
+
+        .home-intro-sub {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 18px;
+        }
+
+        .home-intro-stats {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .home-intro-stat {
+            background: #FFFFFF;
+            border: 1px solid #E8E3DD;
+            border-radius: 20px;
+            padding: 7px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #3B6D11;
+        }
+
         @media (min-width: 1024px) {
             .recipe-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -697,6 +748,10 @@
 
             .carousel-card {
                 flex: none;
+            }
+
+            .home-intro {
+                display: block;
             }
         }
     </style>
@@ -758,33 +813,49 @@
     </div>
 
     <!-- 홈 페이지 -->
-    <div id="home" class="page active">
-        <div class="section-label-home" style="margin-top: 30px;">오늘 뭐 먹지? 🎲</div>
-        <div class="carousel-cat-row">
-            <div class="carousel-cat-tab active" data-cat="all" onclick="selectCarouselCategory('all', this);">전체</div>
-            <div class="carousel-cat-tab" data-cat="한식" onclick="selectCarouselCategory('한식', this);">한식</div>
-            <div class="carousel-cat-tab" data-cat="양식" onclick="selectCarouselCategory('양식', this);">양식</div>
-            <div class="carousel-cat-tab" data-cat="일식" onclick="selectCarouselCategory('일식', this);">일식</div>
-            <div class="carousel-cat-tab" data-cat="중식" onclick="selectCarouselCategory('중식', this);">중식</div>
-            <div class="carousel-cat-tab" data-cat="디저트" onclick="selectCarouselCategory('디저트', this);">디저트</div>
-        </div>
-        <div id="carouselTrack" class="carousel-track"></div>
-        <div style="text-align: center; margin-bottom: 30px;">
-            <button class="carousel-refresh-btn" onclick="renderCarousel(); resetCarouselAutoPlay();">🔄 다른 추천 보기</button>
-        </div>
-
-        <div class="section-label-home" style="display: flex; align-items: center; justify-content: space-between;">
-            <span>📖 레시피 북</span>
-            <span onclick="showPage('recipeBook');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">전체 보기 →</span>
-        </div>
-        <div id="homeRecipeGrid" class="home-recipe-row"></div>
-
-        <div class="section-label-home">🩺 내 알레르기 · 기저질환</div>
-        <div style="background: #ffffff; border: 1px solid #E8E3DD; border-radius: 12px; padding: 16px; margin-bottom: 30px;">
-            <div id="homeHealthDisplay" style="font-size: 13px; color: #2B3E2F; margin-bottom: 10px; line-height: 1.6;">
-                등록된 정보가 없어요.
+        <div id="home" class="page active">
+        <div class="home-intro">
+            <div class="home-intro-title">🍽️ 먹고죽자!</div>
+            <div class="home-intro-sub">알레르기·기저질환이 있어도 안심하고 고르는 레시피</div>
+            <div class="home-intro-stats">
+                <span class="home-intro-stat">레시피 80개</span>
+                <span class="home-intro-stat">알레르기·기저질환 21종 지원</span>
+                <span class="home-intro-stat">대체식품 자동 안내</span>
             </div>
-            <span onclick="showPage('profile');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">내 정보에서 수정하기 →</span>
+        </div>
+
+        <div class="home-section home-section-a">
+            <div class="section-label-home" style="margin-top: 0;">오늘 뭐 먹지? 🎲</div>
+            <div class="carousel-cat-row">
+                <div class="carousel-cat-tab active" data-cat="all" onclick="selectCarouselCategory('all', this);">전체</div>
+                <div class="carousel-cat-tab" data-cat="한식" onclick="selectCarouselCategory('한식', this);">한식</div>
+                <div class="carousel-cat-tab" data-cat="양식" onclick="selectCarouselCategory('양식', this);">양식</div>
+                <div class="carousel-cat-tab" data-cat="일식" onclick="selectCarouselCategory('일식', this);">일식</div>
+                <div class="carousel-cat-tab" data-cat="중식" onclick="selectCarouselCategory('중식', this);">중식</div>
+                <div class="carousel-cat-tab" data-cat="디저트" onclick="selectCarouselCategory('디저트', this);">디저트</div>
+            </div>
+            <div id="carouselTrack" class="carousel-track"></div>
+            <div style="text-align: center;">
+                <button class="carousel-refresh-btn" onclick="renderCarousel(); resetCarouselAutoPlay();">🔄 다른 추천 보기</button>
+            </div>
+        </div>
+
+        <div class="home-section home-section-b">
+            <div class="section-label-home" style="margin-top: 0; display: flex; align-items: center; justify-content: space-between;">
+                <span>📖 레시피 북</span>
+                <span onclick="showPage('recipeBook');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">전체 보기 →</span>
+            </div>
+            <div id="homeRecipeGrid" class="home-recipe-row"></div>
+        </div>
+
+        <div class="home-section home-section-a" style="margin-bottom: 20px;">
+            <div class="section-label-home" style="margin-top: 0;">🩺 내 알레르기 · 기저질환</div>
+            <div style="background: #FAF8F5; border: 1px solid #E8E3DD; border-radius: 12px; padding: 16px;">
+                <div id="homeHealthDisplay" style="font-size: 13px; color: #2B3E2F; margin-bottom: 10px; line-height: 1.6;">
+                    등록된 정보가 없어요.
+                </div>
+                <span onclick="showPage('profile');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">내 정보에서 수정하기 →</span>
+            </div>
         </div>
     </div>
 
