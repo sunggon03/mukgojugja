@@ -737,57 +737,6 @@
             color: #3B6D11;
         }
 
-               .home-section {
-            border-radius: 16px;
-            padding: 24px 20px;
-            margin: 0 -20px 4px;
-        }
-
-        .home-section-a {
-            background: #FFFFFF;
-        }
-
-        .home-section-b {
-            background: #F5F3EE;
-        }
-
-        .home-intro {
-            display: none;
-            text-align: center;
-            padding: 36px 20px 28px;
-            margin-bottom: 8px;
-        }
-
-        .home-intro-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: #2B3E2F;
-            margin-bottom: 10px;
-        }
-
-        .home-intro-sub {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 18px;
-        }
-
-        .home-intro-stats {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .home-intro-stat {
-            background: #FFFFFF;
-            border: 1px solid #E8E3DD;
-            border-radius: 20px;
-            padding: 7px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #3B6D11;
-        }
-
         @media (min-width: 1024px) {
             .recipe-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -907,10 +856,7 @@
                 <div id="homeHealthDisplay" style="font-size: 13px; color: #2B3E2F; margin-bottom: 10px; line-height: 1.6;">
                     등록된 정보가 없어요.
                 </div>
-<<<<<<< HEAD
                 <div id="homeHealthUnrecognized" style="display: none; font-size: 12px; color: #B7791F; background: #FFF4DC; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; line-height: 1.5;"></div>
-=======
->>>>>>> ec2817bbd8738da264b6d5ec873934f859a79d9b
                 <span onclick="showPage('profile');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">내 정보에서 수정하기 →</span>
             </div>
         </div>
@@ -1090,15 +1036,9 @@
     </div>
 
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
-<<<<<<< HEAD
        <script src="diet-data.js?v=20261019"></script>
 <script src="recipes-data.js?v=20261019"></script>
 <script src="substitute-logic.js?v=20261019"></script>
-=======
-       <script src="diet-data.js?v=20260922"></script>
-<script src="recipes-data.js?v=20260922"></script>
-<script src="substitute-logic.js?v=20260922b"></script>
->>>>>>> ec2817bbd8738da264b6d5ec873934f859a79d9b
     <script>
 
 
@@ -1948,10 +1888,6 @@
             recipe.ingredients.forEach((ing, ingIdx) => {
                 const ingNameLower = ing.name.toLowerCase();
                                const { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
-<<<<<<< HEAD
-=======
-                const maybeHint = !hasAllergy && avoidSources.length > 0 ? getMaybeHint(ing.name, avoidSources) : null;
->>>>>>> ec2817bbd8738da264b6d5ec873934f859a79d9b
 
                 const maybeNotes = findMaybeContain(ing.name, allergyObjects);
                 const className = hasAllergy ? 'ingredient-warning' : 'ingredient-normal';
@@ -1991,11 +1927,7 @@
                         </div>
                        <div style="text-align: right;" data-base-amount="${ing.amount}">${scaledAmount}</div>
                     </div>
-<<<<<<< HEAD
                     ${maybeNotes.map(m => `<div style="font-size: 11px; color: #8a5a00; background: #FFF4DC; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">🔎 <strong>${m.allergen}</strong>: ${m.note}. 성분표를 확인하세요.</div>`).join('')}
-=======
-                    ${maybeHint ? `<div style="font-size: 11px; color: #999; padding: 0 0 10px 32px; margin-top: -8px;">🔍 ${maybeHint}</div>` : ''}
->>>>>>> ec2817bbd8738da264b6d5ec873934f859a79d9b
                     ${expandable && !cartModeOn ? `
                         <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
                             ${allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-bottom: 8px;">⚠️ <strong>왜 피해야 하나요?</strong> ${allergyReason}</div>` : ''}
