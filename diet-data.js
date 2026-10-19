@@ -10,7 +10,8 @@ const GLUTEN_AVOID = [
     '중력분', '강력분', '박력분', '부침가루', '튀김가루', '팬케이크 가루', '핫케이크가루',
     '우동면', '소면', '라면', '파스타면', '스파게티면', '라자냐면', '야키소바면',
     '빵가루', '식빵', '치아바타빵', '타르트지', '고체카레', '돈가스', '돈까스', '레이디핑거',
-    '마카로니', '바게트', '튀김'
+    '마카로니', '바게트', '튀김',
+    '통밀', '통밀빵', '통곡물', '귀리', '오트밀'
 ];
 const GLUTEN_SUBSTITUTES = {
     '밀가루': ['글루텐프리 밀가루', '쌀가루'],
@@ -43,7 +44,12 @@ const GLUTEN_SUBSTITUTES = {
     '레이디핑거': ['글루텐프리 비스킷·스펀지(성분표 확인)'],
     '마카로니': ['글루텐프리 파스타(쌀·옥수수)'],
     '바게트': ['글루텐프리 빵'],
-    '튀김': ['쌀 튀김가루로 만든 튀김']
+    '튀김': ['쌀 튀김가루로 만든 튀김'],
+    '통밀': ['쌀', '옥수수'],
+    '통밀빵': ['글루텐프리 빵'],
+    '통곡물': ['쌀', '옥수수'],
+    '귀리': ['글루텐프리 귀리(인증 제품)'],
+    '오트밀': ['글루텐프리 오트밀(인증 제품)']
 };
 
 // 알레르기 매핑 (상세 객체 구조)
@@ -370,33 +376,45 @@ const MAYBE_CONTAIN = [
 const diseaseMapping = {
     '당뇨': {
         name: '당뇨병',
-        reason: '혈당을 급격히 올리는 음식은 혈당 조절을 어렵게 하고 합병증 위험을 높임',
+        reason: '정제 탄수화물(흰쌀·흰빵)과 단 음료는 혈당을 빠르게 올려 혈당 조절을 어렵게 함',
         avoidIngredients: ['설탕', '흰쌀', '흰빵', '과일주스', '단음료'],
         safeIngredients: ['현미', '귀리', '통곡물', '채소', '콩류', '견과류'],
         substitutes: {
-            '설탕': ['스테비아', '알룰로스', '에리스리톨'],
+            '설탕': ['스테비아', '알룰로스'],
             '흰쌀': ['현미', '귀리', '통곡물'],
             '흰빵': ['통밀빵', '호밀빵'],
             '과일주스': ['생과일(통째로)', '무가당 차'],
             '단음료': ['물', '무가당 탄산수', '무가당 차']
         },
-        tips: '정제 탄수화물과 단 음료는 줄이고, 혈당지수(GI)가 낮은 통곡물·채소 위주로 섭취 권장',
-        source: "https://mountsinai.org/health-library/report/diabetes-diet"
+        tips: '탄수화물의 양과 비율은 사람마다 달라서 정해진 하나의 정답은 없어요(개인별 식사 계획 필요). 가공이 적고 식이섬유가 많은 곡물·채소·콩류를 고르고, 설탕 음료와 정제 곡물·첨가당은 줄이세요. 단맛 대체품도 장기 안전성 연구가 진행 중이라 꾸준히 많이 쓰기보다 가끔만 쓰는 편이 좋아요. 과일주스는 설탕이 더해진 제품을 특히 피하세요(100% 주스는 당뇨 발생 위험과의 연관이 뚜렷하지 않았어요).',
+        source: "https://glycemicindex.com/2024/09/the-latest-nutrition-recommendations-for-people-with-diabetes",
+        evidence: [
+            {"level":"지침","claim":"탄수화물 공급원은 식이섬유가 많고 가공이 적은 것을 고르고, 설탕 음료와 가공식품·정제 곡물·첨가당은 줄이기","foods":["설탕","단음료","흰빵","흰쌀"],"cite":"ADA Professional Practice Committee. 5. Facilitating Positive Health Behaviors and Well-being to Improve Health Outcomes: Standards of Care in Diabetes—2024. Diabetes Care 2024 (요약 페이지를 통해 확인)","url":"https://glycemicindex.com/2024/09/the-latest-nutrition-recommendations-for-people-with-diabetes"},
+            {"level":"지침","claim":"식사 패턴 하나가 정답은 아님(지중해·DASH·저탄수화물 등 모두 이점 보고). 탄수화물 비율은 개인별로 정함","foods":[],"cite":"Lim JH. Guidelines for the Use of 2023 Food Exchange Lists for Diabetes Meal Planning. J Korean Diabetes 2024;25(1):42-51","url":"https://synapse.koreamed.org/articles/1516086657"},
+            {"level":"논문","claim":"에리스리톨은 혈중 농도와 심혈관 사건 위험의 연관(검증 코호트 HR 1.80·2.21)과 혈소판 반응 증가가 보고됨. 관찰연구라 인과는 확정 아니지만 장기 안전성 연구가 필요하다고 저자가 밝혀, 대체품 목록에서 뺌","foods":["설탕"],"cite":"Witkowski M, et al. The artificial sweetener erythritol and cardiovascular event risk. Nat Med 2023;29:710-718","url":"https://www.nature.com/articles/s41591-023-02223-9"},
+            {"level":"논문","claim":"가당 과일주스는 제2형 당뇨 발생 위험 증가와 연관(최고 vs 최저 섭취 RR 1.28, 95% CI 1.04–1.59). 100% 과일주스는 유의한 연관이 없었음(RR 1.03, 95% CI 0.91–1.18). 일반인 대상 관찰연구 메타분석이라, 당뇨 환자의 혈당 반응을 직접 다룬 근거는 아님","foods":["과일주스"],"cite":"Xi B, et al. Intake of Fruit Juice and Incidence of Type 2 Diabetes: A Systematic Review and Meta-Analysis. PLoS ONE 2014;9(3):e93471 (초록을 통해 확인)","url":"https://ideas.repec.org/a/plo/pone00/0093471.html"}
+        ]
     },
     '당뇨병': {
         name: '당뇨병',
-        reason: '혈당을 급격히 올리는 음식은 혈당 조절을 어렵게 하고 합병증 위험을 높임',
+        reason: '정제 탄수화물(흰쌀·흰빵)과 단 음료는 혈당을 빠르게 올려 혈당 조절을 어렵게 함',
         avoidIngredients: ['설탕', '흰쌀', '흰빵', '과일주스', '단음료'],
         safeIngredients: ['현미', '귀리', '통곡물', '채소', '콩류', '견과류'],
         substitutes: {
-            '설탕': ['스테비아', '알룰로스', '에리스리톨'],
+            '설탕': ['스테비아', '알룰로스'],
             '흰쌀': ['현미', '귀리', '통곡물'],
             '흰빵': ['통밀빵', '호밀빵'],
             '과일주스': ['생과일(통째로)', '무가당 차'],
             '단음료': ['물', '무가당 탄산수', '무가당 차']
         },
-        tips: '정제 탄수화물과 단 음료는 줄이고, 혈당지수(GI)가 낮은 통곡물·채소 위주로 섭취 권장',
-        source: "https://mountsinai.org/health-library/report/diabetes-diet"
+        tips: '탄수화물의 양과 비율은 사람마다 달라서 정해진 하나의 정답은 없어요(개인별 식사 계획 필요). 가공이 적고 식이섬유가 많은 곡물·채소·콩류를 고르고, 설탕 음료와 정제 곡물·첨가당은 줄이세요. 단맛 대체품도 장기 안전성 연구가 진행 중이라 꾸준히 많이 쓰기보다 가끔만 쓰는 편이 좋아요. 과일주스는 설탕이 더해진 제품을 특히 피하세요(100% 주스는 당뇨 발생 위험과의 연관이 뚜렷하지 않았어요).',
+        source: "https://glycemicindex.com/2024/09/the-latest-nutrition-recommendations-for-people-with-diabetes",
+        evidence: [
+            {"level":"지침","claim":"탄수화물 공급원은 식이섬유가 많고 가공이 적은 것을 고르고, 설탕 음료와 가공식품·정제 곡물·첨가당은 줄이기","foods":["설탕","단음료","흰빵","흰쌀"],"cite":"ADA Professional Practice Committee. 5. Facilitating Positive Health Behaviors and Well-being to Improve Health Outcomes: Standards of Care in Diabetes—2024. Diabetes Care 2024 (요약 페이지를 통해 확인)","url":"https://glycemicindex.com/2024/09/the-latest-nutrition-recommendations-for-people-with-diabetes"},
+            {"level":"지침","claim":"식사 패턴 하나가 정답은 아님(지중해·DASH·저탄수화물 등 모두 이점 보고). 탄수화물 비율은 개인별로 정함","foods":[],"cite":"Lim JH. Guidelines for the Use of 2023 Food Exchange Lists for Diabetes Meal Planning. J Korean Diabetes 2024;25(1):42-51","url":"https://synapse.koreamed.org/articles/1516086657"},
+            {"level":"논문","claim":"에리스리톨은 혈중 농도와 심혈관 사건 위험의 연관(검증 코호트 HR 1.80·2.21)과 혈소판 반응 증가가 보고됨. 관찰연구라 인과는 확정 아니지만 장기 안전성 연구가 필요하다고 저자가 밝혀, 대체품 목록에서 뺌","foods":["설탕"],"cite":"Witkowski M, et al. The artificial sweetener erythritol and cardiovascular event risk. Nat Med 2023;29:710-718","url":"https://www.nature.com/articles/s41591-023-02223-9"},
+            {"level":"논문","claim":"가당 과일주스는 제2형 당뇨 발생 위험 증가와 연관(최고 vs 최저 섭취 RR 1.28, 95% CI 1.04–1.59). 100% 과일주스는 유의한 연관이 없었음(RR 1.03, 95% CI 0.91–1.18). 일반인 대상 관찰연구 메타분석이라, 당뇨 환자의 혈당 반응을 직접 다룬 근거는 아님","foods":["과일주스"],"cite":"Xi B, et al. Intake of Fruit Juice and Incidence of Type 2 Diabetes: A Systematic Review and Meta-Analysis. PLoS ONE 2014;9(3):e93471 (초록을 통해 확인)","url":"https://ideas.repec.org/a/plo/pone00/0093471.html"}
+        ]
     },
     '고혈압': {
         name: '고혈압',
@@ -410,8 +428,17 @@ const diseaseMapping = {
             '젓갈': ['저염 젓갈', '허브양념'],
             '라면': ['저염 국수(직접 육수)']
         },
-        tips: '나트륨 섭취를 하루 2,300mg 이하로 제한 (DASH 식단 기준). 칼륨이 풍부한 채소·과일과 함께 섭취',
-        source: "https://www.mayoclinic.org/dash-diet/art-20048456"
+        tips: '나트륨은 줄이고 칼륨이 많은 채소·과일을 늘리세요. 2025년 미국 지침은 나트륨을 이상적으로 하루 1,500mg 미만으로 권하고 DASH 식단(채소·과일·통곡물·살코기·생선)을 권해요. 술은 남성 하루 2잔, 여성 1잔 이하로 줄이세요. 칼륨 대체소금은 신장질환이 있거나 칼륨 수치를 관리 중이면 쓰지 말고 의료진과 먼저 상의하세요.',
+        source: "https://www.uspharmacist.com/article/acc-aha-hypertension-guideline-update",
+        evidence: [
+            {"level":"지침","claim":"나트륨은 이상적으로 하루 1,500mg 미만으로 줄이고, 칼륨 섭취를 늘리기","foods":["소금","나트륨"],"cite":"Jones DW, et al. 2025 AHA/ACC/AANP/AAPA/ABC/ACCP/ACPM/AGS/AMA/ASPC/NMA/PCNA/SGIM Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults. J Am Coll Cardiol 2025;86(18):1567-1678 (요약 기사를 통해 확인)","url":"https://www.uspharmacist.com/article/acc-aha-hypertension-guideline-update"},
+            {"level":"지침","claim":"DASH 식단 권고(채소·과일·통곡물·살코기와 생선·건강한 지방)","foods":[],"cite":"Jones DW, et al. 2025 AHA/ACC/AANP/AAPA/ABC/ACCP/ACPM/AGS/AMA/ASPC/NMA/PCNA/SGIM Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults. J Am Coll Cardiol 2025;86(18):1567-1678 (요약 기사를 통해 확인)","url":"https://www.uspharmacist.com/article/acc-aha-hypertension-guideline-update"},
+            {"level":"지침","claim":"알코올은 남성 하루 2잔 이하, 여성 1잔 이하. 과체중이면 최소 5% 체중 감량","foods":[],"cite":"Jones DW, et al. 2025 AHA/ACC/AANP/AAPA/ABC/ACCP/ACPM/AGS/AMA/ASPC/NMA/PCNA/SGIM Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults. J Am Coll Cardiol 2025;86(18):1567-1678 (요약 기사를 통해 확인)","url":"https://www.uspharmacist.com/article/acc-aha-hypertension-guideline-update"},
+            {"level":"지침","claim":"칼륨 대체소금은 식탁 소금으로 나트륨을 주로 섭취하는 사람에게 권하되, 신장질환 등 칼륨 관리가 필요한 경우는 제외","foods":[],"cite":"Jones DW, et al. 2025 AHA/ACC/AANP/AAPA/ABC/ACCP/ACPM/AGS/AMA/ASPC/NMA/PCNA/SGIM Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults. J Am Coll Cardiol 2025;86(18):1567-1678 (요약 기사를 통해 확인)","url":"https://www.uspharmacist.com/article/acc-aha-hypertension-guideline-update"},
+            {"level":"지침","claim":"국내 고혈압 지침(2018)도 나트륨 제한·절주·채소와 과일 충분 섭취를 생활요법으로 권고","foods":["소금","나트륨"],"cite":"대한고혈압학회 2018 진료지침(Clin Hypertens 2019;25:20). 내용은 Clin Hypertens 2020;26:5 논문의 인용으로 확인","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC7073010"},
+            {"level":"논문","claim":"한국인의 나트륨 급원: 소금 약 21%, 장류(간장·된장·고추장·쌈장) 약 22.5%, 김치 약 14%, 라면 약 4~5%. 상위 10개 급원이 섭취량의 약 70%(두 가지 추정 방법 모두)","foods":["소금","라면"],"cite":"Lee JY, et al. Dietary sodium and potassium intake of Koreans estimated using 2 different sources of their contents in foods, Food & Nutrient Database and the Korean Total Diet Study: a comparative study. Korean J Community Nutr 2023;28(3):235-244","url":"https://www.koreascience.or.kr/article/JAKO202322136704392.pdf"},
+            {"level":"참고","claim":"가공식품(빵·제과류 등)은 상위 급원이지만 비중이 작음(약 2.3%). 젓갈은 상위 10개 급원에 별도 항목으로 나오지 않음. 나트륨 제한 원칙을 적용한 예시로 목록에 둠","foods":["가공식품","젓갈"],"cite":"Lee JY, et al. Dietary sodium and potassium intake of Koreans estimated using 2 different sources of their contents in foods, Food & Nutrient Database and the Korean Total Diet Study: a comparative study. Korean J Community Nutr 2023;28(3):235-244","url":"https://www.koreascience.or.kr/article/JAKO202322136704392.pdf"}
+        ]
     },
     '고콜레스테롤': {
         name: '고콜레스테롤',
@@ -425,12 +452,18 @@ const diseaseMapping = {
             '전지우유': ['저지방 우유', '무지방 우유'],
             '버터': ['올리브유']
         },
-        tips: '포화지방·트랜스지방 섭취를 줄이고 불포화지방(올리브유, 생선 등)으로 대체 (미국심장협회 AHA 가이드라인 기준)',
-        source: "https://www.goodoc.co.kr/goodbot/10007"
+        tips: '포화지방은 하루 에너지의 7% 이내, 트랜스지방은 최대한 적게, 식이섬유는 하루 25g 이상, 당류는 에너지의 10~20% 이내, 술은 하루 1~2잔 이내(가급적 금주)로 권고돼요. 콜레스테롤 섭취는 "적게"로만 제시되고 숫자 기준은 없어요. 아래 식품 목록은 이 원칙을 적용한 예시예요.',
+        source: "https://www.lipid.or.kr/uploaded/board/guideline/_50e8f3527d0798a82a29b8ef6c363cce2.pdf",
+        evidence: [
+            {"level":"지침","claim":"포화지방산은 하루 섭취 에너지의 7% 이내, 트랜스지방은 최대한 적게. 콜레스테롤 섭취는 적게(수치 기준 없음)","foods":[],"cite":"한국지질·동맥경화학회 진료지침위원회. 이상지질혈증 진료지침 제5판","url":"https://www.lipid.or.kr/uploaded/board/guideline/_50e8f3527d0798a82a29b8ef6c363cce2.pdf"},
+            {"level":"지침","claim":"버터·라드 같은 동물성 지방은 액체 식물성 기름으로, 전지 유제품은 저지방·무지방으로 바꾸기. 붉은 고기는 심혈관 질환 위험과 연관되고 가공육은 연관이 더 강해서 살코기를 고르고 가공육은 피하기","foods":["버터","전지우유","가공육","삼겹살"],"cite":"Lichtenstein AH, et al. 2021 Dietary Guidance to Improve Cardiovascular Health: A Scientific Statement From the American Heart Association. Circulation 2021 (ACC 요약을 통해 확인)","url":"https://www.acc.org/Latest-in-Cardiology/ten-points-to-remember/2021/11/23/19/45/2021-Dietary-Guidance-to-Improve"},
+            {"level":"참고","claim":"튀긴음식: AHA 2021은 튀김 일반을 직접 다루지 않고 생선 튀김은 이득이 없다고만 언급함. 트랜스·포화지방 제한 원칙을 적용한 예시","foods":["튀긴음식"],"cite":"지침의 \"포화·트랜스지방 제한\" 원칙을 적용한 예시","url":""},
+            {"level":"지침","claim":"식이섬유 하루 25g 이상, 총 당류 에너지의 10~20% 이내, 알코올 하루 1~2잔 이내(가급적 금주)","foods":[],"cite":"한국지질·동맥경화학회 진료지침위원회. 이상지질혈증 진료지침 제5판","url":"https://www.lipid.or.kr/uploaded/board/guideline/_50e8f3527d0798a82a29b8ef6c363cce2.pdf"}
+        ]
     },
     '신장질환': {
         name: '신장질환',
-        reason: '나트륨·칼륨·단백질이 과다한 음식은 신장에 부담을 줘 기능 저하를 악화시킬 수 있음',
+        reason: '나트륨·칼륨·인·단백질 조절이 필요한 질환이에요. 특히 혈중 칼륨이 높을 때는 칼륨이 많은 식품을 제한해요',
         avoidIngredients: ['바나나', '토마토', '감자', '시금치', '가공식품', '짠음식'],
         safeIngredients: ['사과', '포도', '양배추', '흰쌀'],
         substitutes: {
@@ -441,12 +474,18 @@ const diseaseMapping = {
             '가공식품': ['신선식품'],
             '짠음식': ['저염식']
         },
-        tips: '칼륨·나트륨·인 제한이 핵심이며, 신장 기능 단계와 검사 수치에 따라 제한 정도가 달라지므로 반드시 의료진·영양사와 상담 필요 (서울아산병원 식사요법 기준)',
-        source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=55"
+        tips: '아래 목록은 혈중 칼륨이 높을 때를 기준으로 한 보수적인 예시예요. 칼륨·인 제한은 혈액검사 수치와 신장 기능 단계에 따라 사람마다 달라서(KDIGO 2024·KDOQI) 수치가 정상이면 채소·과일을 일률적으로 끊을 필요는 없어요. 공통으로는 나트륨 하루 2g(소금 약 5g) 미만, 가공식품 줄이기, 단백질은 의료진이 정한 양 지키기예요. 반드시 신장 전문 의료진·영양사와 상담하세요.',
+        source: "https://www.nephjc.com/news/kdigo-ckd-part2",
+        evidence: [
+            {"level":"지침","claim":"CKD 성인은 나트륨을 하루 2g 미만으로 제한. G3~G5 성인의 단백질은 하루 0.8g/kg 권고(과도한 고단백 1.3g/kg 초과 피하기)","foods":["짠음식"],"cite":"KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of CKD. Kidney Int 2024;105(4S):S117-S314 (NephJC 요약을 통해 확인)","url":"https://www.nephjc.com/news/kdigo-ckd-part2"},
+            {"level":"지침","claim":"초가공식품을 피하고 식물성 단백질을 우선하는 건강하고 다양한 식사(실무 권고, 근거는 제한적)","foods":["가공식품"],"cite":"KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of CKD. Kidney Int 2024;105(4S):S117-S314 (NephJC 요약을 통해 확인)","url":"https://www.nephjc.com/news/kdigo-ckd-part2"},
+            {"level":"지침","claim":"칼륨 제한은 고칼륨혈증 관리 선택지 중 하나이며 숫자 목표는 없음. 칼륨·인·나트륨은 신장 영양사가 개인별로 조절. KDOQI도 혈중 칼륨 수치에 맞춰 조절하는 방향","foods":[],"cite":"KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of CKD. Kidney Int 2024;105(4S):S117-S314 (NephJC 요약을 통해 확인) / KDOQI Clinical Practice Guidelines for Nutrition in CKD: 2019 Update (공개 초안을 다룬 Healio 기사를 통해 확인, 최종본 문구는 미확인)","url":"https://www.nephjc.com/news/kdigo-ckd-part2"},
+            {"level":"참고","claim":"혈중 칼륨이 높을 때 제한하는 식품 예: 바나나(반 개), 토마토·토마토 제품, 감자(흰·고구마), 익힌 시금치. 칼륨이 적은 식품 예: 사과, 양배추. 1회 200mg 이상이면 고칼륨 식품으로 보고, 양이 많으면 저칼륨 식품도 고칼륨이 될 수 있음","foods":["바나나","토마토","감자","시금치"],"cite":"National Kidney Foundation. Potassium in Your CKD Diet (환자 교육 자료, 지침 아님)","url":"https://www.kidney.org/atoz/content/potassium"}
+        ]
     },
     '위산역류': {
         name: '위산역류',
-        reason: '자극적이거나 기름진 음식은 위산 분비를 늘리고 식도괄약근을 약화시켜 역류를 악화시킴',
+        reason: '일부 음식은 사람에 따라 위산 역류 증상을 유발할 수 있어요',
         avoidIngredients: ['커피', '탄산음료', '기름진 음식', '매운 음식', '초콜릿', '술'],
         safeIngredients: ['오트밀', '바나나', '채소', '현미'],
         substitutes: {
@@ -457,8 +496,14 @@ const diseaseMapping = {
             '초콜릿': ['바나나'],
             '술': ['물', '무가당 음료']
         },
-        tips: '자극적인 음식과 야식을 피하고, 식사 후 바로 눕지 않는 것이 증상 관리에 중요',
-        source: "https://www.hyunmyoung.co.kr/general-medicine/gerd-foods-good-and-bad"
+        tips: '2022년 ACG 지침은 과체중이면 체중 감량, 취침 전 2~3시간은 식사 피하기, 밤에 증상이 있으면 침대 머리 쪽 높이기, 증상을 일으키는 음식은 피하기를 권해요. 아래 목록(커피·초콜릿 등)은 흔히 거론되는 유발 음식 예시라서, 본인에게 증상을 일으키는 것만 줄여도 돼요. 커피·초콜릿·술은 연구마다 연관이 뚜렷하지 않았어요.',
+        source: "https://blogs.the-hospitalist.org/content/updated-acg-gerd-guideline-addresses-increased-scrutiny-ppi-therapy",
+        evidence: [
+            {"level":"지침","claim":"과체중이면 체중 감량, 취침 전 2~3시간 식사 피하기, 야간 증상이 있으면 침대 머리 쪽 높이기","foods":[],"cite":"Katz PO, et al. ACG Clinical Guideline for the Diagnosis and Management of Gastroesophageal Reflux Disease. Am J Gastroenterol 2022 (The Hospitalist 요약 기사를 통해 확인)","url":"https://blogs.the-hospitalist.org/content/updated-acg-gerd-guideline-addresses-increased-scrutiny-ppi-therapy"},
+            {"level":"지침","claim":"증상을 유발하는 음식(trigger foods)은 피하기(요약 기사에는 개별 식품명이 없음)","foods":[],"cite":"Katz PO, et al. ACG Clinical Guideline for the Diagnosis and Management of Gastroesophageal Reflux Disease. Am J Gastroenterol 2022 (The Hospitalist 요약 기사를 통해 확인)","url":"https://blogs.the-hospitalist.org/content/updated-acg-gerd-guideline-addresses-increased-scrutiny-ppi-therapy"},
+            {"level":"논문","claim":"체계적 문헌고찰: 고지방 식사·탄산음료·감귤류·맵고 짠 음식·튀긴 음식이 역류 위험과 연관된다고 정리했지만 연구마다 결과가 엇갈림(탄산음료 OR 1.86, 95% CI 1.16–2.97처럼 연관이 보인 연구도, 튀긴 음식 OR 1.52 [0.95–2.45]나 매운 음식 OR 0.97 [0.66–1.45]처럼 뚜렷하지 않은 연구도 있음). 관찰연구만 포함","foods":["탄산음료","기름진 음식","매운 음식"],"cite":"Heidarzadeh-Esfahani N, et al. Dietary Intake in Relation to the Risk of Reflux Disease: A Systematic Review. Prev Nutr Food Sci 2021;26(4):367-379","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC8747955/"},
+            {"level":"참고","claim":"커피·초콜릿·술은 같은 고찰에서 대체로 유의한 연관이 없었음(예: 커피 OR 0.89, 술 OR 0.83). 흔히 거론되는 유발 음식이라 본인에게 증상이 있는지 확인하는 용도로만 목록에 둠","foods":["커피","초콜릿","술"],"cite":"Heidarzadeh-Esfahani N, et al. Dietary Intake in Relation to the Risk of Reflux Disease: A Systematic Review. Prev Nutr Food Sci 2021;26(4):367-379","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC8747955/"}
+        ]
     },
     '글루텐불내증': {
         name: '글루텐 불내증(셀리악병)',
@@ -466,13 +511,18 @@ const diseaseMapping = {
         avoidIngredients: [...GLUTEN_AVOID],
         safeIngredients: ['쌀', '옥수수', '감자', '글루텐프리 제품'],
         substitutes: { ...GLUTEN_SUBSTITUTES },
-        tips: '평생 글루텐(밀·보리·호밀)을 완전히 제거하는 식이가 핵심. 가공식품 속 숨은 글루텐 성분표 확인 필수',
-        source: "https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"
+        tips: '평생 글루텐(밀·보리·호밀)을 완전히 제거하는 식이가 핵심이에요. 가공식품 속 숨은 글루텐은 성분표로 확인하세요. 귀리는 "글루텐프리" 표시 제품만 드세요(일반 귀리는 밀 등과 섞일 수 있어요). 글루텐프리 식이에 경험 있는 영양사와 식단을 점검받는 것이 표준 진료예요.',
+        source: "https://www.guidelinecentral.com/summaries/acg-clinical-guidelines-diagnosis-and-management-of-celiac-disease",
+        evidence: [
+            {"level":"지침","claim":"글루텐프리 귀리는 식단에 포함 가능. 단 교차오염·귀리 품종 차이·드문 반응 가능성이 있어 내성을 확인","foods":["귀리","오트밀"],"cite":"Rubio-Tapia A, Hill ID, Semrad C, Kelly CP, Lebwohl B. ACG Guidelines Update: Diagnosis and Management of Celiac Disease. Am J Gastroenterol 2023;118(1):59-76 (Guideline Central 요약을 통해 확인)","url":"https://www.guidelinecentral.com/summaries/acg-clinical-guidelines-diagnosis-and-management-of-celiac-disease"},
+            {"level":"지침","claim":"식이 준수 평가의 표준은 글루텐프리 식이 경험이 있는 영양사 면담. 장 점막 회복을 치료 목표로 제안","foods":[],"cite":"Rubio-Tapia A, Hill ID, Semrad C, Kelly CP, Lebwohl B. ACG Guidelines Update: Diagnosis and Management of Celiac Disease. Am J Gastroenterol 2023;118(1):59-76 (Guideline Central 요약을 통해 확인)","url":"https://www.guidelinecentral.com/summaries/acg-clinical-guidelines-diagnosis-and-management-of-celiac-disease"},
+            {"level":"참고","claim":"밀·보리·호밀과 이를 쓰는 가공품 제거(기존 출처 유지)","foods":["밀가루","밀","보리","호밀"],"cite":"현명한 병원 건강정보(기존 출처 유지, 이번 작업에서 원문은 다시 확인하지 못함)","url":"https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"}
+        ]
     },
     '통풍': {
         name: '통풍',
         reason: '퓨린 함량이 높은 음식은 요산 수치를 높여 통풍 발작을 유발할 수 있음',
-        avoidIngredients: ['맥주', '내장류', '멸치', '고등어', '정어리', '조개류'],
+        avoidIngredients: ['맥주', '술', '내장류', '멸치', '고등어', '정어리', '참치', '가리비', '조개류', '단음료'],
         safeIngredients: ['저지방 유제품', '채소', '두부', '달걀'],
         substitutes: {
             '맥주': ['물', '무알코올 음료'],
@@ -480,10 +530,21 @@ const diseaseMapping = {
             '멸치': ['다시마 육수'],
             '고등어': ['흰살생선(저퓨린)'],
             '정어리': ['흰살생선(저퓨린)'],
-            '조개류': ['두부']
+            '조개류': ['두부'],
+            '술': ['물', '무알코올 음료'],
+            '참치': ['흰살생선(저퓨린)'],
+            '가리비': ['두부'],
+            '단음료': ['물', '무가당 탄산수', '무가당 차']
         },
-        tips: '고퓨린 식품(내장류, 등푸른 생선)과 술(특히 맥주) 섭취를 제한하고 물을 충분히 마시는 것이 도움',
-        source: "https://www.hyunmyoung.co.kr/general-medicine/통풍에-좋은-음식과-피해야-할-음식-총정리"
+        tips: '술(특히 맥주)을 줄이고, 내장류·정어리·참치·가리비처럼 퓨린이 많은 식품은 제한하세요. 설탕·과당이 든 음료도 줄이고, 저지방 유제품은 도움이 될 수 있어요. 미국류마티스학회(2020)는 퓨린 제한을 "조건부 권고(근거 수준 낮음)"로, 알코올 제한을 권고해요. 물을 충분히 마시는 것도 도움이 돼요.',
+        source: "https://www.eatrightpro.org/news-center/practice-trends/gout-is-a-purine-restricted-diet-still-recommended",
+        evidence: [
+            {"level":"지침","claim":"알코올 섭취 제한 권고(질병 활동도와 관계없이, 조건부)","foods":["맥주","술"],"cite":"FitzGerald JD, et al. 2020 ACR Guideline for the Management of Gout. Arthritis Care Res 2020;72(6):744-760 (Eat Right Pro 기사를 통해 확인)","url":"https://www.eatrightpro.org/news-center/practice-trends/gout-is-a-purine-restricted-diet-still-recommended"},
+            {"level":"지침","claim":"퓨린 섭취 제한은 조건부 권고(근거 확실성 낮음). 내장류는 퓨린이 특히 많고 정어리·참치·가리비 등도 제한되는 편","foods":["내장류","정어리","참치","가리비"],"cite":"FitzGerald JD, et al. 2020 ACR Guideline for the Management of Gout. Arthritis Care Res 2020;72(6):744-760 (Eat Right Pro 기사를 통해 확인)","url":"https://www.eatrightpro.org/news-center/practice-trends/gout-is-a-purine-restricted-diet-still-recommended"},
+            {"level":"논문","claim":"과당·설탕 음료의 높은 섭취는 통풍·고요산혈증 위험 증가와 연관(2018 메타분석)","foods":["단음료"],"cite":"Rongrong L, Kang Y, Chunwei L. Asia Pac J Clin Nutr 2018;27(6):1344-1356 (Eat Right Pro 기사를 통해 확인)","url":"https://www.eatrightpro.org/news-center/practice-trends/gout-is-a-purine-restricted-diet-still-recommended"},
+            {"level":"논문","claim":"저지방 유제품은 혈청 요산 감소와 연관(유제품 섭취와 통풍 위험은 무관하다는 결과도 있음)","foods":[],"cite":"FitzGerald JD, et al. 2020 ACR Guideline for the Management of Gout. Arthritis Care Res 2020;72(6):744-760 (Eat Right Pro 기사를 통해 확인)","url":"https://www.eatrightpro.org/news-center/practice-trends/gout-is-a-purine-restricted-diet-still-recommended"},
+            {"level":"논문","claim":"해산물 섭취가 많을수록 남성의 통풍 위험이 높았음(최고 vs 최저 섭취군 RR 1.51, 95% CI 1.17–1.95; 육류 RR 1.41, 유제품 RR 0.56). 남성 47,150명을 12년 추적한 코호트이며 해산물 전체 기준이라 멸치·고등어·조개류 개별 식품의 근거는 아님","foods":["멸치","고등어","조개류"],"cite":"Choi HK, Atkinson K, Karlson EW, et al. Purine-rich foods, dairy and protein intake, and the risk of gout in men. N Engl J Med 2004 (PMID 15014182, 요약 페이지를 통해 확인)","url":"https://www.metabolicum.com/learn/research/choi-2004-purine-foods-gout"}
+        ]
     }
 };
 
@@ -513,6 +574,8 @@ const substituteInfo = {
     '귀리 밀크': '유당이 없고 식이섬유가 있는 식물성 음료',
     '글루텐프리 밀가루': '쌀가루·옥수수가루 등으로 만든 밀가루 대체품',
     '글루텐프리 빵': '밀 대신 쌀 등으로 만들어 글루텐이 없는 빵',
+    '글루텐프리 귀리': '글루텐프리 인증을 받은 귀리. 일반 귀리는 밀 등과 섞일 수 있어 인증 제품만 드세요 (처음엔 소량으로 몸 반응 확인)',
+    '글루텐프리 오트밀': '글루텐프리 인증을 받은 오트밀. 일반 오트밀은 교차오염 가능성이 있어요',
     '글루텐프리 파스타': '쌀이나 옥수수 등으로 만든 글루텐 없는 면',
     '다시마 육수': '멸치 대신 감칠맛을 내는 저퓨린 육수',
     '달걀': '단백질이 풍부한 대체 단백질원',
