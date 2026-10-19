@@ -36,6 +36,14 @@ function getSubstituteInfo(foodName) {
     return substituteInfo[stripped] || null;
 }
 
+// '고기류(닭고기·소고기 등)'처럼 괄호 안에 재료를 나열한 대체품은, 나열된 재료도 들어 있는 것으로 봐요.
+// (괄호 안은 보통 무시하지만, 이런 나열은 닭고기·소고기 알레르기와 겹치는지 따질 때 필요해요.)
+function listedInParens(foodName) {
+    const m = foodName.match(/\(([^)]*)\)/);
+    if (!m || m[1].indexOf('·') === -1) return [];
+    return m[1].replace(/\s*등$/, '').split(/[·,]/).map(s => s.trim()).filter(Boolean);
+}
+
 // 이름만 봐도 "그 성분이 없는" 대체품 표기: 예) '비건 치즈'는 '치즈'라는 글자가 있어도 유제품이 아니에요.
 // resolveSubstitutes가 대체품을 걸러낼 때만 쓰는 예외표예요.
 const FREE_FROM_MARKERS = [
@@ -95,7 +103,8 @@ function resolveSubstitutes(ing, avoidSources) {
             const makers = producers.get(food) || new Set();
             for (const other of avoidSources) {
                 if (makers.has(other)) continue;
-                const matched = other.avoidFoods.find(avoidFood => isIngredientMatch(food, avoidFood) && !isFreeFrom(food, avoidFood));
+                const listed = listedInParens(food);
+                const matched = other.avoidFoods.find(avoidFood => (isIngredientMatch(food, avoidFood) && !isFreeFrom(food, avoidFood)) || listed.some(t => isIngredientMatch(t, avoidFood)));
                 if (matched) { excludedFoods.push({ food, by: other.label || '', matched }); return false; }
             }
             return true;
@@ -105,6 +114,49 @@ function resolveSubstitutes(ing, avoidSources) {
     const noSubMessage = hasAllergy && ing.noSubstituteHere;
     const noAlternative = !!(hasAllergy && !noSubMessage && alternativeFoods.length === 0 && excludedFoods.length > 0);
     return { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative };
+}
+
+// ───── 사용자가 입력한 건강정보 한 항목 해석 (공백·'알레르기' 꼬리말·별칭 처리) ─────
+function normalizeHealthText(s) { return String(s || '').toLowerCase().replace(/\s/g, ''); }
+function stripAllergySuffix(s) { return s.replace(/(알레르기증|알레르기|알러지증|알러지)$/, ''); }
+function findMappingKey(mapping, normalized) { return Object.keys(mapping).find(k => normalizeHealthText(k) === normalized) || null; }
+
+// 알레르기: allergyMapping 키 또는 HEALTH_ALIASES로 찾아요. 못 찾으면 null.
+function resolveAllergyKey(item) {
+    const n = normalizeHealthText(item);
+    if (!n) return null;
+    const stripped = stripAllergySuffix(n);
+    for (const c of [n, stripped, stripped + '알레르기']) {
+        const k = findMappingKey(allergyMapping, c);
+        if (k) return k;
+    }
+    const alias = HEALTH_ALIASES[stripped] || HEALTH_ALIASES[n];
+    return alias ? findMappingKey(allergyMapping, normalizeHealthText(alias)) : null;
+}
+// 기저질환: diseaseMapping 키와 (공백 제거 후) 정확히 같을 때만
+function resolveDiseaseKey(item) {
+    const n = normalizeHealthText(item);
+    return n ? findMappingKey(diseaseMapping, n) : null;
+}
+// 알레르기로도 질환으로도 해석되지 않는 입력 항목 (화면에 "지원하지 않는 항목"으로 알려줘요)
+function getUnrecognizedHealthItems(text) {
+    return String(text || '').split(',').map(s => s.trim()).filter(Boolean)
+        .filter(item => !resolveAllergyKey(item) && !resolveDiseaseKey(item));
+}
+
+// 확실히 들어 있지는 않지만 제품에 따라 들어 있을 수 있는 알레르겐 안내 ("성분표 확인" 노랑 표시용)
+// allergyObjects: getUserAllergies() 결과. 이미 avoidFoods로 확실히 걸리는 알레르기는 제외해요.
+function findMaybeContain(ingName, allergyObjects) {
+    const out = [];
+    const nameOnly = ingName.replace(/\([^)]*\)/g, '').trim();
+    (allergyObjects || []).forEach(a => {
+        if (out.some(o => o.allergen === a.name)) return;
+        if ((a.avoidFoods || []).some(af => isIngredientMatch(ingName, af))) return;
+        const hit = MAYBE_CONTAIN.find(rule => rule.allergen === a.name &&
+            rule.words.some(w => w.charAt(0) === '=' ? nameOnly === w.slice(1) : ingName.indexOf(w) !== -1));
+        if (hit) out.push({ allergen: a.name, note: hit.note });
+    });
+    return out;
 }
 
    // 알레르기 객체 목록 + 기저질환 이름 목록 → resolveSubstitutes()가 받는 avoidSources 모양으로 변환

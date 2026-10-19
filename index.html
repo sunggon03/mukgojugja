@@ -511,8 +511,8 @@
             border-radius: 6px;
             font-size: 13px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column; /* 재료 줄 아래로 펼침/성분표 안내가 붙도록 (가로로 붙어 이름이 찌그러지던 문제 수정) */
+            align-items: stretch;
         }
 
         .ingredient-normal {
@@ -582,6 +582,14 @@
             display: grid;
             grid-template-columns: 1fr 280px;
             gap: 24px;
+        }
+
+        .avoid-panel {
+            width: 280px;
+            align-self: start;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         @media (max-width: 768px) {
@@ -657,12 +665,9 @@
                 font-size: 16px;
             }
 
-            #avoidFoodsDesktop {
-                display: none !important;
-            }
-
-            #avoidFoodsMobile {
-                display: block !important;
+            .avoid-panel {
+                width: 100%;
+                order: -1;
             }
 
             .search-grid-layout {
@@ -675,13 +680,61 @@
                 grid-template-columns: 1fr;
             }
 
-            #avoidFoodsDesktop {
-                display: none !important;
+            .avoid-panel {
+                width: 100%;
+                order: -1;
             }
+        }
 
-            #avoidFoodsMobile {
-                display: block !important;
-            }
+               .home-section {
+            border-radius: 16px;
+            padding: 24px 20px;
+            margin: 0 -20px 4px;
+        }
+
+        .home-section-a {
+            background: #FFFFFF;
+        }
+
+        .home-section-b {
+            background: #F5F3EE;
+        }
+
+        .home-intro {
+            display: none;
+            text-align: center;
+            padding: 36px 20px 28px;
+            margin-bottom: 8px;
+        }
+
+        .home-intro-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2B3E2F;
+            margin-bottom: 10px;
+        }
+
+        .home-intro-sub {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 18px;
+        }
+
+        .home-intro-stats {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .home-intro-stat {
+            background: #FFFFFF;
+            border: 1px solid #E8E3DD;
+            border-radius: 20px;
+            padding: 7px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #3B6D11;
         }
 
                .home-section {
@@ -854,6 +907,10 @@
                 <div id="homeHealthDisplay" style="font-size: 13px; color: #2B3E2F; margin-bottom: 10px; line-height: 1.6;">
                     등록된 정보가 없어요.
                 </div>
+<<<<<<< HEAD
+                <div id="homeHealthUnrecognized" style="display: none; font-size: 12px; color: #B7791F; background: #FFF4DC; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; line-height: 1.5;"></div>
+=======
+>>>>>>> ec2817bbd8738da264b6d5ec873934f859a79d9b
                 <span onclick="showPage('profile');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">내 정보에서 수정하기 →</span>
             </div>
         </div>
@@ -867,9 +924,9 @@
                     <div class="search-title">🛡️ 대체식품 찾기</div>
                     <div style="margin-bottom: 20px; padding: 16px; background: #EAF3DE; border-radius: 8px; color: #3B6D11; font-size: 13px; line-height: 1.6;">
                         <div style="font-weight: 500; margin-bottom: 8px;">📋 사용 방법:</div>
-                        <div>1. 음식의 재료를 텍스트로 입력</div>
+                        <div>1. 음식의 재료를 한 줄씩 입력 (예: 우유 200ml)</div>
                         <div>2. "분석하기" 버튼 클릭</div>
-                        <div>3. DB의 대체식품 확인</div>
+                        <div>3. 내 정보 기준으로 위험한 재료, 대체식품, 관련 레시피 확인</div>
                     </div>
 
                     <div style="margin-bottom: 20px;">
@@ -890,26 +947,18 @@
                     </div>
                 </div>
 
-                <div id="avoidFoodsDesktop" style="width: 280px;">
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #dc3545;">
-                        🚨 피해야할 음식
+                <div id="avoidFoodsDesktop" class="avoid-panel">
+                    <div onclick="toggleAvoidFoods()" style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
+                        <div style="font-weight: 600; color: #333;">🚨 피해야할 음식 <span id="avoidFoodsCount" style="font-size: 12px; font-weight: 500; color: #999;"></span></div>
+                        <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #666;">
+                            <span id="avoidFoodsToggleLabel">더보기</span>
+                            <span id="avoidFoodsToggle" style="font-size: 14px; transition: transform 0.2s;">▼</span>
+                        </div>
                     </div>
-                    <div id="avoidFoodsList" style="font-size: 13px; line-height: 1.8; color: #666;">
-                        <div style="color: #999;">입력한 건강 정보가 없습니다</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="avoidFoodsMobile" style="margin-top: 20px;">
-            <div style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
-                <div onclick="toggleAvoidFoods()" style="padding: 12px 16px; background: #f5f5f5; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none;">
-                    <div style="font-weight: 600; color: #333;">🚨 피해야할 음식</div>
-                    <div id="avoidFoodsToggle" style="font-size: 20px;">▼</div>
-                </div>
-                <div id="avoidFoodsContent" style="display: none; padding: 16px; border-top: 1px solid #e0e0e0; background: #fff; font-size: 13px; line-height: 1.8;">
-                    <div id="avoidFoodsListMobile" style="color: #666;">
-                        <div style="color: #999;">입력한 건강 정보가 없습니다</div>
+                    <div id="avoidFoodsContent" style="display: none; padding: 14px 16px; border-top: 1px solid #e0e0e0; background: #fff;">
+                        <div id="avoidFoodsList" style="font-size: 13px; line-height: 1.8; color: #666;">
+                            <div style="color: #999;">입력한 건강 정보가 없습니다</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1008,6 +1057,7 @@
 
                 <div style="font-size: 13px; font-weight: 600; color: #2B3E2F; margin-bottom: 8px;">기타 (위에 없는 알레르기·기저질환, 쉼표로 구분)</div>
                 <textarea id="etcHealthInput" placeholder="예: 땅콩 알레르기, 통풍" onchange="onHealthCheckboxChange()" style="width: 100%; height: 60px; resize: vertical;"></textarea>
+                <div id="healthUnrecognized" style="display: none; font-size: 12px; color: #B7791F; background: #FFF4DC; border-radius: 8px; padding: 8px 10px; margin-top: 6px; line-height: 1.5;"></div>
 
                 <textarea id="healthInput" style="display: none;"></textarea>
             </div>
@@ -1040,9 +1090,15 @@
     </div>
 
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
+<<<<<<< HEAD
+       <script src="diet-data.js?v=20261019"></script>
+<script src="recipes-data.js?v=20261019"></script>
+<script src="substitute-logic.js?v=20261019"></script>
+=======
        <script src="diet-data.js?v=20260922"></script>
 <script src="recipes-data.js?v=20260922"></script>
 <script src="substitute-logic.js?v=20260922b"></script>
+>>>>>>> ec2817bbd8738da264b6d5ec873934f859a79d9b
     <script>
 
 
@@ -1096,11 +1152,29 @@
             }
         }
 
+        // 입력은 했지만 사이트가 아직 지원하지 않는 항목을 알려줘요 (조용히 무시되면 사용자가 안전하다고 오해해요)
+        function escapeHealthText(s) {
+            return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+        function renderUnrecognizedHealth(text) {
+            const items = getUnrecognizedHealthItems(text);
+            const html = items.length
+                ? '⚠️ <strong>' + items.map(escapeHealthText).join(', ') + '</strong>은(는) 아직 지원하지 않는 항목이라 레시피 경고에 반영되지 않아요. 이 항목은 재료의 성분표를 직접 확인해 주세요.'
+                : '';
+            ['healthUnrecognized', 'homeHealthUnrecognized'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = html;
+                el.style.display = items.length ? 'block' : 'none';
+            });
+        }
+
         function syncHealthInputs(text) {
             const a = document.getElementById('healthInput');
             if (a) a.value = text;
             syncCheckboxesFromText(text);
             renderHomeHealthDisplay(text);
+            renderUnrecognizedHealth(text);
         }
 
         function saveHealthInfo(valueOverride) {
@@ -1188,20 +1262,13 @@
             const seenNames = [];
             
             items.forEach(item => {
-                // 입력값의 공백 제거
-                const normalizedItem = item.replace(/\s/g, '');
-                
-                // allergyMapping의 모든 키 확인
-                for (const key in allergyMapping) {
-                    // 매핑 키의 공백 제거해서 비교
-                    const normalizedKey = key.replace(/\s/g, '');
-                    if (normalizedKey === normalizedItem) {
-                        const allergyObj = allergyMapping[key];
-                        if (!seenNames.includes(allergyObj.name)) {
-                            allergyObjects.push(allergyObj);
-                            seenNames.push(allergyObj.name);
-                        }
-                        break;
+                // 공백·'알레르기' 꼬리말·별칭을 처리해 매핑 키를 찾아요 (substitute-logic.js)
+                const key = resolveAllergyKey(item);
+                if (key) {
+                    const allergyObj = allergyMapping[key];
+                    if (!seenNames.includes(allergyObj.name)) {
+                        allergyObjects.push(allergyObj);
+                        seenNames.push(allergyObj.name);
                     }
                 }
             });
@@ -1218,18 +1285,8 @@
             const diseases = [];
             
             items.forEach(item => {
-                // 입력값의 공백 제거
-                const normalizedItem = item.replace(/\s/g, '');
-                
-                // diseaseMapping의 모든 키 확인
-                for (const key in diseaseMapping) {
-                    // 매핑 키의 공백 제거해서 비교
-                    const normalizedKey = key.replace(/\s/g, '');
-                    if (normalizedKey === normalizedItem) {
-                        diseases.push(key);
-                        break;
-                    }
-                }
+                const key = resolveDiseaseKey(item);
+                if (key) diseases.push(key);
             });
             
             return diseases;
@@ -1266,25 +1323,29 @@
             
             if (avoidList.length === 0) {
                 document.getElementById('avoidFoodsList').innerHTML = '<div style="color: #999;">입력한 건강 정보가 없습니다</div>';
-                document.getElementById('avoidFoodsListMobile').innerHTML = '<div style="color: #999;">입력한 건강 정보가 없습니다</div>';
+                document.getElementById('avoidFoodsCount').textContent = '';
                 return;
             }
             
-            const listHTML = avoidList.map(item => `<div>• ${item}</div>`).join('');
+            // 세로로 길어지지 않게 칩 형태로 줄바꿈해서 보여줘요 (접이식 패널 안에 들어가요)
+            const listHTML = avoidList.map(item => `<span style="display: inline-block; background: #FFEBEE; color: #c5192d; border-radius: 12px; padding: 3px 10px; margin: 2px 4px 2px 0; font-size: 12px; line-height: 1.5;">${item}</span>`).join('');
             document.getElementById('avoidFoodsList').innerHTML = listHTML;
-            document.getElementById('avoidFoodsListMobile').innerHTML = listHTML;
+            document.getElementById('avoidFoodsCount').textContent = '(' + avoidList.length + '개)';
         }
 
         function toggleAvoidFoods() {
             const content = document.getElementById('avoidFoodsContent');
             const toggle = document.getElementById('avoidFoodsToggle');
+            const label = document.getElementById('avoidFoodsToggleLabel');
             
             if (content.style.display === 'none') {
                 content.style.display = 'block';
                 toggle.style.transform = 'rotate(180deg)';
+                if (label) label.textContent = '접기';
             } else {
                 content.style.display = 'none';
                 toggle.style.transform = 'rotate(0deg)';
+                if (label) label.textContent = '더보기';
             }
         }
 
@@ -1650,8 +1711,11 @@
                 );
 
                 const showBadge = avoidSources.length > 0;
+                const hasMaybe = !hasAllergy && allergyObjects.length > 0 && recipe.ingredients.some(ing => findMaybeContain(ing.name, allergyObjects).length > 0);
                 const badge = !showBadge ? '' : hasAllergy
                     ? '<span style="background: #FFEBEE; color: #DC3545; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">주의 필요</span>'
+                    : hasMaybe
+                    ? '<span style="background: #FFF4DC; color: #B7791F; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">🔎 성분표 확인</span>'
                     : '<span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">안전</span>';
                 const kcalText = recipe.calories ? ` · <span style="color: #5A8B4A; font-weight: 700;">약 ${recipe.calories}kcal</span>` : '';
                 const metaText = recipe.category + (recipe.difficulty ? ' · ' + recipe.difficulty : '') + (recipe.cookTime ? ' · ⏱ ' + recipe.cookTime : '');
@@ -1748,8 +1812,11 @@
 
                 const style = safetyFilterOn && hasAllergy ? 'opacity: 0.4; filter: grayscale(50%);' : '';
                 const showBadge = avoidSources.length > 0;
+                const hasMaybe = !hasAllergy && allergyObjects.length > 0 && recipe.ingredients.some(ing => findMaybeContain(ing.name, allergyObjects).length > 0);
                 const badge = !showBadge ? '' : hasAllergy
                     ? '<span style="background: #FFEBEE; color: #DC3545; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">주의 필요</span>'
+                    : hasMaybe
+                    ? '<span style="background: #FFF4DC; color: #B7791F; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">🔎 성분표 확인</span>'
                     : '<span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">안전</span>';
                 const kcalText = recipe.calories ? ` · <span style="color: #5A8B4A; font-weight: 700;">약 ${recipe.calories}kcal</span>` : '';
                 const starIcon = isFavorite(name) ? '⭐' : '☆';
@@ -1837,6 +1904,8 @@
             const hasAnyAllergy = recipe.ingredients.some(ing =>
                 allAvoidFoods.some(avoidFood => isIngredientMatch(ing.name, avoidFood))
             );
+            // 확실하진 않지만 제품에 따라 알레르겐이 들어 있을 수 있는 재료 (노랑 "성분표 확인")
+            const maybeIngCount = recipe.ingredients.filter(ing => findMaybeContain(ing.name, allergyObjects).length > 0).length;
 
             let html = '';
             if (hasAnyAllergy && avoidSources.length > 0) {
@@ -1848,6 +1917,12 @@
                     <div style="color: #c5192d; font-size: 12px; margin-top: 6px;">
                         아래 표시된 재료를 피하고 대체식품을 사용하세요.
                     </div>
+                </div>`;
+            }
+
+            if (maybeIngCount > 0) {
+                html += `<div style="background: #FFF4DC; border-left: 4px solid #e0b04a; padding: 10px 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; color: #8a5a00;">
+                    🔎 <strong>성분표 확인이 필요한 재료가 ${maybeIngCount}개 있어요.</strong> 제품에 따라 알레르기 성분이 들어 있을 수 있어요. 아래 노란 표시를 확인하세요.
                 </div>`;
             }
 
@@ -1873,8 +1948,12 @@
             recipe.ingredients.forEach((ing, ingIdx) => {
                 const ingNameLower = ing.name.toLowerCase();
                                const { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
+<<<<<<< HEAD
+=======
                 const maybeHint = !hasAllergy && avoidSources.length > 0 ? getMaybeHint(ing.name, avoidSources) : null;
+>>>>>>> ec2817bbd8738da264b6d5ec873934f859a79d9b
 
+                const maybeNotes = findMaybeContain(ing.name, allergyObjects);
                 const className = hasAllergy ? 'ingredient-warning' : 'ingredient-normal';
                 const requiredText = ing.required ? '' : '(선택)';
                 const warningMark = hasAllergy && avoidSources.length > 0 ? '⚠️ ' : '';
@@ -1912,7 +1991,11 @@
                         </div>
                        <div style="text-align: right;" data-base-amount="${ing.amount}">${scaledAmount}</div>
                     </div>
+<<<<<<< HEAD
+                    ${maybeNotes.map(m => `<div style="font-size: 11px; color: #8a5a00; background: #FFF4DC; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">🔎 <strong>${m.allergen}</strong>: ${m.note}. 성분표를 확인하세요.</div>`).join('')}
+=======
                     ${maybeHint ? `<div style="font-size: 11px; color: #999; padding: 0 0 10px 32px; margin-top: -8px;">🔍 ${maybeHint}</div>` : ''}
+>>>>>>> ec2817bbd8738da264b6d5ec873934f859a79d9b
                     ${expandable && !cartModeOn ? `
                         <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
                             ${allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-bottom: 8px;">⚠️ <strong>왜 피해야 하나요?</strong> ${allergyReason}</div>` : ''}
@@ -1979,29 +2062,15 @@
         }
 
         // 대체식품 분석 (간단 버전)
-        function analyzeIngredients() {
-            const ingredientInput = document.getElementById('ingredientInput').value.toLowerCase().trim();
-            const resultsDiv = document.getElementById('analysisResults');
-            const noResultsDiv = document.getElementById('noAnalysisResults');
-            const resultsContent = document.getElementById('resultsContent');
-
-            if (!ingredientInput) {
-                resultsDiv.style.display = 'none';
-                noResultsDiv.style.display = 'block';
-                return;
-            }
-
+        // 입력한 이름이 알레르기/질환 이름(별칭 포함)이면 그 항목의 안내 카드를 만들어 돌려줘요 (없으면 빈 문자열)
+        function renderNameCards(ingredientInput) {
             let html = '';
             let foundAlternative = false;
 
             // allergyMapping에서 검색
-            for (const key in allergyMapping) {
+            for (const key of [resolveAllergyKey(ingredientInput)].filter(Boolean)) {
                 const allergyObj = allergyMapping[key];
-                // 입력값과 매핑 키를 공백 제거해서 비교
-                const normalizedInput = ingredientInput.replace(/\s/g, '');
-                const normalizedKey = key.toLowerCase().replace(/\s/g, '');
-                
-                if (normalizedKey === normalizedInput) {
+                {
                     foundAlternative = true;
                     html += `
                         <div style="background: #e8f5e9; border: 1px solid #4caf50; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
@@ -2031,12 +2100,9 @@
             }
 
             // diseaseMapping에서도 검색
-            for (const key in diseaseMapping) {
+            for (const key of [resolveDiseaseKey(ingredientInput)].filter(Boolean)) {
                 const diseaseObj = diseaseMapping[key];
-                const normalizedInput = ingredientInput.replace(/\s/g, '');
-                const normalizedKey = key.toLowerCase().replace(/\s/g, '');
-                
-                if (normalizedKey === normalizedInput) {
+                {
                     foundAlternative = true;
                     const avoidIngs = diseaseObj.avoidIngredients || [];
                     const safeIngs = diseaseObj.safeIngredients || [];
@@ -2072,14 +2138,177 @@
                 }
             }
 
-            if (foundAlternative) {
-                resultsContent.innerHTML = html;
-                resultsDiv.style.display = 'block';
-                noResultsDiv.style.display = 'none';
-            } else {
+            return html;
+        }
+
+        // ===== 대체식품 찾기: 재료를 한 줄씩 분석 =====
+        // 재료 한 줄("우유 200ml")에서 재료 이름만 뽑아요
+        function extractIngredientName(line) {
+            return line.replace(/\([^)]*\)/g, ' ')
+                .replace(/[0-9]+([./][0-9]+)?\s*(ml|kg|mg|g|l|개|큰술|작은술|스푼|컵|장|마리|쪽|줄기|대|포기|봉지|모|알|조각|T|t)?/gi, ' ')
+                .replace(/약간|조금|적당량|소량/g, ' ')
+                .replace(/\s+/g, ' ').trim();
+        }
+
+        // 레시피 하나의 위험 정도: danger(확실히 걸림) / maybe(성분표 확인) / safe / none(등록한 정보 없음)
+        function recipeRisk(recipe, avoidSources, allergyObjects) {
+            if (avoidSources.length === 0) return 'none';
+            const danger = recipe.ingredients.some(ing => avoidSources.some(src => src.avoidFoods.some(af => isIngredientMatch(ing.name, af))));
+            if (danger) return 'danger';
+            return recipe.ingredients.some(ing => findMaybeContain(ing.name, allergyObjects).length > 0) ? 'maybe' : 'safe';
+        }
+        function riskBadgeHTML(risk) {
+            const base = 'font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;';
+            if (risk === 'danger') return `<span style="background: #FFEBEE; color: #DC3545; ${base}">주의 필요</span>`;
+            if (risk === 'maybe') return `<span style="background: #FFF4DC; color: #B7791F; ${base}">🔎 성분표 확인</span>`;
+            if (risk === 'safe') return `<span style="background: #E8F5E9; color: #2E7D32; ${base}">안전</span>`;
+            return '';
+        }
+
+        // 레시피의 재료가 검색한 재료와 같은지 (1글자 재료는 정확히 같을 때만)
+        function ingredientQueryMatches(ingName, query) {
+            const n = ingName.replace(/\([^)]*\)/g, '').trim().toLowerCase();
+            const q = query.toLowerCase();
+            if (!n || !q) return false;
+            return q.length >= 2 ? (n.includes(q) || isIngredientMatch(n, q)) : isIngredientMatch(n, q);
+        }
+
+        let relatedListSeq = 0;
+        function relatedRecipeListHTML(names, avoidSources, allergyObjects) {
+            const row = name => {
+                const r = recipes[name];
+                return `<div onclick="showRecipeModal('${name}')" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; background: #fff; border: 1px solid #E8E3DD; border-radius: 10px; margin-bottom: 6px; cursor: pointer; font-size: 13px;">
+                    <div><div style="font-weight: 600; color: #2B3E2F;">${name}</div><div style="font-size: 11px; color: #999;">${r.category}${r.cookTime ? ' · ⏱ ' + r.cookTime : ''}</div></div>
+                    ${riskBadgeHTML(recipeRisk(r, avoidSources, allergyObjects))}
+                </div>`;
+            };
+            const first = names.slice(0, 6), rest = names.slice(6);
+            let html = first.map(row).join('');
+            if (rest.length) {
+                const id = 'relList' + (++relatedListSeq);
+                html += `<div id="${id}" style="display: none;">${rest.map(row).join('')}</div>
+                    <div onclick="document.getElementById('${id}').style.display = 'block'; this.style.display = 'none';" style="text-align: center; font-size: 12px; font-weight: 600; color: #5A8B4A; padding: 8px; cursor: pointer;">더 보기 (${rest.length}개) ▼</div>`;
+            }
+            return html;
+        }
+
+        function analyzeIngredients() {
+            const raw = document.getElementById('ingredientInput').value;
+            const resultsDiv = document.getElementById('analysisResults');
+            const noResultsDiv = document.getElementById('noAnalysisResults');
+            const resultsContent = document.getElementById('resultsContent');
+
+            const lines = raw.split(/\n|,/).map(x => x.trim()).filter(Boolean);
+            if (lines.length === 0) {
                 resultsDiv.style.display = 'none';
                 noResultsDiv.style.display = 'block';
+                return;
             }
+
+            const esc = escapeHealthText;
+            const allergyObjects = getUserAllergies();
+            const diseases = getHealthDiseases();
+            const avoidSources = buildAvoidSources(allergyObjects, diseases);
+            const registered = avoidSources.length > 0;
+            const allAllergies = [...new Map(Object.values(allergyMapping).map(a => [a.name, a])).values()];
+            const TONE = {
+                danger: ['#FFEBEE', '#dc3545', '#c5192d'], maybe: ['#FFF4DC', '#e0b04a', '#8a5a00'],
+                safe: ['#E8F5E9', '#4caf50', '#2e7d32'], info: ['#FFF3E0', '#ff9800', '#e65100'], none: ['#f5f5f5', '#cccccc', '#666666']
+            };
+            const altHTML = res => {
+                let h = '';
+                if (res.noAlternative) {
+                    h += '<div style="margin-top: 8px; font-size: 12px;">🙅 고르신 제약을 모두 지키면서 대신할 수 있는 대체품이 없어요. 다른 재료나 메뉴를 골라보세요.</div>';
+                } else if (res.alternativeFoods.length) {
+                    h += '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #3B6D11;">✅ 대체 음식</div>' +
+                        res.alternativeFoods.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">💡 <strong>${esc(f)}</strong>: ${esc(getSubstituteInfo(f) || res.allergyTip || '')}</div>`).join('');
+                }
+                if (res.excludedFoods.length) {
+                    h += `<div style="margin-top: 4px; font-size: 11px; color: #888;">다른 제약과 겹쳐서 뺀 대체품: ${res.excludedFoods.map(e => esc(e.food) + ' (' + esc(e.by) + '와 겹침)').join(', ')}</div>`;
+                }
+                return h;
+            };
+            const maybeHTML = list => list.map(m => `<div style="margin-top: 6px; font-size: 11px; color: #8a5a00; background: #FFF4DC; border-radius: 6px; padding: 6px 8px;">🔎 <strong>${esc(m.allergen)}</strong>: ${esc(m.note)}. 성분표를 확인하세요.</div>`).join('');
+
+            let html = registered ? '' : `<div style="font-size: 12px; color: #666; background: #f5f5f5; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; line-height: 1.5;">💡 내 정보에 알레르기·기저질환을 등록하면, 입력한 재료가 내게 위험한지 맞춤으로 알려드려요. 지금은 모든 알레르기 항목 기준으로 보여드릴게요.</div>`;
+            const queries = [];
+
+            lines.forEach(line => {
+                const name = extractIngredientName(line) || line;
+                const ing = { name, required: true };
+                const anyHits = allAllergies.filter(a => (a.avoidFoods || []).some(af => isIngredientMatch(name, af)));
+                const isHealthName = !!(resolveAllergyKey(name) || resolveDiseaseKey(name));
+                let tone = 'none', title = '', body = '';
+
+                if (registered) {
+                    const res = resolveSubstitutes(ing, avoidSources);
+                    const maybes = findMaybeContain(name, allergyObjects);
+                    if (res.hasAllergy) {
+                        tone = 'danger';
+                        title = '🚨 내 알레르기·질환에 해당해요';
+                        body = (res.allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-top: 6px;">⚠️ <strong>왜 피해야 하나요?</strong> ${esc(res.allergyReason)}</div>` : '') + altHTML(res);
+                        body += maybeHTML(maybes);
+                    } else if (maybes.length) {
+                        tone = 'maybe';
+                        title = '🔎 성분표 확인이 필요해요';
+                        body = maybeHTML(maybes);
+                    } else if (anyHits.length === 0 && isHealthName) {
+                        tone = 'none';
+                    } else {
+                        tone = 'safe';
+                        title = '✅ 등록한 정보 기준으로 걸리는 항목이 없어요';
+                        const others = anyHits.filter(a => !allergyObjects.some(o => o.name === a.name));
+                        if (others.length) body = `<div style="margin-top: 6px; font-size: 11px; color: #666;">참고: 등록하지 않은 ${others.map(a => esc(a.name)).join(', ')} 항목에는 해당해요.</div>`;
+                    }
+                } else if (anyHits.length) {
+                    tone = 'info';
+                    title = `해당하는 항목: ${anyHits.map(a => esc(a.name)).join(', ')}`;
+                    const subs = [...new Set(anyHits.flatMap(a => resolveSubstitutes(ing, buildAvoidSources([a], [])).alternativeFoods))];
+                    const tip = anyHits[0].tips || '';
+                    body = (anyHits[0].reason ? `<div style="font-size: 11px; color: #DC3545; margin-top: 6px;">⚠️ <strong>왜 피해야 하나요?</strong> ${esc(anyHits[0].reason)}</div>` : '') +
+                        (subs.length ? '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #3B6D11;">✅ 대체 음식</div>' + subs.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">💡 <strong>${esc(f)}</strong>: ${esc(getSubstituteInfo(f) || tip)}</div>`).join('') : '') +
+                        maybeHTML(findMaybeContain(name, anyHits));
+                } else {
+                    const maybes = findMaybeContain(name, allAllergies);
+                    if (maybes.length) { tone = 'maybe'; title = '🔎 성분표 확인이 필요해요'; body = maybeHTML(maybes); }
+                }
+
+                if (tone === 'none') {
+                    // 재료가 아니라 알레르기·질환 이름을 쓴 경우(예: "글루텐 불내증")는 그 항목 안내를 보여줘요
+                    const cards = isHealthName ? renderNameCards(name.toLowerCase()) : '';
+                    if (cards) { html += cards; return; }
+                    tone = 'none';
+                    title = '해당하는 알레르기·질환 항목을 찾지 못했어요';
+                    body = '<div style="margin-top: 6px; font-size: 11px;">아직 DB에 없는 재료일 수 있어요. 가공식품이라면 성분표를 직접 확인해 주세요.</div>';
+                }
+                queries.push(name);
+                const [bg, bd, fg] = TONE[tone];
+                html += `<div style="background: ${bg}; border: 1px solid ${bd}; border-left-width: 4px; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #2B3E2F;">${esc(line)}</div>
+                    <div style="font-size: 12px; font-weight: 600; color: ${fg}; margin-top: 2px;">${title}</div>
+                    ${body}
+                </div>`;
+            });
+
+            // 관련 레시피: 입력한 재료가 들어간 레시피 / 들어가지 않은 레시피 (위험한 레시피는 레시피북과 똑같이 표시)
+            const uniq = [...new Set(queries.map(q => q.toLowerCase()))];
+            if (uniq.length) {
+                const scored = Object.keys(recipes).map(n => ({ n, score: uniq.filter(q => recipes[n].ingredients.some(i => ingredientQueryMatches(i.name, q))).length }));
+                const orderOf = n => ({ safe: 0, none: 0, maybe: 1, danger: 2 }[recipeRisk(recipes[n], avoidSources, allergyObjects)]);
+                const containing = scored.filter(x => x.score > 0).sort((a, b) => b.score - a.score).map(x => x.n);
+                const without = scored.filter(x => x.score === 0).map(x => x.n).sort((a, b) => orderOf(a) - orderOf(b));
+                const head = t => `<div style="font-size: 14px; font-weight: 600; margin: 18px 0 8px;">${t}</div>`;
+                const empty = '<div style="font-size: 12px; color: #999; padding: 8px 0;">해당하는 레시피가 없어요.</div>';
+                html += head(`🍽️ 입력한 재료가 들어간 레시피 (${containing.length})`) + (containing.length ? relatedRecipeListHTML(containing, avoidSources, allergyObjects) : empty);
+                html += head(`✅ 입력한 재료가 들어가지 않은 레시피 (${without.length})`) + (without.length ? relatedRecipeListHTML(without, avoidSources, allergyObjects) : empty);
+                html += registered
+                    ? '<div style="font-size: 11px; color: #888; margin-top: 6px;">내 정보 기준으로 위험한 재료가 든 레시피는 레시피북과 똑같이 "주의 필요"로 표시돼요.</div>'
+                    : '<div style="font-size: 11px; color: #888; margin-top: 6px;">내 정보를 등록하면 레시피마다 위험 표시가 함께 나와요.</div>';
+            }
+
+            resultsContent.innerHTML = html;
+            resultsDiv.style.display = 'block';
+            noResultsDiv.style.display = 'none';
         }
 
         // 모달 외부 클릭 시 닫기
