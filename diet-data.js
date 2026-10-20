@@ -88,7 +88,7 @@ const allergyMapping = {
             '고체카레': ['유제품 무첨가 카레루(성분표 확인)']
         },
         tips: '버터는 유당 함량이 매우 낮아 대부분 문제없이 섭취 가능한 경우가 많음',
-        source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
+        source: "https://www.niddk.nih.gov/health-information/digestive-diseases/lactose-intolerance/eating-diet-nutrition"
     },
     '우유 알레르기': {
         name: '우유 알레르기',
@@ -136,7 +136,7 @@ const allergyMapping = {
         safeFoods: ['글루텐프리 밀가루', '글루텐프리 파스타', '쌀가루', '옥수수가루'],
         substitutes: { ...GLUTEN_SUBSTITUTES },
         tips: '교차오염 주의. 조리기구 별도 사용',
-        source: "https://www.hyunmyoung.co.kr/general-medicine/celiac-disease-recurrence-prevention"
+        source: "https://www.guidelinecentral.com/summaries/acg-clinical-guidelines-diagnosis-and-management-of-celiac-disease"
     },
     '땅콩': {
         name: '땅콩 알레르기',
