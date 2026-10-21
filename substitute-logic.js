@@ -10,6 +10,13 @@ const FOOD_NAME_SYNONYMS = {
     '통밀가루': '밀가루'
 };
 
+// '돈가스소스'는 소스예요. 이름에 음식 이름(돈가스·돈까스)이 들어 있어도 돈가스(튀김옷·돼지고기)로 보지 않아요.
+// (이런 소스는 diet-data.js의 MAYBE_CONTAIN에서 "성분표 확인"으로 따로 안내해요.)
+const SAUCE_OF_DISH_WORDS = ['돈가스', '돈까스'];
+function isSauceOfDish(name, word) {
+    return SAUCE_OF_DISH_WORDS.includes(word) && String(name).replace(/\s/g, '').includes(word + '소스');
+}
+
 // 재료명과 알레르기 회피 식품명을 정확하게 비교 (괄호 부가정보 제거 + 표기 통일 후 단어 단위 비교)
 function isIngredientMatch(ingName, avoidFood) {
     const strip = s => s.toLowerCase().replace(/\([^)]*\)/g, '').trim()
@@ -17,6 +24,7 @@ function isIngredientMatch(ingName, avoidFood) {
     const ingLower = strip(ingName);
     const avoidLower = strip(avoidFood);
     if (!ingLower || !avoidLower) return false;
+    if (isSauceOfDish(ingLower, avoidLower)) return false;
     if (ingLower === avoidLower ||
         ingLower.split(' ').some(word => word === avoidLower) ||
         avoidLower.split(' ').some(word => word === ingLower)) {
@@ -153,7 +161,7 @@ function findMaybeContain(ingName, allergyObjects) {
         if (out.some(o => o.allergen === a.name)) return;
         if ((a.avoidFoods || []).some(af => isIngredientMatch(ingName, af))) return;
         const hit = MAYBE_CONTAIN.find(rule => rule.allergen === a.name &&
-            rule.words.some(w => w.charAt(0) === '=' ? nameOnly === w.slice(1) : ingName.indexOf(w) !== -1));
+            rule.words.some(w => w.charAt(0) === '=' ? nameOnly === w.slice(1) : (ingName.indexOf(w) !== -1 && !isSauceOfDish(ingName, w))));
         if (hit) out.push({ allergen: a.name, note: hit.note });
     });
     return out;

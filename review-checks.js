@@ -1,6 +1,6 @@
 // 먹고죽자! 검토 도구 점검 규칙 (review.html 전용 — index.html은 이 파일을 읽지 않아요)
 // 필요한 전역: recipes, allergyMapping, diseaseMapping, substituteInfo (데이터 파일들)
-//              isIngredientMatch, resolveSubstitutes, getSubstituteInfo, buildAvoidSources (substitute-logic.js)
+//              isIngredientMatch, isSauceOfDish, resolveSubstitutes, getSubstituteInfo, buildAvoidSources (substitute-logic.js)
 // 이 파일은 화면 코드가 없어서 Node에서도 그대로 돌려 볼 수 있어요.
 
 const REVIEW_HIDDEN_RULES = [
@@ -132,7 +132,7 @@ function reviewCheckRecipe(name, recipe, ctx) {
     const seenHidden = new Set();
     ings.forEach(ing => {
         REVIEW_HIDDEN_RULES.forEach(rule => {
-            if (!rule.words.some(w => ing.name.includes(w))) return;
+            if (!rule.words.some(w => ing.name.includes(w) && !isSauceOfDish(ing.name, w))) return;
             rule.allergens.forEach(allergenName => {
                 const prof = ctx.profiles.find(p => p.kind === 'allergy' && p.label === allergenName);
                 if (!prof) return;
