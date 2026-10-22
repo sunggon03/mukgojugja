@@ -3,14 +3,14 @@
 
 // ── 글루텐(밀) 관련 공용 목록: 밀가루/글루텐/글루텐 불내증/글루텐 알레르기/기저질환 글루텐불내증이 함께 씀 ──
 // 회피 목록에 없으면 "안전한 레시피"로 잘못 표시되므로, 밀이 확실히 들어가는 재료명을 여기에 모아요.
-// 참고: 재료명이 목록의 단어를 포함하면 걸려요(예: '돈가스소스'도 '돈가스'에 걸림).
+// 참고: 재료명이 목록의 단어를 포함하면 걸려요. 단, '돈가스소스'는 소스라서 '돈가스'로 보지 않아요(substitute-logic.js의 isSauceOfDish).
 // 간장·굴소스·쯔유·고추장 등 소스류는 제품마다 밀 함유가 달라 아직 넣지 않았어요(팀 결정 필요).
 const GLUTEN_AVOID = [
     '밀가루', '밀', '보리', '호밀', '일반 파스타', '일반 빵',
     '중력분', '강력분', '박력분', '부침가루', '튀김가루', '팬케이크 가루', '핫케이크가루',
     '우동면', '소면', '라면', '파스타면', '스파게티면', '라자냐면', '야키소바면',
     '빵가루', '식빵', '치아바타빵', '타르트지', '고체카레', '돈가스', '돈까스', '레이디핑거',
-    '마카로니', '바게트', '튀김',
+    '마카로니', '바게트', '튀김', '꽃빵',
     '통밀', '통밀빵', '통곡물', '귀리', '오트밀'
 ];
 const GLUTEN_SUBSTITUTES = {
@@ -44,6 +44,7 @@ const GLUTEN_SUBSTITUTES = {
     '레이디핑거': ['글루텐프리 비스킷·스펀지(성분표 확인)'],
     '마카로니': ['글루텐프리 파스타(쌀·옥수수)'],
     '바게트': ['글루텐프리 빵'],
+    '꽃빵': ['글루텐프리 빵'],
     '튀김': ['쌀 튀김가루로 만든 튀김'],
     '통밀': ['쌀', '옥수수'],
     '통밀빵': ['글루텐프리 빵'],
@@ -114,12 +115,13 @@ const allergyMapping = {
         name: '계란 알레르기',
         type: 'allergy',
         reason: '계란 단백질에 대한 면역 과민반응으로 피부·소화기·호흡기 증상을 유발할 수 있음',
-        avoidFoods: ['계란', '계란 함유 음식', '달걀', '크래미', '게맛살', '맛살', '레이디핑거'],
+        avoidFoods: ['계란', '계란 함유 음식', '달걀', '마요네즈', '크래미', '게맛살', '맛살', '레이디핑거'],
         safeFoods: ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
         substitutes: {
             '계란': ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
             '계란 함유 음식': ['아쿠아파바(베이킹용)', '바나나(베이킹용)'],
             '달걀': ['아쿠아파바(베이킹용)', '바나나(베이킹용)', '요구르트(베이킹용)'],
+            '마요네즈': ['계란 없는 마요네즈(성분표 확인)'],
             '크래미': ['닭가슴살(삶아 찢은 것)'],
             '게맛살': ['닭가슴살(삶아 찢은 것)'],
             '맛살': ['닭가슴살(삶아 찢은 것)'],
@@ -181,7 +183,7 @@ const allergyMapping = {
         name: '대두 알레르기',
         type: 'allergy',
         reason: '대두 단백질에 대한 면역 과민반응',
-        avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)', '청국장', '낫토', '고추장', '쯔유', '데리야끼소스', '두반장'],
+        avoidFoods: ['두부', '콩', '두유', '된장', '간장(대두 함유)', '청국장', '낫토', '고추장', '쌈장', '쯔유', '데리야끼소스', '두반장'],
         safeFoods: ['쌀', '고기류', '달걀(알레르기 없는 경우)'],
         substitutes: {
             '두부': ['고기류(닭고기·소고기 등)'],
@@ -193,7 +195,8 @@ const allergyMapping = {
             '고추장': ['고춧가루 + 쌀조청(고추장 대용, 맛 차이 있음)'],
             '쯔유': ['코코넛 아미노스 + 미림 + 다시마 육수(쯔유 대용)'],
             '데리야끼소스': ['코코넛 아미노스 + 꿀(데리야끼 대용)'],
-            '두반장': ['고춧가루 + 고추기름(두반장 대용)']
+            '두반장': ['고춧가루 + 고추기름(두반장 대용)'],
+            '쌈장': ['쌈장 없이 조리(대체 어려움)']
         },
         tips: '된장·간장·두부 등 한식에 대두가 광범위하게 쓰이므로 성분표 확인이 특히 중요한 국내 5대 알레르기 원인 식품 중 하나',
         source: "https://koreascience.or.kr/article/JAKO200203042151312.page?&lang=en"
@@ -211,14 +214,21 @@ const allergyMapping = {
         name: '생선 알레르기',
         type: 'allergy',
         reason: '생선 단백질에 대한 면역 과민반응',
-        avoidFoods: ['고등어', '참치', '연어', '생선류', '가쓰오부시', '명란젓', '사각어묵', '꽁치통조림', '고기 또는 생선'],
+        avoidFoods: ['고등어', '참치', '연어', '생선류', '가쓰오부시', '명란젓', '사각어묵', '꽁치통조림', '고기 또는 생선', '멸치', '앤초비', '액젓', '어묵', '맛살', '크래미', '게맛살'],
         safeFoods: ['닭고기', '두부', '달걀(알레르기 없는 경우)'],
         substitutes: {
             '가쓰오부시': ['김가루', '다시마 가루'],
             '명란젓': ['명란 없이 조리(대체 어려움)'],
             '사각어묵': ['두부(대두 알레르기 없는 경우)'],
             '꽁치통조림': ['닭고기', '두부(대두 알레르기 없는 경우)'],
-            '고기 또는 생선': ['고기(소고기·닭고기 등)만 사용']
+            '고기 또는 생선': ['고기(소고기·닭고기 등)만 사용'],
+            '멸치': ['다시마 육수'],
+            '앤초비': ['앤초비 없이 조리(대체 어려움)'],
+            '액젓': ['액젓 없이 조리(대체 어려움)'],
+            '어묵': ['두부(대두 알레르기 없는 경우)'],
+            '맛살': ['닭가슴살(삶아 찢은 것)'],
+            '크래미': ['닭가슴살(삶아 찢은 것)'],
+            '게맛살': ['닭가슴살(삶아 찢은 것)']
         },
         tips: '고등어는 국내 알레르기 원인 조사에서 가장 많이 보고된 식품. 신선도가 떨어지면 히스타민 중독(알레르기와 유사한 증상)도 유발 가능',
         source: "https://www.koreascience.or.kr/article/JAKO199711921349210.page"
@@ -276,7 +286,7 @@ const allergyMapping = {
         name: '쇠고기 알레르기',
         type: 'allergy',
         reason: '쇠고기 단백질에 대한 면역 과민반응',
-        avoidFoods: ['소고기', '쇠고기', '우삼겹', '소곱창'],
+        avoidFoods: ['소고기', '쇠고기', '우삼겹', '소곱창', '소대창'],
         safeFoods: ['닭고기(알레르기 없는 경우)', '돼지고기(알레르기 없는 경우)', '두부'],
         tips: '사골·곰탕·소고기 육수 같은 가공식품에도 들어가요. 식약처 알레르기 표시 의무 대상이니 성분표 확인',
         source: "https://110.go.kr/data/counselView.do?curPage=23&num=B03_668837&scCate1=&scCate2=&scIntt=&scText=&scType="
@@ -358,9 +368,31 @@ const HEALTH_ALIASES = {
 // words: 재료명에 이 글자가 들어 있으면 해당. '=육수'처럼 '='로 시작하면 이름이 정확히 같을 때만.
 // 화면에서는 경고(빨강)가 아니라 "성분표 확인"(노랑)으로 보여줘요. allergen은 allergyMapping의 name과 같아야 해요.
 const MAYBE_CONTAIN = [
-    { allergen: '대두 알레르기', words: ['마라소스', '우스터', '야키소바소스', '굴소스', '콩나물'], note: '대두(간장·콩)가 들어가는 제품이 많아요' },
-    { allergen: '글루텐 불내증', words: ['간장', '고추장', '쌈장', '춘장', '두반장', '쯔유', '데리야끼', '우스터', '야키소바소스', '굴소스', '마라소스', '메밀면', '어묵'], note: '밀이 섞이는 제품이 많아요(무밀 제품은 예외)' },
+    { allergen: '대두 알레르기', words: ['마라소스', '우스터', '야키소바소스', '굴소스', '콩나물', '돈가스소스', '돈까스소스'], note: '대두(간장·콩)가 들어가는 제품이 많아요' },
+    { allergen: '글루텐 불내증', words: ['간장', '고추장', '쌈장', '춘장', '두반장', '쯔유', '데리야끼', '우스터', '야키소바소스', '굴소스', '마라소스', '메밀면', '어묵', '돈가스소스', '돈까스소스', '참치액', '소세지', '소시지'], note: '밀이 섞이는 제품이 많아요(무밀 제품은 예외)' },
     { allergen: '우유 알레르기', words: ['다크초콜릿', '초콜릿'], note: '우유가 들어가는 제품이 많아요' },
+    // 2026-10-21 추가. 근거: 시판 돈가스소스 2종의 알레르기 표시(컬리 5052290·5131404: 대두·토마토·밀·우유·쇠고기 함유 표기가 제품마다 다름),
+    //   페스토는 잣·호두 등 견과류와 파마산 같은 치즈가 흔히 들어감(wyndly.com 페스토 알레르기 설명; 캐나다 식품검사청 2025 리콜: 페스토에 브라질너트·잣·우유 미표시)
+    { allergen: '우유 알레르기', words: ['페스토'], note: '파마산 같은 치즈가 들어가는 제품이 많아요' },
+    { allergen: '우유 알레르기', words: ['돈가스소스', '돈까스소스'], note: '우유가 들어가는 제품이 있어요' },
+    { allergen: '견과류 알레르기', words: ['페스토'], note: '전통 페스토는 잣(제품에 따라 호두·캐슈·브라질너트)이 들어가요' },
+    { allergen: '토마토 알레르기', words: ['돈가스소스', '돈까스소스'], note: '토마토가 들어가는 제품이 많아요' },
+    { allergen: '쇠고기 알레르기', words: ['돈가스소스', '돈까스소스'], note: '쇠고기가 들어가는 제품이 있어요' },
+    // 2026-10-22 추가(재료 전수 점검). 근거: 시판 제품 알레르기 표시(컬리 상품 페이지에서 직접 확인, 함유 기준)
+    //   고체카레=오뚜기 백세카레 3종·매콤닭가슴살카레(쇠고기·닭고기·밀·토마토·우유·대두·굴 중 일부) / 소세지·햄=오뗄 비엔나(돼지·우유·대두·밀·굴), 상하농원 소시지&햄(치즈 제품은 우유·대두)
+    //   참치액=한라(대두·밀·굴) / 크래미=한성(계란·대두·게·토마토) / 식빵=밀도 우유쌀식빵(밀·우유·대두), 야미요밀(밀·대두)
+    //   김치=오아시스 프리미엄 포기김치(새우 함유), 아워홈 포기김치(원재료에 멸치액젓·새우액젓, 표시 일부만 확인됨) / 쌈장=풀무원 고소견과쌈장(땅콩·대두·밀)
+    //   다크초콜릿=FDA: 다크초콜릿은 같은 설비 때문에 우유가 미표시로 들어갈 수 있음
+    { allergen: '우유 알레르기', words: ['소세지', '소시지', '햄'], note: '치즈·우유가 들어가는 제품이 있어요' },
+    { allergen: '우유 알레르기', words: ['식빵'], note: '우유가 들어가는 제품이 있어요' },
+    { allergen: '대두 알레르기', words: ['참치액', '고체카레', '소세지', '소시지', '햄', '크래미', '게맛살', '식빵'], note: '대두가 들어가는 제품이 많아요' },
+    { allergen: '조개류 알레르기', words: ['참치액', '고체카레', '소세지', '소시지'], note: '굴 추출물이 들어가는 제품이 있어요' },
+    { allergen: '토마토 알레르기', words: ['고체카레', '크래미', '게맛살'], note: '토마토가 들어가는 제품이 있어요' },
+    { allergen: '쇠고기 알레르기', words: ['고체카레'], note: '쇠고기가 들어가는 제품이 많아요' },
+    { allergen: '닭고기 알레르기', words: ['고체카레'], note: '닭고기가 들어가는 제품이 많아요' },
+    { allergen: '생선 알레르기', words: ['김치'], note: '멸치액젓 같은 생선 젓갈이 들어가는 김치가 많아요' },
+    { allergen: '갑각류 알레르기', words: ['김치'], note: '새우젓·새우액젓이 들어가는 김치가 많아요' },
+    { allergen: '땅콩 알레르기', words: ['쌈장'], note: '땅콩이 들어간 제품이 있어요(고소견과쌈장 등)' },
     { allergen: '계란 알레르기', words: ['돈가스', '튀김(천우라)', '팬케이크 가루', '팬케이크가루', '타르트지', '라자냐면', '식빵'], note: '튀김옷·반죽·믹스에 계란이 들어가는 제품이 있어요' },
     { allergen: '생선 알레르기', words: ['쯔유', '우스터', '해산물'], note: '생선 육수·앤초비·해산물 혼합일 수 있어요' },
     { allergen: '갑각류 알레르기', words: ['크래미', '게맛살', '해산물'], note: '게살·새우가 섞일 수 있어요' },
@@ -372,15 +404,32 @@ const MAYBE_CONTAIN = [
     { allergen: '아황산류 과민', words: ['건포도', '건살구', '건조과일', '건과일'], note: '색을 유지하려고 아황산류를 쓰는 제품이 있어요' }
 ];
 
+// 분량이 "약간·적당량"으로만 적힌 재료에 붙이는 안내 (계산이 안 되는 분량이라 숫자 대신 기준만 알려줘요)
+// disease: diseaseMapping의 name과 같아야 해요. words: 재료명에 이 글자가 들어 있으면 해당.
+// 출처: 나트륨 2,300mg/일 = 2020 한국인 영양소 섭취기준(만성질환위험감소섭취량)
+//        https://www.foodtoday.or.kr/news/article.html?no=173687
+//       첨가당(유리당) 총 에너지의 10% 미만 = WHO 2015 https://tdr.who.int/publications/i/item/WHO-NMH-NHD-15.3
+const VAGUE_AMOUNT_RULES = [
+    { disease: '고혈압', words: ['소금', '간장', '국간장', '된장', '고추장', '쌈장', '굴소스', '액젓'],
+      note: '분량이 정해져 있지 않아요. 조금씩 넣어 가며 간을 보세요. 하루 나트륨 일반 기준은 2,300mg이에요.' },
+    { disease: '당뇨병', words: ['설탕', '물엿', '올리고당', '꿀', '시럽', '조청'],
+      note: '분량이 정해져 있지 않아요. 조금씩 넣어 가며 단맛을 보세요. WHO는 첨가당을 하루 총 에너지의 10% 미만으로 권고해요.' }
+];
+
 // 기저질환 매핑
 const diseaseMapping = {
     '당뇨': {
         name: '당뇨병',
-        reason: '정제 탄수화물(흰쌀·흰빵)과 단 음료는 혈당을 빠르게 올려 혈당 조절을 어렵게 함',
-        avoidIngredients: ['설탕', '흰쌀', '흰빵', '과일주스', '단음료'],
+        reason: '정제 탄수화물(흰쌀·흰빵), 첨가당(설탕·물엿 등), 단 음료는 혈당을 빠르게 올려 혈당 조절을 어렵게 함',
+        avoidIngredients: ['설탕', '물엿', '올리고당', '꿀', '시럽', '조청', '흰쌀', '흰빵', '과일주스', '단음료'],
         safeIngredients: ['현미', '귀리', '통곡물', '채소', '콩류', '견과류'],
         substitutes: {
             '설탕': ['스테비아', '알룰로스'],
+            '물엿': ['알룰로스'],
+            '올리고당': ['알룰로스'],
+            '꿀': ['알룰로스'],
+            '시럽': ['알룰로스'],
+            '조청': ['알룰로스'],
             '흰쌀': ['현미', '귀리', '통곡물'],
             '흰빵': ['통밀빵', '호밀빵'],
             '과일주스': ['생과일(통째로)', '무가당 차'],
@@ -392,16 +441,24 @@ const diseaseMapping = {
             {"level":"지침","claim":"탄수화물 공급원은 식이섬유가 많고 가공이 적은 것을 고르고, 설탕 음료와 가공식품·정제 곡물·첨가당은 줄이기","foods":["설탕","단음료","흰빵","흰쌀"],"cite":"ADA Professional Practice Committee. 5. Facilitating Positive Health Behaviors and Well-being to Improve Health Outcomes: Standards of Care in Diabetes—2024. Diabetes Care 2024 (요약 페이지를 통해 확인)","url":"https://glycemicindex.com/2024/09/the-latest-nutrition-recommendations-for-people-with-diabetes"},
             {"level":"지침","claim":"식사 패턴 하나가 정답은 아님(지중해·DASH·저탄수화물 등 모두 이점 보고). 탄수화물 비율은 개인별로 정함","foods":[],"cite":"Lim JH. Guidelines for the Use of 2023 Food Exchange Lists for Diabetes Meal Planning. J Korean Diabetes 2024;25(1):42-51","url":"https://synapse.koreamed.org/articles/1516086657"},
             {"level":"논문","claim":"에리스리톨은 혈중 농도와 심혈관 사건 위험의 연관(검증 코호트 HR 1.80·2.21)과 혈소판 반응 증가가 보고됨. 관찰연구라 인과는 확정 아니지만 장기 안전성 연구가 필요하다고 저자가 밝혀, 대체품 목록에서 뺌","foods":["설탕"],"cite":"Witkowski M, et al. The artificial sweetener erythritol and cardiovascular event risk. Nat Med 2023;29:710-718","url":"https://www.nature.com/articles/s41591-023-02223-9"},
-            {"level":"논문","claim":"가당 과일주스는 제2형 당뇨 발생 위험 증가와 연관(최고 vs 최저 섭취 RR 1.28, 95% CI 1.04–1.59). 100% 과일주스는 유의한 연관이 없었음(RR 1.03, 95% CI 0.91–1.18). 일반인 대상 관찰연구 메타분석이라, 당뇨 환자의 혈당 반응을 직접 다룬 근거는 아님","foods":["과일주스"],"cite":"Xi B, et al. Intake of Fruit Juice and Incidence of Type 2 Diabetes: A Systematic Review and Meta-Analysis. PLoS ONE 2014;9(3):e93471 (초록을 통해 확인)","url":"https://ideas.repec.org/a/plo/pone00/0093471.html"}
+            {"level":"논문","claim":"가당 과일주스는 제2형 당뇨 발생 위험 증가와 연관(최고 vs 최저 섭취 RR 1.28, 95% CI 1.04–1.59). 100% 과일주스는 유의한 연관이 없었음(RR 1.03, 95% CI 0.91–1.18). 일반인 대상 관찰연구 메타분석이라, 당뇨 환자의 혈당 반응을 직접 다룬 근거는 아님","foods":["과일주스"],"cite":"Xi B, et al. Intake of Fruit Juice and Incidence of Type 2 Diabetes: A Systematic Review and Meta-Analysis. PLoS ONE 2014;9(3):e93471 (초록을 통해 확인)","url":"https://ideas.repec.org/a/plo/pone00/0093471.html"},
+            {"level":"지침","claim":"대한당뇨병학회는 설탕·시럽·물엿 등 첨가당 섭취를 최소화하고 식이섬유가 풍부한 식품으로 바꾸라고 권고(여러 나라 진료지침을 인용)","foods":["물엿","설탕"],"cite":"대한당뇨병학회 의견서(2023-07-12). 메디게이트뉴스 보도를 통해 확인","url":"https://medigatenews.com/news/2929592561"},
+            {"level":"참고","claim":"혈당지수(GI)는 물엿 100, 설탕 68, 프락토·이소말토올리고당 25~40으로 보고됨. 올리고당은 설탕보다 GI와 칼로리가 낮지만 단맛을 내려고 넣는 첨가당이라 '줄이기' 원칙에 따라 같은 목록에 둠(물엿보다 근거가 약함). 알룰로스는 혈당 반응을 줄인다고 보고됨","foods":["물엿","올리고당"],"cite":"Kim YH, Kim SB, Kim SJ, Park SW. Market and trend of alternative sweeteners (저칼로리 저감미도 대체감미료 시장 및 동향). Food Sci Ind 2016;49(3)","url":"https://koreascience.or.kr/article/JAKO201629561844413.pdf"},
+            {"level":"참고","claim":"WHO는 줄여야 할 '유리당'에 꿀·시럽·과일주스·농축과즙 속 당을 포함시킴(일반인 대상 권고이며 당뇨 환자 전용 지침은 아님). 조청은 곡물 시럽이라 시럽으로 분류해 목록에 둠","foods":["꿀","시럽","조청"],"cite":"WHO. WHO calls on countries to reduce sugars intake among adults and children (2015-03-04)","url":"https://www.who.int/news/item/04-03-2015-who-calls-on-countries-to-reduce-sugars-intake-among-adults-and-children"}
         ]
     },
     '당뇨병': {
         name: '당뇨병',
-        reason: '정제 탄수화물(흰쌀·흰빵)과 단 음료는 혈당을 빠르게 올려 혈당 조절을 어렵게 함',
-        avoidIngredients: ['설탕', '흰쌀', '흰빵', '과일주스', '단음료'],
+        reason: '정제 탄수화물(흰쌀·흰빵), 첨가당(설탕·물엿 등), 단 음료는 혈당을 빠르게 올려 혈당 조절을 어렵게 함',
+        avoidIngredients: ['설탕', '물엿', '올리고당', '꿀', '시럽', '조청', '흰쌀', '흰빵', '과일주스', '단음료'],
         safeIngredients: ['현미', '귀리', '통곡물', '채소', '콩류', '견과류'],
         substitutes: {
             '설탕': ['스테비아', '알룰로스'],
+            '물엿': ['알룰로스'],
+            '올리고당': ['알룰로스'],
+            '꿀': ['알룰로스'],
+            '시럽': ['알룰로스'],
+            '조청': ['알룰로스'],
             '흰쌀': ['현미', '귀리', '통곡물'],
             '흰빵': ['통밀빵', '호밀빵'],
             '과일주스': ['생과일(통째로)', '무가당 차'],
@@ -413,16 +470,20 @@ const diseaseMapping = {
             {"level":"지침","claim":"탄수화물 공급원은 식이섬유가 많고 가공이 적은 것을 고르고, 설탕 음료와 가공식품·정제 곡물·첨가당은 줄이기","foods":["설탕","단음료","흰빵","흰쌀"],"cite":"ADA Professional Practice Committee. 5. Facilitating Positive Health Behaviors and Well-being to Improve Health Outcomes: Standards of Care in Diabetes—2024. Diabetes Care 2024 (요약 페이지를 통해 확인)","url":"https://glycemicindex.com/2024/09/the-latest-nutrition-recommendations-for-people-with-diabetes"},
             {"level":"지침","claim":"식사 패턴 하나가 정답은 아님(지중해·DASH·저탄수화물 등 모두 이점 보고). 탄수화물 비율은 개인별로 정함","foods":[],"cite":"Lim JH. Guidelines for the Use of 2023 Food Exchange Lists for Diabetes Meal Planning. J Korean Diabetes 2024;25(1):42-51","url":"https://synapse.koreamed.org/articles/1516086657"},
             {"level":"논문","claim":"에리스리톨은 혈중 농도와 심혈관 사건 위험의 연관(검증 코호트 HR 1.80·2.21)과 혈소판 반응 증가가 보고됨. 관찰연구라 인과는 확정 아니지만 장기 안전성 연구가 필요하다고 저자가 밝혀, 대체품 목록에서 뺌","foods":["설탕"],"cite":"Witkowski M, et al. The artificial sweetener erythritol and cardiovascular event risk. Nat Med 2023;29:710-718","url":"https://www.nature.com/articles/s41591-023-02223-9"},
-            {"level":"논문","claim":"가당 과일주스는 제2형 당뇨 발생 위험 증가와 연관(최고 vs 최저 섭취 RR 1.28, 95% CI 1.04–1.59). 100% 과일주스는 유의한 연관이 없었음(RR 1.03, 95% CI 0.91–1.18). 일반인 대상 관찰연구 메타분석이라, 당뇨 환자의 혈당 반응을 직접 다룬 근거는 아님","foods":["과일주스"],"cite":"Xi B, et al. Intake of Fruit Juice and Incidence of Type 2 Diabetes: A Systematic Review and Meta-Analysis. PLoS ONE 2014;9(3):e93471 (초록을 통해 확인)","url":"https://ideas.repec.org/a/plo/pone00/0093471.html"}
+            {"level":"논문","claim":"가당 과일주스는 제2형 당뇨 발생 위험 증가와 연관(최고 vs 최저 섭취 RR 1.28, 95% CI 1.04–1.59). 100% 과일주스는 유의한 연관이 없었음(RR 1.03, 95% CI 0.91–1.18). 일반인 대상 관찰연구 메타분석이라, 당뇨 환자의 혈당 반응을 직접 다룬 근거는 아님","foods":["과일주스"],"cite":"Xi B, et al. Intake of Fruit Juice and Incidence of Type 2 Diabetes: A Systematic Review and Meta-Analysis. PLoS ONE 2014;9(3):e93471 (초록을 통해 확인)","url":"https://ideas.repec.org/a/plo/pone00/0093471.html"},
+            {"level":"지침","claim":"대한당뇨병학회는 설탕·시럽·물엿 등 첨가당 섭취를 최소화하고 식이섬유가 풍부한 식품으로 바꾸라고 권고(여러 나라 진료지침을 인용)","foods":["물엿","설탕"],"cite":"대한당뇨병학회 의견서(2023-07-12). 메디게이트뉴스 보도를 통해 확인","url":"https://medigatenews.com/news/2929592561"},
+            {"level":"참고","claim":"혈당지수(GI)는 물엿 100, 설탕 68, 프락토·이소말토올리고당 25~40으로 보고됨. 올리고당은 설탕보다 GI와 칼로리가 낮지만 단맛을 내려고 넣는 첨가당이라 '줄이기' 원칙에 따라 같은 목록에 둠(물엿보다 근거가 약함). 알룰로스는 혈당 반응을 줄인다고 보고됨","foods":["물엿","올리고당"],"cite":"Kim YH, Kim SB, Kim SJ, Park SW. Market and trend of alternative sweeteners (저칼로리 저감미도 대체감미료 시장 및 동향). Food Sci Ind 2016;49(3)","url":"https://koreascience.or.kr/article/JAKO201629561844413.pdf"},
+            {"level":"참고","claim":"WHO는 줄여야 할 '유리당'에 꿀·시럽·과일주스·농축과즙 속 당을 포함시킴(일반인 대상 권고이며 당뇨 환자 전용 지침은 아님). 조청은 곡물 시럽이라 시럽으로 분류해 목록에 둠","foods":["꿀","시럽","조청"],"cite":"WHO. WHO calls on countries to reduce sugars intake among adults and children (2015-03-04)","url":"https://www.who.int/news/item/04-03-2015-who-calls-on-countries-to-reduce-sugars-intake-among-adults-and-children"}
         ]
     },
     '고혈압': {
         name: '고혈압',
         reason: '나트륨이 많은 음식은 체내 수분을 저류시켜 혈압을 높임',
-        avoidIngredients: ['소금', '나트륨', '가공식품', '젓갈', '라면'],
+        avoidIngredients: ['소금', '간장', '나트륨', '가공식품', '젓갈', '라면'],
         safeIngredients: ['채소', '과일', '저지방 유제품', '통곡물', '견과류'],
         substitutes: {
             '소금': ['허브', '레몬즙', '식초'],
+            '간장': ['저염 간장'],
             '나트륨': ['저염 조미료', '허브'],
             '가공식품': ['신선식품'],
             '젓갈': ['저염 젓갈', '허브양념'],
@@ -436,18 +497,24 @@ const diseaseMapping = {
             {"level":"지침","claim":"알코올은 남성 하루 2잔 이하, 여성 1잔 이하. 과체중이면 최소 5% 체중 감량","foods":[],"cite":"Jones DW, et al. 2025 AHA/ACC/AANP/AAPA/ABC/ACCP/ACPM/AGS/AMA/ASPC/NMA/PCNA/SGIM Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults. J Am Coll Cardiol 2025;86(18):1567-1678 (요약 기사를 통해 확인)","url":"https://www.uspharmacist.com/article/acc-aha-hypertension-guideline-update"},
             {"level":"지침","claim":"칼륨 대체소금은 식탁 소금으로 나트륨을 주로 섭취하는 사람에게 권하되, 신장질환 등 칼륨 관리가 필요한 경우는 제외","foods":[],"cite":"Jones DW, et al. 2025 AHA/ACC/AANP/AAPA/ABC/ACCP/ACPM/AGS/AMA/ASPC/NMA/PCNA/SGIM Guideline for the Prevention, Detection, Evaluation and Management of High Blood Pressure in Adults. J Am Coll Cardiol 2025;86(18):1567-1678 (요약 기사를 통해 확인)","url":"https://www.uspharmacist.com/article/acc-aha-hypertension-guideline-update"},
             {"level":"지침","claim":"국내 고혈압 지침(2018)도 나트륨 제한·절주·채소와 과일 충분 섭취를 생활요법으로 권고","foods":["소금","나트륨"],"cite":"대한고혈압학회 2018 진료지침(Clin Hypertens 2019;25:20). 내용은 Clin Hypertens 2020;26:5 논문의 인용으로 확인","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC7073010"},
-            {"level":"논문","claim":"한국인의 나트륨 급원: 소금 약 21%, 장류(간장·된장·고추장·쌈장) 약 22.5%, 김치 약 14%, 라면 약 4~5%. 상위 10개 급원이 섭취량의 약 70%(두 가지 추정 방법 모두)","foods":["소금","라면"],"cite":"Lee JY, et al. Dietary sodium and potassium intake of Koreans estimated using 2 different sources of their contents in foods, Food & Nutrient Database and the Korean Total Diet Study: a comparative study. Korean J Community Nutr 2023;28(3):235-244","url":"https://www.koreascience.or.kr/article/JAKO202322136704392.pdf"},
-            {"level":"참고","claim":"가공식품(빵·제과류 등)은 상위 급원이지만 비중이 작음(약 2.3%). 젓갈은 상위 10개 급원에 별도 항목으로 나오지 않음. 나트륨 제한 원칙을 적용한 예시로 목록에 둠","foods":["가공식품","젓갈"],"cite":"Lee JY, et al. Dietary sodium and potassium intake of Koreans estimated using 2 different sources of their contents in foods, Food & Nutrient Database and the Korean Total Diet Study: a comparative study. Korean J Community Nutr 2023;28(3):235-244","url":"https://www.koreascience.or.kr/article/JAKO202322136704392.pdf"}
+            {"level":"논문","claim":"한국인의 나트륨 급원: 소금 약 21%, 장류(간장·된장·고추장·쌈장) 약 22.5%, 김치 약 14%, 라면 약 4~5%. 상위 10개 급원이 섭취량의 약 70%(두 가지 추정 방법 모두)","foods":["소금","간장","라면"],"cite":"Lee JY, et al. Dietary sodium and potassium intake of Koreans estimated using 2 different sources of their contents in foods, Food & Nutrient Database and the Korean Total Diet Study: a comparative study. Korean J Community Nutr 2023;28(3):235-244","url":"https://www.koreascience.or.kr/article/JAKO202322136704392.pdf"},
+            {"level":"참고","claim":"가공식품(빵·제과류 등)은 상위 급원이지만 비중이 작음(약 2.3%). 젓갈은 상위 10개 급원에 별도 항목으로 나오지 않음. 나트륨 제한 원칙을 적용한 예시로 목록에 둠","foods":["가공식품","젓갈"],"cite":"Lee JY, et al. Dietary sodium and potassium intake of Koreans estimated using 2 different sources of their contents in foods, Food & Nutrient Database and the Korean Total Diet Study: a comparative study. Korean J Community Nutr 2023;28(3):235-244","url":"https://www.koreascience.or.kr/article/JAKO202322136704392.pdf"},
+            {"level":"참고","claim":"조리할 때 소금·간장·된장·고추장·쌈장 등 양념류와 화학조미료 사용을 줄이라고 안내. 장류는 한국인 나트륨 급원 중 약 22.5%(위 논문)","foods":["간장"],"cite":"국민건강보험공단(nhis.or.kr) 건강보험 매거진 138호 기사(c02)","url":"https://www.nhis.or.kr/magazin/138/html/c02.html"}
         ]
     },
     '고콜레스테롤': {
         name: '고콜레스테롤',
         reason: '포화지방·콜레스테롤이 많은 음식은 혈중 콜레스테롤을 높여 심혈관 질환 위험을 높임',
-        avoidIngredients: ['삼겹살', '가공육', '튀긴음식', '전지우유', '버터'],
+        avoidIngredients: ['삼겹살', '가공육', '베이컨', '소세지', '소시지', '햄', '스팸', '튀긴음식', '전지우유', '버터'],
         safeIngredients: ['올리브유', '생선', '귀리', '저지방 유제품', '견과류'],
         substitutes: {
             '삼겹살': ['닭가슴살', '흰살생선'],
             '가공육': ['신선육(닭가슴살 등)'],
+            '베이컨': ['신선육(닭가슴살 등)'],
+            '소세지': ['신선육(닭가슴살 등)'],
+            '소시지': ['신선육(닭가슴살 등)'],
+            '햄': ['신선육(닭가슴살 등)'],
+            '스팸': ['신선육(닭가슴살 등)'],
             '튀긴음식': ['구운 음식', '찐 음식'],
             '전지우유': ['저지방 우유', '무지방 우유'],
             '버터': ['올리브유']
@@ -464,11 +531,12 @@ const diseaseMapping = {
     '신장질환': {
         name: '신장질환',
         reason: '나트륨·칼륨·인·단백질 조절이 필요한 질환이에요. 특히 혈중 칼륨이 높을 때는 칼륨이 많은 식품을 제한해요',
-        avoidIngredients: ['바나나', '토마토', '감자', '시금치', '가공식품', '짠음식'],
+        avoidIngredients: ['바나나', '토마토', '케첩', '감자', '시금치', '가공식품', '짠음식'],
         safeIngredients: ['사과', '포도', '양배추', '흰쌀'],
         substitutes: {
             '바나나': ['사과', '블루베리'],
             '토마토': ['오이', '양배추'],
+            '케첩': ['오이', '양배추'],
             '감자': ['흰쌀밥(소량)'],
             '시금치': ['양배추', '콜리플라워'],
             '가공식품': ['신선식품'],
@@ -486,15 +554,22 @@ const diseaseMapping = {
     '위산역류': {
         name: '위산역류',
         reason: '일부 음식은 사람에 따라 위산 역류 증상을 유발할 수 있어요',
-        avoidIngredients: ['커피', '탄산음료', '기름진 음식', '매운 음식', '초콜릿', '술'],
+        avoidIngredients: ['커피', '에스프레소', '탄산음료', '기름진 음식', '매운 음식', '초콜릿', '술', '와인', '럼', '청주', '소주', '위스키', '막걸리'],
         safeIngredients: ['오트밀', '바나나', '채소', '현미'],
         substitutes: {
             '커피': ['무카페인 차', '보리차'],
+            '에스프레소': ['무카페인 차', '보리차'],
             '탄산음료': ['물', '무가당 차'],
             '기름진 음식': ['찜 요리', '구이 요리'],
             '매운 음식': ['순한 양념(저자극)'],
             '초콜릿': ['바나나'],
-            '술': ['물', '무가당 음료']
+            '술': ['물', '무가당 음료'],
+            '와인': ['물', '무가당 음료'],
+            '럼': ['물', '무가당 음료'],
+            '청주': ['물', '무가당 음료'],
+            '소주': ['물', '무가당 음료'],
+            '위스키': ['물', '무가당 음료'],
+            '막걸리': ['물', '무가당 음료']
         },
         tips: '2022년 ACG 지침은 과체중이면 체중 감량, 취침 전 2~3시간은 식사 피하기, 밤에 증상이 있으면 침대 머리 쪽 높이기, 증상을 일으키는 음식은 피하기를 권해요. 아래 목록(커피·초콜릿 등)은 흔히 거론되는 유발 음식 예시라서, 본인에게 증상을 일으키는 것만 줄여도 돼요. 커피·초콜릿·술은 연구마다 연관이 뚜렷하지 않았어요.',
         source: "https://blogs.the-hospitalist.org/content/updated-acg-gerd-guideline-addresses-increased-scrutiny-ppi-therapy",
@@ -522,11 +597,21 @@ const diseaseMapping = {
     '통풍': {
         name: '통풍',
         reason: '퓨린 함량이 높은 음식은 요산 수치를 높여 통풍 발작을 유발할 수 있음',
-        avoidIngredients: ['맥주', '술', '내장류', '멸치', '고등어', '정어리', '참치', '가리비', '조개류', '단음료'],
+        avoidIngredients: ['맥주', '술', '와인', '럼', '청주', '소주', '위스키', '막걸리', '내장류', '곱창', '대창', '소대창', '막창', '멸치', '고등어', '정어리', '참치', '가리비', '조개류', '단음료'],
         safeIngredients: ['저지방 유제품', '채소', '두부', '달걀'],
         substitutes: {
             '맥주': ['물', '무알코올 음료'],
             '내장류': ['두부', '달걀'],
+            '곱창': ['두부', '달걀'],
+            '대창': ['두부', '달걀'],
+            '소대창': ['두부', '달걀'],
+            '막창': ['두부', '달걀'],
+            '와인': ['물', '무알코올 음료'],
+            '럼': ['물', '무알코올 음료'],
+            '청주': ['물', '무알코올 음료'],
+            '소주': ['물', '무알코올 음료'],
+            '위스키': ['물', '무알코올 음료'],
+            '막걸리': ['물', '무알코올 음료'],
             '멸치': ['다시마 육수'],
             '고등어': ['흰살생선(저퓨린)'],
             '정어리': ['흰살생선(저퓨린)'],
@@ -691,6 +776,11 @@ const substituteInfo = {
     '고춧가루 + 고추기름(두반장 대용)': '발효 콩장인 두반장 대신 고춧가루와 고추기름으로 매운맛과 색을 내요. 발효된 깊은 감칠맛은 약해요.',
     '김가루': '가쓰오부시 대신 바다 향과 감칠맛을 더해요. 조미김은 생선 성분이 들어간 제품이 있어 성분표를 확인해요.',
     '다시마 가루': '다시마를 곱게 간 가루로 감칠맛을 내요. 생선 없이 국물 맛을 낼 때 가쓰오부시 대신 써요.',
+    '저염 간장': '일반 간장보다 나트륨을 줄인 제품이에요. 그래도 짠 편이라 양을 줄여 써요. 대두·밀 알레르기가 있으면 맞지 않아요.',
+    '앤초비 없이 조리(대체 어려움)': '앤초비는 생선이라 대신할 안전한 재료가 마땅치 않아요. 빼고 조리하면 감칠맛이 줄어요.',
+    '액젓 없이 조리(대체 어려움)': '액젓은 생선으로 만들어 대신할 안전한 재료가 마땅치 않아요. 빼고 조리하면 감칠맛이 줄어요.',
+    '쌈장 없이 조리(대체 어려움)': '쌈장은 된장·고추장(대두)이 바탕이라 대신할 안전한 장이 마땅치 않아요. 쌈장 없이 먹고 마늘·고춧가루로 매콤한 맛만 더해요.',
+    '계란 없는 마요네즈(성분표 확인)': '계란 없이 식물성 재료로 만든 마요네즈예요. 대두나 겨자가 들어갈 수 있어 다른 알레르기가 있으면 성분표를 확인해요.',
     '명란 없이 조리(대체 어려움)': '명란 특유의 짭짤한 알 식감은 대신하기 어려워요. 명란을 빼고 소금으로 간만 맞춰 조리하면 맛이 단순해질 수 있어요.',
     '고기(소고기·닭고기 등)만 사용': '"고기 또는 생선" 재료에서 생선을 빼고 고기만 쓰는 방법이에요. 알레르기가 없는 고기를 골라요.',
     '닭 소시지(돼지고기 미포함, 성분표 확인)': '닭고기로 만든 소시지예요. 돼지고기가 섞인 제품도 있어 성분표를 확인해요. 닭고기 알레르기가 있으면 맞지 않아요.',
