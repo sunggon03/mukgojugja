@@ -1044,9 +1044,9 @@
     </div>
 
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
-       <script src="diet-data.js?v=20261023b"></script>
-<script src="recipes-data.js?v=20261023b"></script>
-<script src="substitute-logic.js?v=20261023b"></script>
+       <script src="diet-data.js?v=20261023d"></script>
+<script src="recipes-data.js?v=20261023d"></script>
+<script src="substitute-logic.js?v=20261023d"></script>
     <script>
 
 
@@ -1894,6 +1894,7 @@
                 </span>
             </div>`;
             
+            let sodiumShown = false;
             recipe.ingredients.forEach((ing, ingIdx) => {
                 const ingNameLower = ing.name.toLowerCase();
                                const { hasAllergy, alternativeFoods, allergyTip: allergyTipAll, allergyReason: allergyReasonAll, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
@@ -1909,6 +1910,8 @@
 
                 const maybeNotes = findMaybeContain(ing.name, allergyObjects);
                 const vagueNotes = findVagueAmountNote(ing, avoidSources);
+                const sodiumEst = estimateSodium(ing, avoidSources, baseServings);
+                if (sodiumEst) sodiumShown = true;
                 const className = kind === 'allergy' ? 'ingredient-warning' : 'ingredient-normal';
                 const requiredText = ing.required ? '' : '(선택)';
                 const warningMark = kind === 'allergy' ? '⚠️ ' : '';
@@ -1947,6 +1950,7 @@
                        <div style="text-align: right;" data-base-amount="${ing.amount}">${scaledAmount}</div>
                     </div>
                     ${maybeNotes.map(m => `<div style="font-size: 11px; color: #8a5a00; background: #FFF4DC; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">🔎 <strong>${m.allergen}</strong>: ${m.note}. 성분표를 확인하세요.</div>`).join('')}
+                    ${sodiumEst ? `<div style="font-size: 11px; color: #2B4A6B; background: #EAF1F8; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">🧂 <strong>고혈압</strong>: 1인분에 이 재료로만 나트륨 약 ${sodiumEst.mg.toLocaleString()}mg (추정, 국물·소스를 다 먹을 때) · 하루 기준 ${SODIUM_DAILY_REF_MG.toLocaleString()}mg의 약 ${sodiumEst.pct}%${sodiumEst.subs.map(x => `<br>↳ <strong>${x.name}</strong>로 같은 양을 바꾸면 약 ${x.mg.toLocaleString()}mg (추정)`).join('')}</div>` : ''}
                     ${vagueNotes.map(v => `<div style="font-size: 11px; color: #2B4A6B; background: #EAF1F8; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">📏 <strong>${v.disease}</strong>: ${v.note}</div>`).join('')}
                     ${expandable && !cartModeOn ? `
                         <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
@@ -1987,6 +1991,9 @@
                 ? `<div style="margin-top: 12px; background: #5A8B4A; color: white; text-align: center; font-weight: 700; font-size: 14px; padding: 12px; border-radius: 10px; cursor: pointer;" onclick="confirmAddToCart('${recipeName}')">✅ 선택한 재료 장바구니에 담기</div>`
                 : `<div style="margin-top: 12px; background: #F5F3EE; color: #3B6D11; border: 1px solid #8FB878; text-align: center; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 10px; cursor: pointer;" onclick="toggleCartMode()">🛒 장바구니에 담기</div>`;
 
+            if (sodiumShown) {
+                html += `<div style="font-size: 10.5px; color: #8a8a8a; margin-top: 8px; line-height: 1.5;">🧂 나트륨은 식약처 식품영양성분DB 제품들의 중앙값과 1큰술=15ml 등 일반 계량을 바탕으로 한 추정치예요. 제품마다 다르고, 국물이나 소스를 남기면 실제 섭취량은 줄어요. 하루 기준 2,300mg은 2020 한국인 영양소 섭취기준이에요.</div>`;
+            }
             html += `<div class="section-title" style="margin-top: 16px;">조리 단계</div>`;
             recipe.steps.forEach(step => {
                 html += `<div class="step-item"><strong>${step.step}단계:</strong> ${step.instruction}</div>`;

@@ -409,6 +409,35 @@ const MAYBE_CONTAIN = [
 // 출처: 나트륨 2,300mg/일 = 2020 한국인 영양소 섭취기준(만성질환위험감소섭취량)
 //        https://www.foodtoday.or.kr/news/article.html?no=173687
 //       첨가당(유리당) 총 에너지의 10% 미만 = WHO 2015 https://tdr.who.int/publications/i/item/WHO-NMH-NHD-15.3
+// 고혈압: 분량이 숫자로 적힌 짠 재료의 나트륨 추정 (mg/ml). 먼저 맞는 항목을 써요(긴 이름이 앞).
+// 근거 (모두 "추정"으로 표시해요):
+//  - 간장·국간장·된장·고추장·굴소스·쯔유·참치액: 식약처 식품영양성분DB(가공식품, 2026-10-23 내려받음, 5만 행까지 받아진 파일) 제품들의 100g/100ml당 나트륨 "중앙값"
+//    간장 6,454mg(126건) · 굴소스 4,580(28) · 된장 3,614(42) · 고추장 2,360(77) · 쯔유 6,040/100ml(3건) · 참치액 6,066(7건)
+//  - 100g → 1ml 환산은 비중 1.2로 가정한 값이에요 (확인된 출처 없음). 1큰술=15ml, 1작은술=5ml, 1컵=200ml로 계산해요.
+//  - 소금: 1작은술(5ml)=2,370mg → 캐나다 보건부 자료(소금 5mL 2,373mg)와 같고, NaCl 중 나트륨 39.3%·소금 비중 1.2로 계산해도 같아요.
+//    https://kb-hlbc.canadacentral.cloudapp.azure.com/sites/default/files/healthyeating/pdf/food-sources-of-sodium-korean.pdf
+//  - 하루 기준 2,300mg: 2020 한국인 영양소 섭취기준 만성질환위험감소섭취량 https://www.foodtoday.or.kr/news/article.html?no=173687
+const SODIUM_DAILY_REF_MG = 2300;
+const SODIUM_ESTIMATES = [
+    { words: ['국간장', '조선간장'], mgPerMl: 80 },
+    { words: ['진간장', '양조간장', '간장'], mgPerMl: 80 },
+    { words: ['굴소스'], mgPerMl: 55 },
+    { words: ['쯔유'], mgPerMl: 60 },
+    { words: ['참치액'], mgPerMl: 60 },
+    { words: ['된장'], mgPerMl: 43 },
+    { words: ['고추장'], mgPerMl: 27 },
+    { words: ['소금'], mgPerMl: 474 }
+];
+
+// 대체 재료로 바꿨을 때의 나트륨 추정 (같은 양으로 바꿨다고 가정). 숫자 근거를 확인한 것만 넣어요.
+//  - 코코넛 아미노스: 1작은술 약 90mg ≈ 1큰술 270mg → 18mg/ml
+//    https://www.healthline.com/nutrition/coconut-aminos · https://davita.com/diet-nutrition/kidney-diet-tips/coconut-aminos/
+//    (미국 제품 기준, 브랜드마다 달라요)
+//  - 저염 간장·고춧가루+쌀조청·굴소스 대용 등은 한국 제품 숫자를 확인하지 못해서 넣지 않았어요.
+const SODIUM_SUBSTITUTE_ESTIMATES = [
+    { name: '코코넛 아미노스', forWords: ['국간장', '조선간장', '진간장', '양조간장', '간장'], mgPerMl: 18 }
+];
+
 const VAGUE_AMOUNT_RULES = [
     { disease: '고혈압', words: ['소금', '간장', '국간장', '된장', '고추장', '쌈장', '굴소스', '액젓'],
       note: '분량이 정해져 있지 않아요. 조금씩 넣어 가며 간을 보세요. 하루 나트륨 일반 기준은 2,300mg이에요.' },

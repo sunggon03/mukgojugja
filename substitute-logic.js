@@ -214,6 +214,37 @@ function recipeBadgeHTML(info) {
     return m ? '<span style="background: ' + m[0] + '; color: ' + m[1] + '; ' + base + '">' + m[2] + '</span>' : '';
 }
 
+// "1과 1/2큰술"·"3/4작은술"·"1/4컵"·"30ml" → ml (그 외 단위·약간·꼬집은 null)
+function parseAmountMl(amount) {
+    const m = String(amount || '').trim().match(/^(?:(\d+)[과와]\s*)?(\d+\/\d+|\d+\.\d+|\d+)\s*(큰술|작은술|컵|ml|mL)\s*$/);
+    if (!m) return null;
+    let v = m[1] ? parseInt(m[1], 10) : 0;
+    if (m[2].includes('/')) { const [n, d] = m[2].split('/').map(Number); v += n / d; } else v += parseFloat(m[2]);
+    const unit = { '큰술': 15, '작은술': 5, '컵': 200, 'ml': 1, 'mL': 1 }[m[3]];
+    return v * unit;
+}
+
+// 고혈압을 고른 경우, 숫자 분량이 있는 짠 재료의 "1인분당 나트륨 추정치"
+// baseServings = 레시피 데이터가 몇 인분 기준인지. 없으면 null.
+function estimateSodium(ing, avoidSources, baseServings) {
+    const hasHyp = (avoidSources || []).some(s => diseaseMapping[s.label] && diseaseMapping[s.label].name === '고혈압');
+    if (!hasHyp) return null;
+    const ml = parseAmountMl(ing.amount);
+    if (ml === null) return null;
+    const rule = SODIUM_ESTIMATES.find(r => r.words.some(w => isIngredientMatch(ing.name, w)));
+    if (!rule) return null;
+    const mg = ml * rule.mgPerMl / (baseServings || 1);
+    const rounded = Math.max(10, Math.round(mg / 10) * 10);
+    const subs = [];
+    const alts = resolveSubstitutes(ing, avoidSources).alternativeFoods || [];
+    SODIUM_SUBSTITUTE_ESTIMATES.forEach(se => {
+        if (!alts.includes(se.name) || !se.forWords.some(w => isIngredientMatch(ing.name, w))) return;
+        const smg = Math.max(10, Math.round(ml * se.mgPerMl / (baseServings || 1) / 10) * 10);
+        subs.push({ name: se.name, mg: smg, pct: Math.round(smg / SODIUM_DAILY_REF_MG * 100) });
+    });
+    return { mg: rounded, pct: Math.round(rounded / SODIUM_DAILY_REF_MG * 100), subs };
+}
+
 function findMaybeContain(ingName, allergyObjects) {
     const out = [];
     const nameOnly = ingName.replace(/\([^)]*\)/g, '').trim();
