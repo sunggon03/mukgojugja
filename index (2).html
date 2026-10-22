@@ -951,6 +951,14 @@
                         <input type="checkbox" id="safetyFilter" onchange="toggleSafetyFilter()">
                         <label for="safetyFilter">🛡️ 안전한 것만 보기</label>
                     </div>
+
+                    <div id="sortRow" style="display: none; margin-top: 14px;">
+                        <div style="font-size: 12px; font-weight: 700; color: #2B3E2F; margin-bottom: 8px;">정렬</div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span class="sort-pill" data-sort="default" onclick="setRecipeSort('default');" style="background: #5A8B4A; border: 1px solid #5A8B4A; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: white; cursor: pointer;">기본 순서</span>
+                            <span class="sort-pill" data-sort="reduce" onclick="setRecipeSort('reduce');" style="background: #F5F3EE; border: 1px solid #E8E3DD; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #666; cursor: pointer;">줄일 재료 적은 순</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1036,9 +1044,9 @@
     </div>
 
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
-       <script src="diet-data.js?v=20261021e"></script>
-<script src="recipes-data.js?v=20261021e"></script>
-<script src="substitute-logic.js?v=20261021e"></script>
+       <script src="diet-data.js?v=20261023b"></script>
+<script src="recipes-data.js?v=20261023b"></script>
+<script src="substitute-logic.js?v=20261023b"></script>
     <script>
 
 
@@ -1536,10 +1544,25 @@
             filterRecipeBook();
         }
 
+        let recipeSortMode = 'default';
+        function setRecipeSort(mode) {
+            recipeSortMode = mode;
+            updateFilterCountBadge();
+            filterRecipeBook();
+        }
+        function updateSortPills() {
+            document.querySelectorAll('.sort-pill').forEach(p => {
+                const on = p.dataset.sort === recipeSortMode;
+                p.style.background = on ? '#5A8B4A' : '#F5F3EE';
+                p.style.color = on ? 'white' : '#666';
+                p.style.borderColor = on ? '#5A8B4A' : '#E8E3DD';
+            });
+        }
+
         function updateFilterCountBadge() {
             const badge = document.getElementById('filterCountBadge');
             if (!badge) return;
-            const count = difficultyFilter.length + (favoritesFilterOn ? 1 : 0) + (safetyFilterOn ? 1 : 0);
+            const count = difficultyFilter.length + (favoritesFilterOn ? 1 : 0) + (safetyFilterOn ? 1 : 0) + (recipeSortMode !== 'default' ? 1 : 0);
             if (count > 0) {
                 badge.textContent = count;
                 badge.style.display = 'inline-block';
@@ -1650,13 +1673,7 @@
                     allAvoidFoods.some(avoidFood => isIngredientMatch(ing.name, avoidFood))
                 );
 
-                const showBadge = avoidSources.length > 0;
-                const hasMaybe = !hasAllergy && allergyObjects.length > 0 && recipe.ingredients.some(ing => findMaybeContain(ing.name, allergyObjects).length > 0);
-                const badge = !showBadge ? '' : hasAllergy
-                    ? '<span style="background: #FFEBEE; color: #DC3545; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">주의 필요</span>'
-                    : hasMaybe
-                    ? '<span style="background: #FFF4DC; color: #B7791F; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">🔎 성분표 확인</span>'
-                    : '<span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">안전</span>';
+                const badge = allergyObjects.length > 0 ? recipeBadgeHTML(recipeSafetyInfo(recipe, allergyObjects, diseases)) : '';
                 const kcalText = recipe.calories ? ` · <span style="color: #5A8B4A; font-weight: 700;">약 ${recipe.calories}kcal</span>` : '';
                 const metaText = recipe.category + (recipe.difficulty ? ' · ' + recipe.difficulty : '') + (recipe.cookTime ? ' · ⏱ ' + recipe.cookTime : '');
 
@@ -1724,7 +1741,23 @@
                 });
             });
 
-            Object.entries(recipes).forEach(([name, recipe]) => {
+            // 정렬: 기본은 알레르기 기준으로 안전한 것부터. 기저질환이 있으면 "줄일 재료 적은 순"도 고를 수 있어요
+            const hasDisease = diseases.length > 0;
+            if (!hasDisease && recipeSortMode === 'reduce') recipeSortMode = 'default';
+            const sortRow = document.getElementById('sortRow');
+            if (sortRow) sortRow.style.display = hasDisease ? 'block' : 'none';
+            updateSortPills();
+            const infoOf = {};
+            Object.entries(recipes).forEach(([n, r]) => { infoOf[n] = recipeSafetyInfo(r, allergyObjects, diseases); });
+            const TIER_ORDER = { safe: 0, maybe: 1, sub: 2, block: 3 };
+            let entries = Object.entries(recipes);
+            if (recipeSortMode === 'reduce') {
+                entries = entries.slice().sort((x, y) => infoOf[x[0]].dis - infoOf[y[0]].dis || TIER_ORDER[infoOf[x[0]].tier] - TIER_ORDER[infoOf[y[0]].tier]);
+            } else if (allergyObjects.length > 0) {
+                entries = entries.slice().sort((x, y) => TIER_ORDER[infoOf[x[0]].tier] - TIER_ORDER[infoOf[y[0]].tier]);
+            }
+
+            entries.forEach(([name, recipe]) => {
                 if (selectedCategory !== 'all' && recipe.category !== selectedCategory) {
                     return;
                 }
@@ -1745,19 +1778,11 @@
                     }
                 }
 
-                // 단어 단위로 정확하게 비교 (헬퍼 함수 사용 - 괄호 부가정보 처리 포함)
-                const hasAllergy = recipe.ingredients.some(ing =>
-                    allAvoidFoods.some(avoidFood => isIngredientMatch(ing.name, avoidFood))
-                );
+                // 안전 필터는 알레르기만 기준이에요 (기저질환 재료는 막지 않고 "줄이면 좋은 재료"로만 안내해요)
+                const hasAllergy = infoOf[name].sub + infoOf[name].block > 0;
 
                 const style = safetyFilterOn && hasAllergy ? 'opacity: 0.4; filter: grayscale(50%);' : '';
-                const showBadge = avoidSources.length > 0;
-                const hasMaybe = !hasAllergy && allergyObjects.length > 0 && recipe.ingredients.some(ing => findMaybeContain(ing.name, allergyObjects).length > 0);
-                const badge = !showBadge ? '' : hasAllergy
-                    ? '<span style="background: #FFEBEE; color: #DC3545; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">주의 필요</span>'
-                    : hasMaybe
-                    ? '<span style="background: #FFF4DC; color: #B7791F; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">🔎 성분표 확인</span>'
-                    : '<span style="background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;">안전</span>';
+                const badge = allergyObjects.length > 0 ? recipeBadgeHTML(recipeSafetyInfo(recipe, allergyObjects, diseases)) : '';
                 const kcalText = recipe.calories ? ` · <span style="color: #5A8B4A; font-weight: 700;">약 ${recipe.calories}kcal</span>` : '';
                 const starIcon = isFavorite(name) ? '⭐' : '☆';
                 const metaText = recipe.category + (recipe.difficulty ? ' · ' + recipe.difficulty : '') + (recipe.cookTime ? ' · ⏱ ' + recipe.cookTime : '');
@@ -1849,42 +1874,7 @@
             // 알레르기 + 기저질환을 하나의 목록으로 합침
            const avoidSources = buildAvoidSources(allergyObjects, diseases);
 
-            // 모든 피해야할 음식 수집 (알레르기 + 기저질환)
-            const allAvoidFoods = [];
-            avoidSources.forEach(source => {
-                source.avoidFoods.forEach(food => {
-                    if (!allAvoidFoods.includes(food)) {
-                        allAvoidFoods.push(food);
-                    }
-                });
-            });
-
-            // 단어 단위로 정확하게 비교 (헬퍼 함수 사용)
-            const hasAnyAllergy = recipe.ingredients.some(ing =>
-                allAvoidFoods.some(avoidFood => isIngredientMatch(ing.name, avoidFood))
-            );
-            // 확실하진 않지만 제품에 따라 알레르겐이 들어 있을 수 있는 재료 (노랑 "성분표 확인")
-            const maybeIngCount = recipe.ingredients.filter(ing => findMaybeContain(ing.name, allergyObjects).length > 0).length;
-
             let html = '';
-            if (hasAnyAllergy && avoidSources.length > 0) {
-                html += `<div style="background: #ffebee; border-left: 4px solid #dc3545; padding: 12px; border-radius: 6px; margin-bottom: 20px;">
-                    <div style="font-weight: 600; color: #dc3545; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 18px;">🚨</span>
-                        주의! 당신의 알레르기/기저질환에 해당하는 재료가 포함되어 있습니다
-                    </div>
-                    <div style="color: #c5192d; font-size: 12px; margin-top: 6px;">
-                        아래 표시된 재료를 피하고 대체식품을 사용하세요.
-                    </div>
-                </div>`;
-            }
-
-            if (maybeIngCount > 0) {
-                html += `<div style="background: #FFF4DC; border-left: 4px solid #e0b04a; padding: 10px 12px; border-radius: 6px; margin-bottom: 16px; font-size: 12px; color: #8a5a00;">
-                    🔎 <strong>성분표 확인이 필요한 재료가 ${maybeIngCount}개 있어요.</strong> 제품에 따라 알레르기 성분이 들어 있을 수 있어요. 아래 노란 표시를 확인하세요.
-                </div>`;
-            }
-
             html += `<div class="modal-title">${recipeName}</div>`;
             if (recipe.difficulty || recipe.cookTime) {
                 const metaParts = [];
@@ -1906,12 +1896,22 @@
             
             recipe.ingredients.forEach((ing, ingIdx) => {
                 const ingNameLower = ing.name.toLowerCase();
-                               const { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
+                               const { hasAllergy, alternativeFoods, allergyTip: allergyTipAll, allergyReason: allergyReasonAll, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
+                // 알레르기와 기저질환을 따로 봐요: 알레르기는 빨강 ⚠️, 기저질환 재료는 초록 줄에 파란 알약
+                const kind = buildAvoidSources(allergyObjects, []).length && resolveSubstitutes(ing, buildAvoidSources(allergyObjects, [])).hasAllergy ? 'allergy'
+                    : (diseases.length && resolveSubstitutes(ing, buildAvoidSources([], diseases)).hasAllergy ? 'disease' : null);
+                const diseaseNames = kind === 'disease' ? diseaseNamesHit(ing, diseases).join('·') : '';
+                // 알레르기 줄의 이유·팁은 알레르기 쪽 것만 써요 (질환과 겹치는 재료여도 질환 문구로 덮이지 않게)
+                const aOnly = kind === 'allergy' ? resolveSubstitutes(ing, buildAvoidSources(allergyObjects, [])) : null;
+                const allergyReason = aOnly ? aOnly.allergyReason : allergyReasonAll;
+                const allergyTip = aOnly ? aOnly.allergyTip : allergyTipAll;
+                const alsoDisease = kind === 'allergy' ? diseaseNamesHit(ing, diseases) : [];
 
                 const maybeNotes = findMaybeContain(ing.name, allergyObjects);
-                const className = hasAllergy ? 'ingredient-warning' : 'ingredient-normal';
+                const vagueNotes = findVagueAmountNote(ing, avoidSources);
+                const className = kind === 'allergy' ? 'ingredient-warning' : 'ingredient-normal';
                 const requiredText = ing.required ? '' : '(선택)';
-                const warningMark = hasAllergy && avoidSources.length > 0 ? '⚠️ ' : '';
+                const warningMark = kind === 'allergy' ? '⚠️ ' : '';
                 const ingredientId = `ingredient_${recipeName}_${ingIdx}`;
                 const alternativeId = `alternative_${recipeName}_${ingIdx}`;
 
@@ -1939,17 +1939,19 @@
 
                 html += `<div class="ingredient-item ${className}" style="cursor: ${expandable ? 'pointer' : 'default'};padding-bottom: 0;">
                     <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 0; ${expandable ? 'border-bottom: 1px solid #e0e0e0;' : ''}" onclick="${expandable && !cartModeOn ? `document.getElementById('${alternativeId}').style.display = document.getElementById('${alternativeId}').style.display === 'none' ? 'block' : 'none'` : ''}">
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 6px 8px; flex-wrap: wrap;">
                             ${cartControlHtml}
                             <span>${warningMark}${ing.name} ${requiredText}</span>
-                            ${expandable && !cartModeOn ? `<span style="color: #5A8B4A; font-weight: 600; font-size: 16px;">ℹ️</span>` : ''}
+                            ${kind === 'disease' ? `<span style="font-size: 11px; font-weight: 700; color: #1F5FA8; background: #fff; border: 1.5px solid #3B7DD8; border-radius: 999px; padding: 2px 9px; white-space: nowrap;">줄이면 좋은 재료${diseaseNames ? ' · ' + diseaseNames : ''}</span>` : (expandable && !cartModeOn ? `<span style="color: #5A8B4A; font-weight: 600; font-size: 16px;">ℹ️</span>` : '')}
                         </div>
                        <div style="text-align: right;" data-base-amount="${ing.amount}">${scaledAmount}</div>
                     </div>
                     ${maybeNotes.map(m => `<div style="font-size: 11px; color: #8a5a00; background: #FFF4DC; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">🔎 <strong>${m.allergen}</strong>: ${m.note}. 성분표를 확인하세요.</div>`).join('')}
+                    ${vagueNotes.map(v => `<div style="font-size: 11px; color: #2B4A6B; background: #EAF1F8; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">📏 <strong>${v.disease}</strong>: ${v.note}</div>`).join('')}
                     ${expandable && !cartModeOn ? `
                         <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
-                            ${allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-bottom: 8px;">⚠️ <strong>왜 피해야 하나요?</strong> ${allergyReason}</div>` : ''}
+                            ${allergyReason ? (kind === 'disease' ? `<div style="font-size: 11px; color: #2B4A6B; margin-bottom: 8px;">💡 <strong>왜 줄이면 좋나요?</strong> ${allergyReason}</div>` : `<div style="font-size: 11px; color: #DC3545; margin-bottom: 8px;">⚠️ <strong>왜 피해야 하나요?</strong> ${allergyReason}</div>`) : ''}
+                            ${alsoDisease.length ? `<div style="font-size: 11px; color: #1F5FA8; margin-bottom: 8px;">💡 ${alsoDisease.join('·')} 기준으로도 줄이면 좋은 재료예요.</div>` : ''}
                             ${noSubMessage ? `
                                 <div style="font-size: 12px; color: #2B3E2F; background: white; padding: 8px; border-radius: 4px;">
                                     ${typeof ing.noSubstituteHere === 'string'
@@ -2127,17 +2129,8 @@
 
         // 레시피 하나의 위험 정도: danger(확실히 걸림) / maybe(성분표 확인) / safe / none(등록한 정보 없음)
         function recipeRisk(recipe, avoidSources, allergyObjects) {
-            if (avoidSources.length === 0) return 'none';
-            const danger = recipe.ingredients.some(ing => avoidSources.some(src => src.avoidFoods.some(af => isIngredientMatch(ing.name, af))));
-            if (danger) return 'danger';
-            return recipe.ingredients.some(ing => findMaybeContain(ing.name, allergyObjects).length > 0) ? 'maybe' : 'safe';
-        }
-        function riskBadgeHTML(risk) {
-            const base = 'font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;';
-            if (risk === 'danger') return `<span style="background: #FFEBEE; color: #DC3545; ${base}">주의 필요</span>`;
-            if (risk === 'maybe') return `<span style="background: #FFF4DC; color: #B7791F; ${base}">🔎 성분표 확인</span>`;
-            if (risk === 'safe') return `<span style="background: #E8F5E9; color: #2E7D32; ${base}">안전</span>`;
-            return '';
+            if (!allergyObjects || allergyObjects.length === 0) return 'none';
+            return recipeSafetyInfo(recipe, allergyObjects, []).tier;
         }
 
         // 레시피의 재료가 검색한 재료와 같은지 (1글자 재료는 정확히 같을 때만)
@@ -2154,7 +2147,7 @@
                 const r = recipes[name];
                 return `<div onclick="showRecipeModal('${name}')" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; background: #fff; border: 1px solid #E8E3DD; border-radius: 10px; margin-bottom: 6px; cursor: pointer; font-size: 13px;">
                     <div><div style="font-weight: 600; color: #2B3E2F;">${name}</div><div style="font-size: 11px; color: #999;">${r.category}${r.cookTime ? ' · ⏱ ' + r.cookTime : ''}</div></div>
-                    ${riskBadgeHTML(recipeRisk(r, avoidSources, allergyObjects))}
+                    ${allergyObjects.length ? recipeBadgeHTML(recipeSafetyInfo(r, allergyObjects, [])) : ''}
                 </div>`;
             };
             const first = names.slice(0, 6), rest = names.slice(6);
@@ -2198,7 +2191,7 @@
             const allConds = [...allAllergies, ...allDiseases];
             const TONE = {
                 danger: ['#FFEBEE', '#dc3545', '#c5192d'], maybe: ['#FFF4DC', '#e0b04a', '#8a5a00'],
-                safe: ['#E8F5E9', '#4caf50', '#2e7d32'], info: ['#FFF3E0', '#ff9800', '#e65100'], none: ['#f5f5f5', '#cccccc', '#666666']
+                safe: ['#E8F5E9', '#4caf50', '#2e7d32'], reduce: ['#EAF3DE', '#3B7DD8', '#1F5FA8'], info: ['#FFF3E0', '#ff9800', '#e65100'], none: ['#f5f5f5', '#cccccc', '#666666']
             };
             const altHTML = res => {
                 let h = '';
@@ -2227,11 +2220,19 @@
 
                 if (registered) {
                     const res = resolveSubstitutes(ing, avoidSources);
+                    const resA = resolveSubstitutes(ing, buildAvoidSources(allergyObjects, []));
+                    const dNames = diseaseNamesHit(ing, diseases);
                     const maybes = findMaybeContain(name, allergyObjects);
-                    if (res.hasAllergy) {
+                    if (allergyObjects.length && resA.hasAllergy) {
                         tone = 'danger';
-                        title = '🚨 내 알레르기·질환에 해당해요';
-                        body = (res.allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-top: 6px;">⚠️ <strong>왜 피해야 하나요?</strong> ${esc(res.allergyReason)}</div>` : '') + altHTML(res);
+                        title = '🚨 내 알레르기에 해당해요';
+                        body = (resA.allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-top: 6px;">⚠️ <strong>왜 피해야 하나요?</strong> ${esc(resA.allergyReason)}</div>` : '') + altHTML(res);
+                        if (dNames.length) body += `<div style="margin-top: 6px; font-size: 11px; color: #1F5FA8;">💡 ${esc(dNames.join('·'))} 기준으로도 줄이면 좋은 재료예요.</div>`;
+                        body += maybeHTML(maybes);
+                    } else if (dNames.length) {
+                        tone = 'reduce';
+                        title = '줄이면 좋은 재료예요 · ' + dNames.join('·');
+                        body = (res.allergyReason ? `<div style="font-size: 11px; color: #2B4A6B; margin-top: 6px;">💡 <strong>왜 줄이면 좋나요?</strong> ${esc(res.allergyReason)}</div>` : '') + altHTML(res);
                         body += maybeHTML(maybes);
                     } else if (maybes.length) {
                         tone = 'maybe';
@@ -2279,7 +2280,7 @@
             const uniq = [...new Set(queries.map(q => q.toLowerCase()))];
             if (uniq.length) {
                 const scored = Object.keys(recipes).map(n => ({ n, score: uniq.filter(q => recipes[n].ingredients.some(i => ingredientQueryMatches(i.name, q))).length }));
-                const orderOf = n => ({ safe: 0, none: 0, maybe: 1, danger: 2 }[recipeRisk(recipes[n], avoidSources, allergyObjects)]);
+                const orderOf = n => ({ safe: 0, none: 0, maybe: 1, sub: 2, block: 3 }[recipeRisk(recipes[n], avoidSources, allergyObjects)]);
                 const containing = scored.filter(x => x.score > 0).sort((a, b) => b.score - a.score).map(x => x.n);
                 const without = scored.filter(x => x.score === 0).map(x => x.n).sort((a, b) => orderOf(a) - orderOf(b));
                 const head = t => `<div style="font-size: 14px; font-weight: 600; margin: 18px 0 8px;">${t}</div>`;
@@ -2287,7 +2288,7 @@
                 html += head(`🍽️ 입력한 재료가 들어간 레시피 (${containing.length})`) + (containing.length ? relatedRecipeListHTML(containing, avoidSources, allergyObjects) : empty);
                 html += head(`✅ 입력한 재료가 들어가지 않은 레시피 (${without.length})`) + (without.length ? relatedRecipeListHTML(without, avoidSources, allergyObjects) : empty);
                 html += registered
-                    ? '<div style="font-size: 11px; color: #888; margin-top: 6px;">내 정보 기준으로 위험한 재료가 든 레시피는 레시피북과 똑같이 "주의 필요"로 표시돼요.</div>'
+                    ? '<div style="font-size: 11px; color: #888; margin-top: 6px;">내 알레르기 기준으로 레시피북과 똑같이 표시돼요.</div>'
                     : '<div style="font-size: 11px; color: #888; margin-top: 6px;">내 정보를 등록하면 레시피마다 위험 표시가 함께 나와요.</div>';
             }
 

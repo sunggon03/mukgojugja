@@ -154,6 +154,66 @@ function getUnrecognizedHealthItems(text) {
 
 // 확실히 들어 있지는 않지만 제품에 따라 들어 있을 수 있는 알레르겐 안내 ("성분표 확인" 노랑 표시용)
 // allergyObjects: getUserAllergies() 결과. 이미 avoidFoods로 확실히 걸리는 알레르기는 제외해요.
+// 분량이 "약간·적당량"처럼 숫자가 없는 표기인지 ('한 꼬집'은 정해진 양이라 제외)
+function isVagueAmount(amount) {
+    return /약간|적당량|적당히|조금/.test(String(amount || ''));
+}
+
+// 고른 기저질환 중 이 재료의 "분량 미정" 안내가 필요한 것 (알레르기는 대상 아님)
+function findVagueAmountNote(ing, avoidSources) {
+    if (!isVagueAmount(ing.amount)) return [];
+    const out = [];
+    (avoidSources || []).forEach(s => {
+        const d = diseaseMapping[s.label];
+        if (!d || out.some(o => o.disease === d.name)) return;
+        const rule = VAGUE_AMOUNT_RULES.find(r => r.disease === d.name && r.words.some(w => isIngredientMatch(ing.name, w)));
+        if (rule) out.push({ disease: d.name, note: rule.note });
+    });
+    return out;
+}
+
+// 이 재료가 걸리는 기저질환 이름 목록 (질환 알약에 "고혈압"처럼 이름을 붙일 때 써요)
+function diseaseNamesHit(ing, diseaseKeys) {
+    const names = (diseaseKeys || [])
+        .filter(d => diseaseMapping[d] && resolveSubstitutes(ing, buildAvoidSources([], [d])).hasAllergy)
+        .map(d => diseaseMapping[d].name);
+    return [...new Set(names)];
+}
+
+// ───── 레시피 한 개의 알레르기 기준 상태 (목록 카드 배지·정렬용) ─────
+// 알레르기만 따져요. 기저질환은 배지에 넣지 않고 dis(줄이면 좋은 재료 수)로만 세어 둬요.
+// tier: safe(걸리는 재료 없음) / maybe(성분표 확인) / sub(대체하면 가능) / block(필수 재료인데 대체품이 없음)
+// 선택 재료는 빼면 되므로 대체품이 없어도 block이 아니라 sub로 봐요.
+function recipeSafetyInfo(recipe, allergyObjects, diseaseKeys) {
+    const aObjs = allergyObjects || [];
+    const aSrc = buildAvoidSources(aObjs, []);
+    const dSrc = buildAvoidSources([], diseaseKeys || []);
+    let block = 0, sub = 0, maybe = 0, dis = 0;
+    recipe.ingredients.forEach(ing => {
+        const a = aSrc.length ? resolveSubstitutes(ing, aSrc) : { hasAllergy: false };
+        if (a.hasAllergy) {
+            const noWay = a.noAlternative || a.noSubMessage || a.alternativeFoods.length === 0;
+            if (noWay && ing.required) block++; else sub++;
+        } else {
+            if (findMaybeContain(ing.name, aObjs).length > 0) maybe++;
+            if (dSrc.length && resolveSubstitutes(ing, dSrc).hasAllergy) dis++;
+        }
+    });
+    return { block, sub, maybe, dis, tier: block ? 'block' : sub ? 'sub' : maybe ? 'maybe' : 'safe' };
+}
+
+// 목록 카드 배지 (알레르기 기준만)
+function recipeBadgeHTML(info) {
+    const base = 'font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; white-space: nowrap;';
+    const m = {
+        safe: ['#E8F5E9', '#2E7D32', '알레르기 안전'],
+        maybe: ['#FFF4DC', '#B7791F', '🔎 성분표 확인'],
+        sub: ['#FFF1DD', '#B86A00', info && info.sub ? '대체하면 가능 · ' + info.sub + '개' : '대체하면 가능'],
+        block: ['#FFEBEE', '#DC3545', '대체 어려움']
+    }[info && info.tier];
+    return m ? '<span style="background: ' + m[0] + '; color: ' + m[1] + '; ' + base + '">' + m[2] + '</span>' : '';
+}
+
 function findMaybeContain(ingName, allergyObjects) {
     const out = [];
     const nameOnly = ingName.replace(/\([^)]*\)/g, '').trim();
