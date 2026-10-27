@@ -453,6 +453,37 @@
             line-height: 1.6;
         }
 
+        /* ===== 가족 등록 ===== */
+        .fam-who{background:#FAF8F5;border:1px solid #E8E3DD;border-radius:12px;padding:10px 12px;margin:0 0 12px}
+        .fam-who-title{font-size:12px;font-weight:700;color:#2B3E2F;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+        .fam-who-title a{font-size:11px;font-weight:600;color:#5A8B4A;cursor:pointer;text-decoration:none}
+        .fam-who-list{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+        .fam-who-btn{flex:none;border:1.5px solid #E8E3DD;background:#fff;border-radius:12px;padding:5px 10px;font-size:12px;font-weight:700;color:#888;cursor:pointer;white-space:nowrap}
+        .fam-who-btn.on{border-color:#5A8B4A;background:#EAF3DE;color:#2b5a1f}
+        .fam-who-sum{font-size:11px;color:#666;margin-top:6px;line-height:1.5}
+        .fam-age-banner{background:#fff3f8;border:1.5px solid #e9a3c0;color:#8a1f4e;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:600;margin:0 0 12px;line-height:1.5}
+        .fam-note-kid{font-size:11px;color:#8a5a00;background:#FFF4DC;border-radius:6px;padding:6px 8px;margin:6px 0;line-height:1.5}
+        .fam-note-stop{font-size:11px;color:#a1232f;background:#FDECEC;border-radius:6px;padding:6px 8px;margin:6px 0;font-weight:600;line-height:1.5}
+        .fam-chips{display:flex;flex-wrap:wrap;gap:6px}
+        .fam-chip{font-size:13px;font-weight:600;border:1.5px solid #E8E3DD;background:#fff;color:#777;border-radius:99px;padding:5px 12px;cursor:pointer}
+        .fam-chip.on{border-color:#5A8B4A;color:#2b5a1f;background:#EAF3DE}
+        .fam-chip.red.on{border-color:#DC3545;color:#DC3545;background:#FDECEC}
+        .fam-chip.blue.on{border-color:#3B7DD8;color:#1F5FA8;background:#EAF2FC}
+        .fam-label{font-size:12px;font-weight:700;color:#666;margin:14px 0 6px}
+        .fam-mem{display:flex;align-items:center;gap:10px;border:1px solid #E8E3DD;border-radius:12px;padding:10px 12px;margin:8px 0}
+        .fam-av{width:36px;height:36px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:19px;flex:none}
+        .fam-mem-info{flex:1;min-width:0;font-size:12px;color:#777}.fam-mem-info b{display:block;color:#2B3E2F;font-size:14px}
+        .fam-mem-act{font-size:12px;color:#5A8B4A;font-weight:600;cursor:pointer;margin-left:6px;white-space:nowrap}
+        .fam-btn{display:block;width:100%;background:#5A8B4A;color:#fff;border:0;border-radius:10px;padding:12px;font-size:14px;font-weight:700;margin-top:12px;cursor:pointer}
+        .fam-btn:disabled{background:#b9c7b3;cursor:not-allowed}
+        .fam-btn.ghost{background:#fff;color:#5A8B4A;border:1.5px solid #5A8B4A}
+        .fam-btn.danger{background:#fff;color:#c5192d;border:1.5px solid #f0b8be;font-weight:600}
+        .fam-notice{background:#EAF2FC;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;color:#2B3E2F}
+        .fam-notice ul{margin:6px 0 0;padding-left:18px}
+        .fam-warn{font-size:12px;color:#B7791F;background:#FFF4DC;border-radius:8px;padding:8px 10px;margin-top:6px;line-height:1.5}
+        .fam-switch{display:flex;align-items:center;justify-content:space-between;background:#FAF8F5;border:1px solid #E8E3DD;border-radius:12px;padding:12px 14px;font-size:14px;font-weight:600}
+        .fam-switch input{width:20px;height:20px}
+
         .modal {
             display: none;
             position: fixed;
@@ -780,6 +811,7 @@
         <div class="more-panel-body">
             <div class="more-cat-label">내 계정</div>
             <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('profile');"><span class="more-ic">👤</span>내 정보 (알레르기·기저질환 관리)</div>
+            <div class="more-menu-row" onclick="toggleMoreMenu(); openFamily();"><span class="more-ic">👨‍👩‍👧</span>가족 등록 (같이 먹는 가족 함께 확인)</div>
             <div class="more-menu-row" id="moreLoginRow" onclick="signInWithGoogle(); toggleMoreMenu();"><span class="more-ic">🔑</span>Google로 로그인</div>
             <div class="more-menu-row" id="moreLogoutRow" style="display:none;" onclick="toggleMoreMenu(); signOutUser();"><span class="more-ic">🔑</span>로그아웃</div>
 
@@ -826,6 +858,8 @@
             </div>
         </div>
 
+        <div class="fam-who-slot" data-slot="home" style="padding: 0 16px;"></div>
+
         <div class="home-section home-section-a">
             <div class="section-label-home" style="margin-top: 0;">오늘 뭐 먹지? 🎲</div>
             <div class="carousel-cat-row">
@@ -856,6 +890,7 @@
                 <div id="homeHealthDisplay" style="font-size: 13px; color: #2B3E2F; margin-bottom: 10px; line-height: 1.6;">
                     등록된 정보가 없어요.
                 </div>
+                <div class="wheat-ask-slot"></div>
                 <div id="homeHealthUnrecognized" style="display: none; font-size: 12px; color: #B7791F; background: #FFF4DC; border-radius: 8px; padding: 8px 10px; margin-bottom: 10px; line-height: 1.5;"></div>
                 <span onclick="showPage('profile');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">내 정보에서 수정하기 →</span>
             </div>
@@ -915,6 +950,7 @@
     <div id="recipeBook" class="page">
         <div class="search-section">
             <div class="search-title">📖 레시피 북</div>
+            <div class="fam-who-slot" data-slot="book"></div>
             
             <div style="margin-bottom: 16px;">
                 <input type="text" id="recipeBookSearch" placeholder="레시피 검색..." onkeyup="filterRecipeBook()" style="width: 100%;">
@@ -992,12 +1028,14 @@
                 </div>
 
                 <div style="font-size: 13px; font-weight: 600; color: #2B3E2F; margin-bottom: 8px;">자주 있는 알레르기</div>
+                <div class="wheat-ask-slot"></div>
                 <div id="topAllergyGroup" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
                     <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="0" onchange="onHealthCheckboxChange()"> 계란</label>
                     <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="1" onchange="onHealthCheckboxChange()"> 우유</label>
-                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="2" onchange="onHealthCheckboxChange()"> 밀가루</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="2" onchange="onHealthCheckboxChange()"> 밀 알레르기</label>
                     <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="3" onchange="onHealthCheckboxChange()"> 대두</label>
                     <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="4" onchange="onHealthCheckboxChange()"> 갑각류</label>
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 13px;"><input type="checkbox" class="top-allergy-cb" data-idx="5" onchange="onHealthCheckboxChange()"> 글루텐(셀리악병)</label>
                 </div>
 
                 <div style="font-size: 13px; font-weight: 600; color: #2B3E2F; margin-bottom: 8px;">자주 있는 기저질환</div>
@@ -1014,6 +1052,13 @@
                 <div id="healthUnrecognized" style="display: none; font-size: 12px; color: #B7791F; background: #FFF4DC; border-radius: 8px; padding: 8px 10px; margin-top: 6px; line-height: 1.5;"></div>
 
                 <textarea id="healthInput" style="display: none;"></textarea>
+
+                <div style="font-size: 13px; font-weight: 600; color: #2B3E2F; margin: 16px 0 8px;">🎂 나이 구간 <span style="font-weight: 400; font-size: 12px; color: #888;">(꿀·식물성 음료처럼 나이에 따라 달라지는 경고에 써요)</span></div>
+                <div id="meAgeChips" class="fam-chips"></div>
+
+                <div onclick="openFamily()" style="margin-top: 16px; display: flex; align-items: center; justify-content: space-between; background: #FAF8F5; border: 1px solid #E8E3DD; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #2B3E2F; cursor: pointer;">
+                    <span>👨‍👩‍👧 <strong>가족 등록</strong> <span id="famProfileState" style="color: #888;"></span></span><span style="color: #5A8B4A;">›</span>
+                </div>
             </div>
 
             <div style="padding: 12px; background: #EAF3DE; border-left: 4px solid #5A8B4A; border-radius: 4px; font-size: 13px; color: #3B6D11;">
@@ -1043,10 +1088,18 @@
         </div>
     </div>
 
+    <!-- 가족 등록 모달 -->
+    <div id="familyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeFamily()">✕</div>
+            <div id="familyBody"></div>
+        </div>
+    </div>
+
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
-       <script src="diet-data.js?v=20261023d"></script>
-<script src="recipes-data.js?v=20261023d"></script>
-<script src="substitute-logic.js?v=20261023d"></script>
+       <script src="diet-data.js?v=20261027g"></script>
+<script src="recipes-data.js?v=20261027g"></script>
+<script src="substitute-logic.js?v=20261027g"></script>
     <script>
 
 
@@ -1060,7 +1113,7 @@
         let currentUser = null; // Firebase 로그인 사용자 (로그인 안 했으면 null)
 
         // 내 정보 입력칸과 홈 화면 입력칸의 값을 서로 동기화
-        const TOP_ALLERGIES = ['계란', '우유', '밀가루', '대두', '갑각류'];
+        const TOP_ALLERGIES = ['계란', '우유', '밀 알레르기', '대두', '갑각류', '글루텐 불내증'];
         const TOP_DISEASES = ['고콜레스테롤', '고혈압', '당뇨병', '위산역류', '신장질환'];
 
         // 체크박스+기타 입력을 조합해서 하나의 건강정보 텍스트로 만들고 저장
@@ -1123,6 +1176,8 @@
             syncCheckboxesFromText(text);
             renderHomeHealthDisplay(text);
             renderUnrecognizedHealth(text);
+            if (typeof renderWhoBars === 'function') renderWhoBars();
+            if (typeof renderWheatAsk === 'function') renderWheatAsk();
         }
 
         function saveHealthInfo(valueOverride) {
@@ -1202,7 +1257,7 @@
         // 알레르기 정보 조회
 
         function getUserAllergies() {
-            const healthText = document.getElementById('healthInput').value.toLowerCase();
+            const healthText = getActiveHealthText().toLowerCase();
             if (!healthText.trim()) return [];
             
             const items = healthText.split(',').map(a => a.trim()).filter(a => a);
@@ -1226,7 +1281,7 @@
 
         // 기저질환 정보 조회
         function getHealthDiseases() {
-            const healthText = document.getElementById('healthInput').value.toLowerCase();
+            const healthText = getActiveHealthText().toLowerCase();
             if (!healthText.trim()) return [];
             
             const items = healthText.split(',').map(a => a.trim()).filter(a => a);
@@ -1876,6 +1931,9 @@
 
             let html = '';
             html += `<div class="modal-title">${recipeName}</div>`;
+            html += `<div class="fam-who-slot" data-slot="modal"></div>`;
+            const youngAge = youngestAgeBand();
+            html += ageBannerHTML(youngAge);
             if (recipe.difficulty || recipe.cookTime) {
                 const metaParts = [];
                 if (recipe.difficulty) metaParts.push('난이도: ' + recipe.difficulty);
@@ -1895,9 +1953,11 @@
             </div>`;
             
             let sodiumShown = false;
+            let kidDrinkShown = false;
             recipe.ingredients.forEach((ing, ingIdx) => {
                 const ingNameLower = ing.name.toLowerCase();
-                               const { hasAllergy, alternativeFoods, allergyTip: allergyTipAll, allergyReason: allergyReasonAll, noSubMessage, excludedFoods, noAlternative } = resolveSubstitutes(ing, avoidSources);
+                               const { hasAllergy, alternativeFoods, allergyTip: allergyTipAll, allergyReason: allergyReasonAll, noSubMessage, excludedFoods, noAlternative, hardOnly } = resolveSubstitutes(ing, avoidSources);
+                const cocoWarn = coconutNutWarning(alternativeFoods, allergyObjects);
                 // 알레르기와 기저질환을 따로 봐요: 알레르기는 빨강 ⚠️, 기저질환 재료는 초록 줄에 파란 알약
                 const kind = buildAvoidSources(allergyObjects, []).length && resolveSubstitutes(ing, buildAvoidSources(allergyObjects, [])).hasAllergy ? 'allergy'
                     : (diseases.length && resolveSubstitutes(ing, buildAvoidSources([], diseases)).hasAllergy ? 'disease' : null);
@@ -1912,6 +1972,9 @@
                 const vagueNotes = findVagueAmountNote(ing, avoidSources);
                 const sodiumEst = estimateSodium(ing, avoidSources, baseServings);
                 if (sodiumEst) sodiumShown = true;
+                // 나이에 따라 달라지는 경고 (식물성 음료는 레시피당 한 번만)
+                const ageNote = ageNotesFor(ing, alternativeFoods, youngAge, allergyObjects.length > 0, kidDrinkShown);
+                if (ageNote.kidDrink) kidDrinkShown = true;
                 const className = kind === 'allergy' ? 'ingredient-warning' : 'ingredient-normal';
                 const requiredText = ing.required ? '' : '(선택)';
                 const warningMark = kind === 'allergy' ? '⚠️ ' : '';
@@ -1925,7 +1988,7 @@
                 const cartRowId = `cart_${ingIdx}`;
                 let cartControlHtml = '';
                 if (cartModeOn) {
-                    if (hasAllergy && alternativeFoods.length > 0) {
+                    if (hasAllergy && alternativeFoods.length > 0 && !hardOnly) {
                         cartControlHtml = `
                             <input type="checkbox" id="${cartRowId}_check" style="width: 18px; height: 18px;">
                             <select id="${cartRowId}_select" style="font-size: 12px; padding: 2px 4px; border-radius: 6px; border: 1px solid #ccc;">
@@ -1952,6 +2015,10 @@
                     ${maybeNotes.map(m => `<div style="font-size: 11px; color: #8a5a00; background: #FFF4DC; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">🔎 <strong>${m.allergen}</strong>: ${m.note}. 성분표를 확인하세요.</div>`).join('')}
                     ${sodiumEst ? `<div style="font-size: 11px; color: #2B4A6B; background: #EAF1F8; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">🧂 <strong>고혈압</strong>: 1인분에 이 재료로만 나트륨 약 ${sodiumEst.mg.toLocaleString()}mg (추정, 국물·소스를 다 먹을 때) · 하루 기준 ${SODIUM_DAILY_REF_MG.toLocaleString()}mg의 약 ${sodiumEst.pct}%${sodiumEst.subs.map(x => `<br>↳ <strong>${x.name}</strong>로 같은 양을 바꾸면 약 ${x.mg.toLocaleString()}mg (추정)`).join('')}</div>` : ''}
                     ${vagueNotes.map(v => `<div style="font-size: 11px; color: #2B4A6B; background: #EAF1F8; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">📏 <strong>${v.disease}</strong>: ${v.note}</div>`).join('')}
+                    ${(hardOnly || (noSubMessage && ing.required)) && kind === 'allergy' ? `<div class="fam-note-stop">🚫 대체할 수 있는 재료가 없어요${ing.required ? '' : ' (선택 재료라 빼고 만들어도 돼요)'}</div>` : ''}
+                    ${hardOnly && kind === 'disease' ? `<div style="font-size: 11px; color: #2B4A6B; background: #EAF1F8; border-radius: 6px; padding: 6px 8px; margin: 6px 0;">💡 대신할 재료가 마땅치 않아요. 양을 줄이거나 빼고 조리하세요.</div>` : ''}
+                    ${cocoWarn ? `<div class="fam-note-kid fam-note-coco">⚠️ ${cocoWarn}</div>` : ''}
+                    ${ageNote.html}
                     ${expandable && !cartModeOn ? `
                         <div id="${alternativeId}" style="display: none; padding: 12px 0; background: #EAF3DE; border-left: 3px solid #5A8B4A; padding-left: 12px; margin-top: 8px; border-radius: 4px;">
                             ${allergyReason ? (kind === 'disease' ? `<div style="font-size: 11px; color: #2B4A6B; margin-bottom: 8px;">💡 <strong>왜 줄이면 좋나요?</strong> ${allergyReason}</div>` : `<div style="font-size: 11px; color: #DC3545; margin-bottom: 8px;">⚠️ <strong>왜 피해야 하나요?</strong> ${allergyReason}</div>`) : ''}
@@ -1964,6 +2031,11 @@
                                         ? `🙅 이 요리는 <strong>${ing.name}</strong>이(가) 맛과 식감의 핵심이라 마땅한 대체품이 없어요. 다른 메뉴를 골라보시는 걸 추천해요.`
                                         : `✂️ <strong>${ing.name}</strong>은(는) 선택 재료예요. 대체할 필요 없이 그냥 빼고 만들어도 괜찮아요.`}
                                                                 </div>
+                            ` : hardOnly ? `
+                                <div style="font-size: 12px; color: #2B3E2F; background: white; padding: 8px; border-radius: 4px;">
+                                    🙅 ${[...new Set(alternativeFoods.map(f => getSubstituteInfo(f) || '').filter(Boolean))].slice(0, 1).join(' ') || `<strong>${ing.name}</strong>을(를) 대신할 재료가 마땅치 않아요.`}
+                                    ${ing.required ? '' : '<div style="margin-top: 4px;">✂️ 선택 재료예요. 빼고 만들어도 괜찮아요.</div>'}
+                                </div>
                             ` : noAlternative ? `
                                 <div style="font-size: 12px; color: #2B3E2F; background: white; padding: 8px; border-radius: 4px;">
                                     🙅 고르신 제약을 모두 지키면서 <strong>${ing.name}</strong>을(를) 대신할 수 있는 대체품이 없어요.
@@ -1992,7 +2064,7 @@
                 : `<div style="margin-top: 12px; background: #F5F3EE; color: #3B6D11; border: 1px solid #8FB878; text-align: center; font-weight: 600; font-size: 13px; padding: 10px; border-radius: 10px; cursor: pointer;" onclick="toggleCartMode()">🛒 장바구니에 담기</div>`;
 
             if (sodiumShown) {
-                html += `<div style="font-size: 10.5px; color: #8a8a8a; margin-top: 8px; line-height: 1.5;">🧂 나트륨은 식약처 식품영양성분DB 제품들의 중앙값과 1큰술=15ml 등 일반 계량을 바탕으로 한 추정치예요. 제품마다 다르고, 국물이나 소스를 남기면 실제 섭취량은 줄어요. 하루 기준 2,300mg은 2020 한국인 영양소 섭취기준이에요.</div>`;
+                html += `<div style="font-size: 10.5px; color: #8a8a8a; margin-top: 8px; line-height: 1.5;">🧂 나트륨은 식약처 식품영양성분DB 제품들의 중앙값과 1큰술=15ml 등 일반 계량을 바탕으로 한 추정치예요. 제품마다 다르고, 국물이나 소스를 남기면 실제 섭취량은 줄어요. 하루 기준 2,300mg은 2020 한국인 영양소 섭취기준이에요(미국 2025 고혈압 지침도 하루 2,300mg 이하를 권해요).</div>`;
             }
             html += `<div class="section-title" style="margin-top: 16px;">조리 단계</div>`;
             recipe.steps.forEach(step => {
@@ -2015,6 +2087,7 @@
 
             modalBody.innerHTML = html;
             modal.classList.add('active');
+            renderWhoBars();
         }
 
         function closeRecipeModal() {
@@ -2023,6 +2096,13 @@
 
         // 대체식품 분석 (간단 버전)
         // 입력한 이름이 알레르기/질환 이름(별칭 포함)이면 그 항목의 안내 카드를 만들어 돌려줘요 (없으면 빈 문자열)
+        // 카드에 따로 보여줄 경고 (diet-data.js의 HEALTH_WARNINGS)
+        function healthWarningsHTML(obj) {
+            const st = { stop: 'color: #a1232f; background: #FDECEC; font-weight: 600;', label: 'color: #8a5a00; background: #FFF4DC;', info: 'color: #2B4A6B; background: #EAF1F8;' };
+            const ic = { stop: '⚠️', label: '🏷️', info: '💡' };
+            return (obj.warnings || []).map(w => `<div style="font-size: 12px; ${st[w.type] || st.info} border-radius: 6px; padding: 7px 9px; margin-bottom: 8px; line-height: 1.5;">${ic[w.type] || '💡'} ${w.text}</div>`).join('');
+        }
+
         function renderNameCards(ingredientInput) {
             let html = '';
             let foundAlternative = false;
@@ -2044,14 +2124,16 @@
                                 </div>
                             </div>
                             <div style="margin-bottom: 12px;">
-                                <div style="font-size: 12px; color: #555; font-weight: 500; margin-bottom: 6px;">✅ 대체 음식:</div>
+                                <div style="font-size: 12px; color: #555; font-weight: 500; margin-bottom: 6px;">✅ 먹어도 되는 음식 (예시, 대체품 아님):</div>
                                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                                     ${allergyObj.safeFoods.map(food => `<span style="background: #e8f5e9; padding: 4px 8px; border-radius: 4px; font-size: 11px; color: #2e7d32; border: 1px solid #4caf50;">${food}</span>`).join('')}
                                 </div>
                             </div>
+                            ${healthWarningsHTML(allergyObj)}
                             <div style="font-size: 11px; color: #666; background: #f5f5f5; padding: 8px; border-radius: 4px;">
                                 💡 ${allergyObj.tips}
                             </div>
+                            ${allergyObj.labelSource ? `<div style="font-size: 10px; color: #888; margin-top: 6px;">라벨 표시 근거: <a href="${allergyObj.labelSource}" target="_blank" rel="noopener noreferrer" style="color: #90a4ae;">식품 알레르기 표시기준(별표 2)</a> · ${allergyObj.labelNote}</div>` : ''}
                             ${allergyObj.source ? `<div style="font-size: 10px; color: #aaa; margin-top: 6px;">출처: <a href="${allergyObj.source}" target="_blank" rel="noopener noreferrer" style="color: #90a4ae;">${allergyObj.source}</a></div>` : ''}
                         </div>
                     `;
@@ -2088,6 +2170,7 @@
                                     </div>
                                 </div>
                             ` : ''}
+                            ${healthWarningsHTML(diseaseObj)}
                             <div style="font-size: 11px; color: #666; background: #f5f5f5; padding: 8px; border-radius: 4px;">
                                 💡 ${diseaseObj.tips || '의료진과 상담하세요.'}
                             </div>
@@ -2204,6 +2287,9 @@
                 let h = '';
                 if (res.noAlternative) {
                     h += '<div style="margin-top: 8px; font-size: 12px;">🙅 고르신 제약을 모두 지키면서 대신할 수 있는 대체품이 없어요. 다른 재료나 메뉴를 골라보세요.</div>';
+                } else if (res.hardOnly) {
+                    h += '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #a1232f;">🚫 대체할 수 있는 재료가 없어요</div>' +
+                        res.alternativeFoods.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">🙅 ${esc(getSubstituteInfo(f) || '')}</div>`).join('');
                 } else if (res.alternativeFoods.length) {
                     h += '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #3B6D11;">✅ 대체 음식</div>' +
                         res.alternativeFoods.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">💡 <strong>${esc(f)}</strong>: ${esc(getSubstituteInfo(f) || res.allergyTip || '')}</div>`).join('');
@@ -2234,6 +2320,8 @@
                         tone = 'danger';
                         title = '🚨 내 알레르기에 해당해요';
                         body = (resA.allergyReason ? `<div style="font-size: 11px; color: #DC3545; margin-top: 6px;">⚠️ <strong>왜 피해야 하나요?</strong> ${esc(resA.allergyReason)}</div>` : '') + altHTML(res);
+                        const coco = res.hardOnly ? '' : coconutNutWarning(res.alternativeFoods, allergyObjects);
+                        if (coco) body += `<div style="margin-top: 6px; font-size: 11px; color: #8a5a00; background: #FFF4DC; border-radius: 6px; padding: 6px 8px;">⚠️ ${esc(coco)}</div>`;
                         if (dNames.length) body += `<div style="margin-top: 6px; font-size: 11px; color: #1F5FA8;">💡 ${esc(dNames.join('·'))} 기준으로도 줄이면 좋은 재료예요.</div>`;
                         body += maybeHTML(maybes);
                     } else if (dNames.length) {
@@ -2256,10 +2344,13 @@
                 } else if (anyHits.length) {
                     tone = 'info';
                     title = `해당하는 항목: ${anyHits.map(a => esc(a.name)).join(', ')}`;
-                    const subs = [...new Set(anyHits.flatMap(a => resolveSubstitutes(ing, a._dkey ? buildAvoidSources([], [a._dkey]) : buildAvoidSources([a], [])).alternativeFoods))];
+                    const subsAll = [...new Set(anyHits.flatMap(a => resolveSubstitutes(ing, a._dkey ? buildAvoidSources([], [a._dkey]) : buildAvoidSources([a], [])).alternativeFoods))];
+                    const subs = subsAll.filter(f => !HARD_SUB_MARK.test(f));
+                    const hards = subsAll.filter(f => HARD_SUB_MARK.test(f));
                     const tip = anyHits[0].tips || '';
                     body = (anyHits[0].reason ? `<div style="font-size: 11px; color: #DC3545; margin-top: 6px;">⚠️ <strong>왜 피해야 하나요?</strong> ${esc(anyHits[0].reason)}</div>` : '') +
                         (subs.length ? '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #3B6D11;">✅ 대체 음식</div>' + subs.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">💡 <strong>${esc(f)}</strong>: ${esc(getSubstituteInfo(f) || tip)}</div>`).join('') : '') +
+                        (hards.length && !subs.length ? '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #a1232f;">🚫 대체할 수 있는 재료가 없어요</div>' + hards.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">🙅 ${esc(getSubstituteInfo(f) || '')}</div>`).join('') : '') +
                         maybeHTML(findMaybeContain(name, anyHits.filter(a => !a._dkey)));
                 } else {
                     const maybes = findMaybeContain(name, allAllergies);
@@ -2312,9 +2403,304 @@
             }
         });
 
+        // ===== 밀 알레르기 / 셀리악 분리: 예전 '밀가루'·'밀' 등록자에게 한 번 물어보기 =====
+        const WHEAT_LEGACY = ['밀가루', '밀'];
+        function wheatLegacyItems(text) { return String(text || '').split(',').map(s => s.trim()).filter(s => WHEAT_LEGACY.includes(s)); }
+        let wheatAskLater = false;
+        function renderWheatAsk() {
+            const show = !wheatAskLater && wheatLegacyItems(meHealthText()).length > 0;
+            document.querySelectorAll('.wheat-ask-slot').forEach(el => {
+                el.innerHTML = show ? `<div style="background: #FFF4DC; border: 1.5px solid #e0b04a; border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px; color: #5a3d00; line-height: 1.5;">
+                    🌾 <strong>'밀가루'로 등록되어 있어요.</strong> 밀 알레르기와 셀리악병은 피해야 할 재료가 달라요. 어떤 경우인가요?
+                    <div style="font-size: 11px; color: #8a5a00; margin-top: 4px;">고르기 전까지는 더 엄격한 셀리악 기준(밀·보리·호밀 모두)으로 확인해요.</div>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                        <button type="button" onclick="answerWheat('밀 알레르기')" style="flex: 1; min-width: 120px; background: #fff; border: 1.5px solid #DC3545; color: #c5192d; border-radius: 8px; padding: 8px; font-weight: 700; cursor: pointer;">밀 알레르기<br><span style="font-weight: 400; font-size: 11px;">밀만 피하면 돼요</span></button>
+                        <button type="button" onclick="answerWheat('글루텐 불내증')" style="flex: 1; min-width: 120px; background: #fff; border: 1.5px solid #5A8B4A; color: #2b5a1f; border-radius: 8px; padding: 8px; font-weight: 700; cursor: pointer;">셀리악병·글루텐 민감<br><span style="font-weight: 400; font-size: 11px;">밀·보리·호밀 모두</span></button>
+                    </div>
+                    <div onclick="wheatAskLater = true; renderWheatAsk();" style="font-size: 11px; color: #888; text-align: right; margin-top: 6px; cursor: pointer; text-decoration: underline;">나중에 할게요</div>
+                </div>` : '';
+            });
+        }
+        function answerWheat(choice) {
+            const items = meHealthText().split(',').map(s => s.trim()).filter(Boolean);
+            const next = [];
+            items.forEach(i => { const v = WHEAT_LEGACY.includes(i) ? choice : i; if (!next.includes(v)) next.push(v); });
+            saveHealthInfo(next.join(', '));
+        }
+
+        // ===== 가족 등록 =====
+        // 가족 정보는 이 기기(브라우저)에만 저장해요. 서버(Firestore)로 보내지 않아요.
+        const FAMILY_KEY = 'familyProfile';
+        const AGE_BANDS = ['1세 미만', '1~4세', '5~13세', '14세 이상'];
+        const FAM_ICONS = ['👶', '🧒', '👧', '👦', '👩', '👨', '👵', '👴'];
+        const FAM_ALLERGIES = ['계란', '우유', '밀 알레르기', '글루텐 불내증', '대두', '땅콩', '견과류', '갑각류', '조개류'];
+        const FAM_MAX = 8;
+        const PLANT_DRINKS = ['두유', '아몬드 밀크', '귀리 밀크', '쌀 음료', '코코넛 밀크'];
+
+        function defaultFamily() { return { consent: false, on: false, meAge: null, members: [], selected: ['me'] }; }
+        function loadFamily() {
+            try {
+                const f = JSON.parse(localStorage.getItem(FAMILY_KEY) || 'null');
+                if (f && Array.isArray(f.members)) {
+                    const base = defaultFamily();
+                    const fam = Object.assign(base, f);
+                    fam.members = fam.members.filter(m => m && m.id && typeof m.nick === 'string');
+                    if (!Array.isArray(fam.selected)) fam.selected = ['me'];
+                    return fam;
+                }
+            } catch (e) { console.warn('가족 정보 불러오기 실패:', e.message); }
+            return defaultFamily();
+        }
+        let family = loadFamily();
+        let famView = { page: 'list', editId: null, draft: null };
+        function saveFamily() {
+            try { localStorage.setItem(FAMILY_KEY, JSON.stringify(family)); }
+            catch (e) { console.warn('localStorage 사용 불가:', e.message); }
+        }
+        function familyActive() { return !!(family.on && family.consent && family.members.length > 0); }
+        function meHealthText() { const el = document.getElementById('healthInput'); return el ? el.value : ''; }
+        function activeEaters() {
+            const me = { id: 'me', nick: '나', icon: '🙋', age: family.meAge, health: meHealthText() };
+            if (!familyActive()) return [me];
+            const all = [me, ...family.members];
+            const picked = all.filter(m => family.selected.includes(m.id));
+            return picked.length ? picked : [me];
+        }
+        // 점검에 쓰는 건강정보 텍스트: 가족 기능이 꺼져 있으면 내 정보 그대로
+        function getActiveHealthText() {
+            return activeEaters().map(m => (m.health || '').trim()).filter(Boolean).join(', ');
+        }
+        // 가장 어린 사람의 나이 구간 (0~3). 나이를 모르는 사람이 있으면 null
+        function youngestAgeBand() {
+            const ages = activeEaters().map(m => m.age);
+            const known = ages.filter(a => Number.isInteger(a));
+            if (known.some(a => a <= 1)) return Math.min(...known);
+            if (ages.some(a => !Number.isInteger(a))) return null;
+            return Math.min(...known);
+        }
+        function ageBannerHTML(age) {
+            if (age !== 0 && age !== 1) return '';
+            const who = familyActive() ? activeEaters().filter(m => m.age === age).map(m => escapeHealthText(m.nick)).join('·') : '';
+            return `<div class="fam-age-banner">👶 ${AGE_BANDS[age]} 아이${who ? '(' + who + ')' : ''}가 먹어요. 아이에게 주의할 재료를 아래에 따로 표시했어요.</div>`;
+        }
+        // 재료 한 줄에 붙는 나이 경고
+        function ageNotesFor(ing, alternativeFoods, age, hasAllergy, kidDrinkShown) {
+            let html = '', kidDrink = false;
+            const alts = alternativeFoods || [];
+            const drinkShown = alts.some(f => PLANT_DRINKS.includes(f));
+            // 5세 미만: 나이가 1~4세 이하로 확인됐거나, 나이를 모르는데 알레르기가 있을 때
+            if (drinkShown && !kidDrinkShown && (age === 0 || age === 1 || (age === null && hasAllergy))) {
+                kidDrink = true;
+                html += `<div class="fam-note-kid">👶 5세 미만 아이에게는 식물성 음료(두유·아몬드·귀리·쌀 음료 등)를 우유 대용으로 주지 마세요. 단백질·지방이 부족할 수 있고, 쌀 음료는 비소 때문에 해외 기관이 어린 아이에게 권하지 않아요. 의사·영양사와 상의하세요.</div>`;
+            }
+            if (age === 0) {
+                if (/꿀/.test(ing.name)) {
+                    html += `<div class="fam-note-stop">🚫 1세 미만 아기에게는 꿀을 주지 마세요 (영아 보툴리눔증 위험). 아기 몫은 꿀을 넣기 전에 덜어 주세요.</div>`;
+                } else if (alts.some(f => /꿀/.test(f))) {
+                    html += `<div class="fam-note-stop">🚫 대체 재료에 꿀이 들어가요. 1세 미만 아기 몫에는 쓰지 마세요.</div>`;
+                }
+            }
+            return { html, kidDrink };
+        }
+
+        // "오늘 누가 먹어요?" 선택 막대 (홈·레시피북·레시피 상세)
+        function renderWhoBars() {
+            document.querySelectorAll('.fam-who-slot').forEach(slot => {
+                if (!familyActive()) { slot.innerHTML = ''; return; }
+                const me = { id: 'me', nick: '나', icon: '🙋' };
+                const all = [me, ...family.members];
+                const eaters = activeEaters();
+                const ids = eaters.map(m => m.id);
+                const btns = all.map(m => `<button type="button" class="fam-who-btn ${ids.includes(m.id) ? 'on' : ''}" onclick="event.stopPropagation(); toggleEater('${m.id}')">${m.icon || '🙂'} ${escapeHealthText(m.nick)}</button>`).join('');
+                const items = getActiveHealthText().split(',').map(x => x.trim()).filter(Boolean);
+                const uniq = [...new Set(items)];
+                slot.innerHTML = `<div class="fam-who"><div class="fam-who-title"><span>👨‍👩‍👧 오늘 누가 먹어요?</span><a onclick="event.stopPropagation(); openFamily()">가족 관리</a></div>
+                    <div class="fam-who-list">${btns}</div>
+                    <div class="fam-who-sum">${eaters.map(m => escapeHealthText(m.nick)).join('·')} 기준을 합쳐서 확인해요${uniq.length ? ' · ' + uniq.map(escapeHealthText).join(', ') : ' · 등록된 알레르기·질환 없음'}</div></div>`;
+            });
+            const st = document.getElementById('famProfileState');
+            if (st) st.textContent = familyActive() ? `켜짐 · 가족 ${family.members.length}명` : (family.consent && family.members.length ? '꺼짐' : '같이 먹는 가족의 알레르기도 함께 확인해요');
+        }
+        function toggleEater(id) {
+            const cur = activeEaters().map(m => m.id);
+            let next = cur.includes(id) ? cur.filter(x => x !== id) : [...cur, id];
+            if (next.length === 0) return; // 최소 한 명은 남겨요
+            family.selected = next;
+            saveFamily();
+            refreshAfterFamilyChange();
+        }
+        function refreshAfterFamilyChange() {
+            renderWhoBars();
+            const isActive = id => { const el = document.getElementById(id); return el && el.classList.contains('active'); };
+            if (isActive('recipeBook') && typeof filterRecipeBook === 'function') filterRecipeBook();
+            if (isActive('home')) { if (typeof renderCarousel === 'function') renderCarousel(); if (typeof renderHomeRecipeGrid === 'function') renderHomeRecipeGrid(); }
+            if (isActive('search') && typeof loadAvoidFoods === 'function') loadAvoidFoods();
+            if (isActive('recipeModal') && currentModalRecipe) showRecipeModal(currentModalRecipe, true);
+        }
+
+        // 내 나이 구간 (내 정보 화면)
+        function renderMeAge() {
+            const el = document.getElementById('meAgeChips');
+            if (!el) return;
+            el.innerHTML = AGE_BANDS.map((a, i) => `<span class="fam-chip ${family.meAge === i ? 'on' : ''}" onclick="setMeAge(${i})">${a}</span>`).join('')
+                + (family.meAge === null ? `<span style="font-size: 12px; color: #B7791F; align-self: center;">아직 선택하지 않았어요</span>` : '');
+        }
+        function setMeAge(i) {
+            family.meAge = family.meAge === i ? null : i;
+            saveFamily(); renderMeAge(); renderFamily(); refreshAfterFamilyChange();
+        }
+
+        // 가족 등록 화면
+        function openFamily() {
+            famView = { page: family.consent ? 'list' : 'intro', editId: null, draft: null };
+            renderFamily();
+            document.getElementById('familyModal').classList.add('active');
+        }
+        function closeFamily() {
+            document.getElementById('familyModal').classList.remove('active');
+            refreshAfterFamilyChange();
+        }
+        function famHealthItems(m) { return (m.health || '').split(',').map(x => x.trim()).filter(Boolean); }
+        function renderFamily() {
+            const body = document.getElementById('familyBody');
+            if (!body || !document.getElementById('familyModal')) return;
+            let h = '';
+            if (famView.page === 'intro') {
+                h += `<div class="modal-title">👨‍👩‍👧 가족 등록</div>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 12px;">같이 먹는 가족을 등록하면, 레시피를 볼 때 모두의 알레르기·질환을 한 번에 확인해요.</div>
+                    <div class="fam-notice"><strong>시작하기 전에 알려드려요</strong><ul>
+                        <li>가족 정보는 <strong>이 기기(브라우저)에만</strong> 저장돼요. 로그인해도 서버로 보내지 않아요.</li>
+                        <li>다른 폰에서는 보이지 않아요. 기기마다 따로 등록해야 해요.</li>
+                        <li>브라우저 기록(사이트 데이터)을 지우면 가족 정보도 지워져요.</li>
+                        <li>이름 대신 <strong>별명</strong>(예: 첫째, 아빠)만 받아요. 생년월일은 받지 않아요.</li>
+                        <li>알레르기·질환은 건강 정보예요. 언제든 이 화면에서 지울 수 있어요.</li>
+                    </ul></div>
+                    <label style="display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; font-size: 13px; cursor: pointer;"><input type="checkbox" id="famAgree" style="margin-top: 3px; width: 18px; height: 18px;" onchange="document.getElementById('famStart').disabled = !this.checked"><span>위 내용을 확인했고, 가족의 알레르기·질환 정보를 이 기기에 저장하는 데 동의해요. (아이 정보는 보호자가 입력해요)</span></label>
+                    <button class="fam-btn" id="famStart" disabled onclick="famAccept()">가족 등록 시작하기</button>
+                    <button class="fam-btn ghost" onclick="closeFamily()">나중에 할게요</button>`;
+            } else if (famView.page === 'list') {
+                h += `<div class="modal-title">👨‍👩‍👧 우리 가족</div>
+                    <label class="fam-switch"><span>가족 기능 켜기</span><input type="checkbox" ${family.on ? 'checked' : ''} onchange="family.on = this.checked; saveFamily(); renderFamily(); refreshAfterFamilyChange();"></label>
+                    <div style="font-size: 12px; color: #888; margin: 6px 2px 4px;">끄면 내 정보만으로 확인해요. 등록한 가족은 지워지지 않아요.</div>
+                    <div class="fam-mem"><div class="fam-av">🙋</div><div class="fam-mem-info"><b>나</b>${famHealthItems({ health: meHealthText() }).map(escapeHealthText).join(' · ') || '등록된 알레르기·질환 없음'}<br>나이: ${family.meAge === null ? '<span style="color:#B7791F">미선택</span>' : AGE_BANDS[family.meAge]}</div><span class="fam-mem-act" onclick="closeFamily(); showPage('profile');">내 정보</span></div>`;
+                family.members.forEach(m => {
+                    const items = famHealthItems(m);
+                    const unrec = getUnrecognizedHealthItems(m.health || '');
+                    h += `<div class="fam-mem"><div class="fam-av">${m.icon || '🙂'}</div><div class="fam-mem-info"><b>${escapeHealthText(m.nick)}</b>${items.map(escapeHealthText).join(' · ') || '등록된 알레르기·질환 없음'}<br>나이: ${Number.isInteger(m.age) ? AGE_BANDS[m.age] : '<span style="color:#B7791F">미선택</span>'}${unrec.length ? `<div class="fam-warn" style="margin-top:4px;">⚠️ ${unrec.map(escapeHealthText).join(', ')}은(는) 아직 지원하지 않아 경고에 반영되지 않아요.</div>` : ''}${wheatLegacyItems(m.health).length ? `<div class="fam-warn" style="margin-top:4px;">🌾 '밀가루'는 지금 셀리악(밀·보리·호밀) 기준으로 확인해요. 밀 알레르기라면 [수정]에서 '밀 알레르기'로 바꿔 주세요.</div>` : ''}</div>
+                        <span class="fam-mem-act" onclick="famEdit('${m.id}')">수정</span><span class="fam-mem-act" style="color:#c5192d" onclick="famDelete('${m.id}')">삭제</span></div>`;
+                });
+                if (!family.members.length) h += `<div style="text-align: center; color: #999; font-size: 13px; padding: 14px 0;">아직 등록한 가족이 없어요.</div>`;
+                h += family.members.length < FAM_MAX
+                    ? `<button class="fam-btn" onclick="famEdit(null)">＋ 가족 추가하기</button>`
+                    : `<div style="font-size: 12px; color: #888; margin-top: 10px;">가족은 최대 ${FAM_MAX}명까지 등록할 수 있어요.</div>`;
+                h += `<button class="fam-btn ghost" onclick="closeFamily()">완료</button>`;
+                if (family.members.length) h += `<button class="fam-btn danger" onclick="famDeleteAll()">가족 정보 모두 지우기</button>`;
+            } else if (famView.page === 'edit') {
+                const d = famView.draft;
+                const items = famHealthItems(d);
+                const knownA = FAM_ALLERGIES, knownD = TOP_DISEASES;
+                const etc = items.filter(i => !knownA.includes(i) && !knownD.includes(i));
+                h += `<div class="modal-title">${famView.editId ? '가족 정보 수정' : '＋ 가족 추가'}</div>
+                    <div class="fam-label">별명</div>
+                    <input type="text" id="famNick" maxlength="8" placeholder="예: 첫째, 엄마, 할머니" value="${escapeHealthText(d.nick)}" style="width: 100%;" oninput="famView.draft.nick = this.value">
+                    <div class="fam-label">아이콘</div>
+                    <div class="fam-chips">${FAM_ICONS.map(ic => `<span class="fam-chip ${d.icon === ic ? 'on' : ''}" onclick="famDraftSet('icon','${ic}')">${ic}</span>`).join('')}</div>
+                    <div class="fam-label">나이 구간</div>
+                    <div class="fam-chips">${AGE_BANDS.map((a, i) => `<span class="fam-chip ${d.age === i ? 'on' : ''}" onclick="famDraftSet('age',${i})">${a}</span>`).join('')}</div>
+                    <div style="font-size: 11px; color: #888; margin-top: 6px;">꿀(1세 미만), 식물성 음료(5세 미만)처럼 나이에 따라 경고가 달라져요.</div>
+                    <div class="fam-label">알레르기</div>
+                    <div class="fam-chips">${knownA.map(a => `<span class="fam-chip red ${items.includes(a) ? 'on' : ''}" onclick="famDraftToggle('${a}')">${a}</span>`).join('')}</div>
+                    <div class="fam-label">기저질환</div>
+                    <div class="fam-chips">${knownD.map(a => `<span class="fam-chip blue ${items.includes(a) ? 'on' : ''}" onclick="famDraftToggle('${a}')">${a}</span>`).join('')}</div>
+                    <div class="fam-label">기타 (쉼표로 구분)</div>
+                    <input type="text" id="famEtc" placeholder="예: 복숭아 알레르기, 통풍" value="${escapeHealthText(etc.join(', '))}" style="width: 100%;">
+                    <div id="famEditErr" style="display: none;" class="fam-warn"></div>
+                    <button class="fam-btn" onclick="famSave()">저장하기</button>
+                    <button class="fam-btn ghost" onclick="famView.page = 'list'; renderFamily();">취소</button>`;
+            }
+            body.innerHTML = h;
+        }
+        function famAccept() {
+            family.consent = true; family.on = true; saveFamily();
+            famView.page = 'list'; renderFamily(); renderWhoBars();
+        }
+        function famEdit(id) {
+            const m = id ? family.members.find(x => x.id === id) : null;
+            famView = { page: 'edit', editId: id, draft: m ? JSON.parse(JSON.stringify(m)) : { nick: '', icon: '🧒', age: null, health: '' } };
+            renderFamily();
+        }
+        function famReadEtc() {
+            const el = document.getElementById('famEtc');
+            return el ? el.value.split(',').map(x => x.trim()).filter(Boolean) : [];
+        }
+        function famDraftSet(k, v) {
+            const d = famView.draft;
+            const etc = famReadEtc();
+            d[k] = (k === 'age' && d.age === v) ? null : v;
+            famKeepEtc(etc); renderFamily();
+        }
+        function famDraftToggle(item) {
+            const d = famView.draft;
+            const etc = famReadEtc();
+            const items = famHealthItems(d).filter(i => FAM_ALLERGIES.includes(i) || TOP_DISEASES.includes(i));
+            const next = items.includes(item) ? items.filter(i => i !== item) : [...items, item];
+            d.health = next.join(', ');
+            famKeepEtc(etc); renderFamily();
+        }
+        function famKeepEtc(etc) {
+            const d = famView.draft;
+            const known = famHealthItems(d).filter(i => FAM_ALLERGIES.includes(i) || TOP_DISEASES.includes(i));
+            d.health = [...known, ...etc].join(', ');
+        }
+        function famSave() {
+            const d = famView.draft;
+            const nickEl = document.getElementById('famNick');
+            d.nick = (nickEl ? nickEl.value : d.nick).trim();
+            famKeepEtc(famReadEtc());
+            const err = document.getElementById('famEditErr');
+            const dup = d.nick === '나' || family.members.some(m => m.nick === d.nick && m.id !== famView.editId);
+            if (!d.nick || dup) {
+                err.textContent = !d.nick ? '별명을 입력해 주세요.' : '이미 쓰고 있는 별명이에요. 다른 별명을 써 주세요.';
+                err.style.display = 'block';
+                return;
+            }
+            if (famView.editId) {
+                const i = family.members.findIndex(m => m.id === famView.editId);
+                family.members[i] = Object.assign(family.members[i], { nick: d.nick, icon: d.icon, age: d.age, health: d.health });
+            } else {
+                const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+                family.members.push({ id, nick: d.nick, icon: d.icon, age: d.age, health: d.health });
+                // 새로 등록한 사람은 오늘 같이 먹는 사람으로 바로 넣어요
+                const cur = activeEaters().map(m => m.id);
+                family.selected = [...new Set([...cur, id])];
+            }
+            saveFamily();
+            famView = { page: 'list', editId: null, draft: null };
+            renderFamily(); renderWhoBars();
+        }
+        function famDelete(id) {
+            const m = family.members.find(x => x.id === id);
+            if (!m || !confirm(`'${m.nick}' 정보를 지울까요?`)) return;
+            family.members = family.members.filter(x => x.id !== id);
+            family.selected = family.selected.filter(x => x !== id);
+            saveFamily(); renderFamily(); renderWhoBars();
+        }
+        function famDeleteAll() {
+            if (!confirm('등록한 가족 정보를 모두 지울까요? 되돌릴 수 없어요.')) return;
+            family.members = []; family.selected = ['me']; family.on = false;
+            saveFamily(); renderFamily(); renderWhoBars();
+        }
+        document.addEventListener('click', function(event) {
+            const fm = document.getElementById('familyModal');
+            if (event.target === fm) closeFamily();
+        });
+
         // 페이지 로드 시 초기화
         document.addEventListener('DOMContentLoaded', function() {
             loadHealthInfo();
+            renderWheatAsk();
+            renderMeAge();
+            renderWhoBars();
             renderCarousel();
             renderHomeRecipeGrid();
             startCarouselAutoPlay();

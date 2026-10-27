@@ -69,6 +69,13 @@ function isFreeFrom(foodName, avoidFood) {
 // 여러 제약을 함께 골랐을 때, 대체품이 "다른" 제약의 피해야 할 식품에 걸리면 목록에서 빼고
 // excludedFoods([{ food, by, matched }])에 담아 돌려줘요. 그래서 다 빠져 빈 목록이 되면 noAlternative가 true예요.
 // (대체품을 제안한 제약 자신의 피해야 할 식품은 비교하지 않아요. 예: 유당불내증의 '버터(소량)' 대체안)
+const HARD_SUB_MARK = /\(대체 어려움\)/;
+// 견과류 알레르기가 있는데 코코넛 대체품이 보이면 붙이는 경고 (Anaphylaxis UK·Teuber 1999: 드물게 교차반응)
+function coconutNutWarning(alternativeFoods, allergyObjects) {
+    const nut = allergyMapping['견과류'];
+    if (!nut || !(allergyObjects || []).includes(nut)) return '';
+    return (alternativeFoods || []).some(f => /코코넛/.test(f)) ? '견과류 알레르기가 있으면 드물게 코코넛에도 반응할 수 있어요. 처음 먹기 전에 의사와 상의하세요.' : '';
+}
 function resolveSubstitutes(ing, avoidSources) {
     const hasAllergy = avoidSources.some(source =>
         source.avoidFoods.some(avoidFood => isIngredientMatch(ing.name, avoidFood))
@@ -84,8 +91,11 @@ function resolveSubstitutes(ing, avoidSources) {
     });
     if (hasAllergy && avoidSources.length > 0) {
         avoidSources.forEach((source) => {
+            // 한 제약 안에서 여러 회피어가 걸리면 가장 구체적인 것만 써요 (예: '사각어묵'이면 '어묵' 규칙 말고 '사각어묵' 규칙)
+            const matchedKeys = source.avoidFoods.filter(avoidFood => isIngredientMatch(ing.name, avoidFood));
+            const specificKeys = matchedKeys.filter(k => !matchedKeys.some(o => o !== k && o.includes(k)));
             source.avoidFoods.forEach(avoidFood => {
-                if (isIngredientMatch(ing.name, avoidFood)) {
+                if (specificKeys.includes(avoidFood)) {
                     allergyTip = source.tips;
                     allergyReason = source.reason || '';
                     if (ing.substituteOverride) {
@@ -93,9 +103,10 @@ function resolveSubstitutes(ing, avoidSources) {
                         alternativeFoods = [...new Set([...alternativeFoods, ...ing.substituteOverride])];
                         propose(ing.substituteOverride, source);
                     } else if (!ing.noSubstituteHere) {
-                        // substitutes 맵이 있으면 매칭된 재료의 정확한 대체품만, 없으면 카테고리 전체 safeFoods 사용
+                        // substitutes 맵에 있는 그 재료의 대체품만 사용
                         const specificSubs = source.substitutes ? source.substitutes[avoidFood] : null;
-                        const foodsToAdd = specificSubs || source.safeFoods;
+                        // 재료별 대체가 없으면 공통 기본 대체(영양 기준)를 쓰지 않고 "대체 어려움"으로 보여줘요 (2026-10-27)
+                        const foodsToAdd = specificSubs || [avoidFood.replace(/\([^)]*\)/g, '').trim() + ' 없이 조리(대체 어려움)'];
                         alternativeFoods = [...new Set([...alternativeFoods, ...foodsToAdd])];
                         propose(foodsToAdd, source);
                     }
@@ -121,7 +132,11 @@ function resolveSubstitutes(ing, avoidSources) {
 
     const noSubMessage = hasAllergy && ing.noSubstituteHere;
     const noAlternative = !!(hasAllergy && !noSubMessage && alternativeFoods.length === 0 && excludedFoods.length > 0);
-    return { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative };
+    // '○○ 없이 조리(대체 어려움)'만 남으면 대체품이 아니라 "대체 불가" 경고로 보여줘요
+    const hardOnly = !!(hasAllergy && !noSubMessage && alternativeFoods.length > 0 && alternativeFoods.every(f => HARD_SUB_MARK.test(f)));
+    // 진짜 대체품이 하나라도 있으면 '(대체 어려움)' 표시는 목록에서 빼요 (예: 알레르기 쪽 대체 + 질환 쪽 '줄이기')
+    if (!hardOnly) alternativeFoods = alternativeFoods.filter(f => !HARD_SUB_MARK.test(f));
+    return { hasAllergy, alternativeFoods, allergyTip, allergyReason, noSubMessage, excludedFoods, noAlternative, hardOnly };
 }
 
 // ───── 사용자가 입력한 건강정보 한 항목 해석 (공백·'알레르기' 꼬리말·별칭 처리) ─────
@@ -192,7 +207,7 @@ function recipeSafetyInfo(recipe, allergyObjects, diseaseKeys) {
     recipe.ingredients.forEach(ing => {
         const a = aSrc.length ? resolveSubstitutes(ing, aSrc) : { hasAllergy: false };
         if (a.hasAllergy) {
-            const noWay = a.noAlternative || a.noSubMessage || a.alternativeFoods.length === 0;
+            const noWay = a.noAlternative || a.noSubMessage || a.hardOnly || a.alternativeFoods.length === 0;
             if (noWay && ing.required) block++; else sub++;
         } else {
             if (findMaybeContain(ing.name, aObjs).length > 0) maybe++;
