@@ -17,6 +17,9 @@ function isSauceOfDish(name, word) {
     return SAUCE_OF_DISH_WORDS.includes(word) && String(name).replace(/\s/g, '').includes(word + '소스');
 }
 
+// 회피식품명 안에서 재료 종류를 바꾸지 않는 꾸밈말
+const GENERIC_QUALIFIERS = ['일반', '함유', '음식', '토막', '손질', '생'];
+
 // 재료명과 알레르기 회피 식품명을 정확하게 비교 (괄호 부가정보 제거 + 표기 통일 후 단어 단위 비교)
 function isIngredientMatch(ingName, avoidFood) {
     const strip = s => s.toLowerCase().replace(/\([^)]*\)/g, '').trim()
@@ -26,8 +29,14 @@ function isIngredientMatch(ingName, avoidFood) {
     if (!ingLower || !avoidLower) return false;
     if (isSauceOfDish(ingLower, avoidLower)) return false;
     if (ingLower === avoidLower ||
-        ingLower.split(' ').some(word => word === avoidLower) ||
-        avoidLower.split(' ').some(word => word === ingLower)) {
+        ingLower.split(' ').some(word => word === avoidLower)) {
+        return true;
+    }
+    // 반대 방향(회피식품명의 한 단어 = 재료명)은 나머지 단어가 '일반·함유' 같은 꾸밈말일 때만 같은 재료로 봐요
+    // ('일반 파스타' → 파스타는 맞음, '닭 소시지' → 소시지는 아님: 닭이 꾸밈말이 아니라 다른 재료라서) (2026-10-31)
+    const avoidWords = avoidLower.split(' ');
+    if (avoidWords.length > 1 && avoidWords.includes(ingLower) &&
+        avoidWords.filter(word => word !== ingLower).every(word => GENERIC_QUALIFIERS.includes(word))) {
         return true;
     }
     // 2글자 이상 단어는 "생크림"처럼 붙여쓴 복합어 안에 포함된 경우도 매칭

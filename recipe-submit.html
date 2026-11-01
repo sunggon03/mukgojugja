@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>레시피 제출·검수 도우미</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F4EF; --card:#FFFFFF; --ink:#1F2A22; --mut:#6B746D; --line:#E4DFD6;
+  --g:#4F7F3F; --gl:#E8F1DF; --red:#C5303E; --rl:#FBE9EA; --amb:#9A6400; --al:#FFF3D6; --bl:#1F5FA8; --bll:#E7F0FB;
+  --code:#F1EEE7;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141714; --card:#1D211D; --ink:#E9EEE8; --mut:#9AA49B; --line:#2F352F;
+  --g:#8CC274; --gl:#22301D; --red:#F08A93; --rl:#3A1E21; --amb:#E8B75A; --al:#352A12; --bl:#8DB8F0; --bll:#17263A; --code:#252A25;
+}}
+:root[data-theme="dark"]{
+  --bg:#141714; --card:#1D211D; --ink:#E9EEE8; --mut:#9AA49B; --line:#2F352F;
+  --g:#8CC274; --gl:#22301D; --red:#F08A93; --rl:#3A1E21; --amb:#E8B75A; --al:#352A12; --bl:#8DB8F0; --bll:#17263A; --code:#252A25;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 'Noto Sans KR',-apple-system,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:22px;margin:4px 0 4px}
+.lead{color:var(--mut);font-size:14px;margin:0 0 16px}
+.flow{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 18px}
+.flow span{font-size:12px;font-weight:700;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:var(--mut)}
+.flow b{color:var(--g)}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;position:sticky;top:0;z-index:5;margin-bottom:16px}
+.tabs button{flex:1;border:0;background:none;color:var(--mut);font:inherit;font-size:14px;font-weight:700;padding:10px 4px;border-radius:9px;cursor:pointer}
+.tabs button.on{background:var(--g);color:#fff}
+.pane{display:none}.pane.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.card h2{font-size:16px;margin:0 0 8px}
+.note{font-size:13px;color:var(--mut)}
+.warnbox{background:var(--al);color:var(--amb);border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
+.okbox{background:var(--gl);color:var(--g);border-radius:10px;padding:10px 12px;font-size:13px;margin:10px 0}
+pre.prompt{background:var(--code);border-radius:10px;padding:12px;font-size:12.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word;max-height:360px;overflow:auto;margin:10px 0}
+textarea,input[type=text]{width:100%;background:var(--card);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:14px}
+textarea:focus,input[type=text]:focus{outline:0;border-color:var(--g)}
+textarea.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;min-height:200px}
+.btn{display:inline-block;background:var(--g);color:#fff;border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--g);border:1.5px solid var(--g)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.copied{font-size:12px;color:var(--g);font-weight:700}
+.issue{border-radius:9px;padding:8px 10px;font-size:13px;margin:6px 0;line-height:1.5}
+.issue.err{background:var(--rl);color:var(--red)}
+.issue.warn{background:var(--al);color:var(--amb)}
+.issue.info{background:var(--bll);color:var(--bl)}
+.sum{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
+.pill{font-size:12px;font-weight:700;border-radius:99px;padding:3px 10px}
+.pill.err{background:var(--rl);color:var(--red)}.pill.warn{background:var(--al);color:var(--amb)}.pill.ok{background:var(--gl);color:var(--g)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+td,th{border-top:1px solid var(--line);padding:7px 6px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mut);font-weight:700}
+.chip{display:inline-block;font-size:11px;font-weight:700;border-radius:99px;padding:1px 8px;margin:1px 3px 1px 0}
+.chip.a{background:var(--rl);color:var(--red)}.chip.m{background:var(--al);color:var(--amb)}.chip.d{background:var(--bll);color:var(--bl)}
+.tierline{font-size:12px;margin:4px 0}
+label.chk{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:14px;cursor:pointer}
+label.chk:first-of-type{border-top:0}
+label.chk input{width:18px;height:18px;margin-top:3px;flex:none;accent-color:var(--g)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media (max-width:520px){.grid2{grid-template-columns:1fr}}
+.rname{font-size:17px;font-weight:700;margin:0 0 2px}
+small.k{color:var(--mut)}
+ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
+ol.rules li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🍽️ 레시피 제출·검수 도우미</h1>
+<p class="lead">먹고죽자! 레시피를 어떤 AI로 만들든 같은 형식으로 받고, 자동 검사와 사람 검수를 거쳐 제출하는 페이지예요.</p>
+<div class="flow"><span><b>①</b> 원본 레시피 찾기</span><span><b>②</b> 프롬프트로 AI 변환</span><span><b>③</b> 자동 검사</span><span><b>④</b> 다른 조원이 검수</span><span><b>⑤</b> 코드 복사해 제출</span></div>
+
+<div class="tabs" role="tablist">
+  <button data-t="p1" class="on">① 프롬프트</button>
+  <button data-t="p2">② 자동 검사</button>
+  <button data-t="p3">③ 검수·제출</button>
+</div>
+
+<!-- ① 프롬프트 -->
+<section class="pane on" id="p1">
+  <div class="card">
+    <h2>만드는 사람 (제출자)</h2>
+    <ol class="rules">
+      <li>아래 표의 사이트에서 <b>많은 사람이 만들어 본 레시피</b>를 찾아요.</li>
+      <li>아래 프롬프트를 복사해 ChatGPT·Gemini·Claude 등에 붙여넣어요.</li>
+      <li>프롬프트 맨 아래에 <b>레시피 주소와 본문(재료·분량·순서)</b>을 직접 복사해 붙여요.</li>
+      <li>AI가 준 JSON을 그대로 복사해 <b>② 자동 검사</b>에 붙여넣어요.</li>
+    </ol>
+    <div class="card" style="background:var(--gl);border-color:transparent;margin:10px 0 0">
+      <h2 style="color:var(--g)">원본은 이런 곳에서만 골라요</h2>
+      <p class="note" style="color:var(--ink);margin:0 0 6px">많은 사람이 실제로 만들어 보고 맛을 확인한 레시피만 받아요. 개인 블로그·카페·SNS·AI 답변은 받지 않아요.</p>
+      <table>
+        <tr><th>원본 사이트</th><th>통과 기준 (검수자가 원본에서 확인)</th></tr>
+        <tr><td>만개의레시피</td><td>요리 후기 <b>10개 이상</b></td></tr>
+        <tr><td>유튜브 요리 영상</td><td>조회수 <b>10만 이상</b></td></tr>
+        <tr><td>우리의식탁 · 해먹남녀</td><td>후기·스크랩·좋아요 중 화면에 보이는 숫자 <b>10 이상</b>, 숫자가 안 보이는 전문가 레시피는 메모로 이유 설명. <b>우리의식탁 "AI 레시피"는 제외</b></td></tr>
+        <tr><td>해외 대형 레시피 사이트<br><small class="k">Allrecipes, BBC Good Food, America's Test Kitchen 등</small></td><td>리뷰(평점) <b>50개 이상</b>, 리뷰가 없는 셰프·테스트키친 사이트는 메모로 이유 설명</td></tr>
+      </table>
+      <p class="note" style="margin:6px 0 0">다른 사이트를 쓰고 싶으면 먼저 김성곤에게 물어봐 주세요.</p>
+    </div>
+    <div class="card" style="background:var(--rl);border-color:transparent;margin:10px 0 0">
+      <h2 style="color:var(--red)">자주 하는 실수 8가지</h2>
+      <ol class="rules" style="color:var(--ink)">
+        <li><b>주소만 주기</b> → AI가 재료를 지어냄. 본문을 꼭 붙여넣기</li>
+        <li><b>몇 인분인지 빼먹기</b> → 원본 4인분 분량이 1인분으로 들어감</li>
+        <li><b>양념장 재료 빠뜨리기</b> → "양념: …" 줄도 모두 복사</li>
+        <li><b>AI 답변 중 일부만 복사</b> → 코드블록 전체(또는 답변 통째)를 붙여넣기</li>
+        <li><b>프롬프트를 ②에 붙이기</b> → ②에는 AI의 <u>답변</u>을 붙이기</li>
+        <li><b>개인 블로그·카페·인스타 레시피 쓰기</b> → 검증이 안 돼서 받지 않아요. 위 표의 사이트에서 고르기</li>
+        <li><b>AI에게 레시피를 만들어 달라고 하기</b> → AI가 만든 레시피는 받지 않아요. 사람이 쓴 레시피를 옮기기만 해요</li>
+        <li><b>제출 코드를 손으로 고치기</b> → 고칠 게 있으면 ②부터 다시. 고친 코드는 검사코드가 안 맞아요</li>
+      </ol>
+    </div>
+    <div class="warnbox">⚠️ 주소만 주고 "이 레시피 바꿔줘"라고 하면 안 돼요. 많은 AI가 링크를 실제로 열지 못하고 재료를 <b>그럴듯하게 지어내요</b>. 본문을 직접 붙여넣어야 원본과 대조할 수 있어요.</div>
+  </div>
+  <div class="card">
+    <h2>AI에게 줄 프롬프트</h2>
+    <pre class="prompt" id="promptText"></pre>
+    <div class="row"><button class="btn" id="copyPrompt">프롬프트 복사</button><span class="copied" id="copiedPrompt"></span></div>
+    <p class="note" style="margin-top:10px">한 번에 레시피 1개를 권해요. 여러 개를 한꺼번에 시키면 AI가 분량·단계를 섞는 일이 늘어요.</p>
+  </div>
+</section>
+
+<!-- ② 자동 검사 -->
+<section class="pane" id="p2">
+  <div class="card">
+    <h2>AI 결과 붙여넣기</h2>
+    <p class="note">AI 답변을 통째로 붙여도 돼요. 코드블록(```json) 안의 내용만 골라 읽어요.</p>
+    <textarea class="code" id="input" placeholder='```json&#10;{ "name": "...", "category": "한식", ... }&#10;```'></textarea>
+    <div class="row"><button class="btn" id="runCheck">검사하기</button><button class="btn ghost" id="clearInput">지우기</button></div>
+  </div>
+  <div id="result"></div>
+</section>
+
+<!-- ③ 검수·제출 -->
+<section class="pane" id="p3">
+  <div class="card">
+    <h2>검수 요청 주고받기</h2>
+    <p class="note" style="margin:0 0 8px">제출자와 검수자는 보통 다른 기기를 써요. <b>제출자</b>는 ②에서 오류 없는 레시피를 만들고 이름을 쓴 뒤 검수 요청을 복사해 검수자에게 보내요. <b>검수자</b>는 받은 요청을 아래에 붙이면 같은 레시피가 열려요.</p>
+    <div class="row" style="margin-top:0"><button class="btn sm" id="copyReq" disabled>검수 요청 복사 (제출자)</button><span class="copied" id="copiedReq"></span></div>
+    <div class="note" id="reqMsg" style="margin-top:4px"></div>
+    <div class="note" style="margin-top:12px">받은 검수 요청 붙여넣기 (검수자)</div>
+    <textarea id="reqBox" style="min-height:70px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px" placeholder="// 레시피 검수 요청 · … 로 시작하는 내용"></textarea>
+    <div class="row"><button class="btn sm ghost" id="loadReq">검수 요청 열기</button></div><div id="reqOut"></div>
+  </div>
+  <div id="reviewEmpty" class="card note">먼저 ② 자동 검사에서 오류(빨강)가 없는 레시피를 만들어 주세요.</div>
+  <div id="reviewArea" style="display:none">
+    <div class="card">
+      <h2>누가 했나요?</h2>
+      <div class="grid2">
+        <div><div class="note">제출자 (레시피를 만든 사람)</div><input type="text" id="who1" maxlength="12"></div>
+        <div><div class="note">검수자 (다른 조원)</div><input type="text" id="who2" maxlength="12"></div>
+      </div>
+      <div id="sameWho" class="issue warn" style="display:none">제출자와 검수자가 같아요. 검수는 다른 사람이 해야 실수를 잡을 수 있어요.</div>
+    </div>
+    <div class="card">
+      <h2>원본 대조 (검수자가 원본을 보고 직접 입력)</h2>
+      <p class="note">원본 링크를 열어 아래 두 숫자를 직접 세어 적어요. AI 결과와 다르면 이유를 메모에 적어야 제출할 수 있어요.</p>
+      <div class="grid2">
+        <div><div class="note">원본은 몇 인분인가요? (안 적혀 있으면 0)</div><input type="text" id="rvServ" inputmode="numeric" maxlength="3"></div>
+        <div><div class="note">원본 재료는 몇 개인가요? (양념 재료 포함)</div><input type="text" id="rvCount" inputmode="numeric" maxlength="3"></div>
+      </div>
+      <div id="popBox" style="margin-top:10px"></div>
+      <div id="rvMsg"></div>
+      <h2 style="margin-top:16px">검수자 체크리스트</h2>
+      <p class="note">검수자는 <b>원본 링크를 직접 열어</b> 아래를 하나씩 확인해요. 모두 체크해야 제출 코드가 나와요.</p>
+      <div id="checks"></div>
+    </div>
+    <div class="card">
+      <h2>대체 불가 재료 표시 (검수자 판단)</h2>
+      <p class="note">알레르기에 걸리는 필수 재료 중, <b>이 요리에선 빼거나 바꾸면 요리가 성립하지 않는 재료</b>만 체크해요. (예: 청국장찌개의 청국장, 계란국의 계란) 대체 가능 여부는 영양이 아니라 맛·식감·요리 역할로 판단해요.</p>
+      <div id="coreList"></div>
+    </div>
+    <div class="card">
+      <h2>메모 (선택)</h2>
+      <textarea id="memo" rows="2" placeholder="예: 원본은 4인분이라 1/4로 나눔, 굴소스는 제품마다 달라 확인 필요"></textarea>
+    </div>
+    <div class="card">
+      <h2>제출 코드</h2>
+      <div id="outBlocked" class="issue warn"></div>
+      <textarea class="code" id="out" readonly style="min-height:240px"></textarea>
+      <div class="row"><button class="btn" id="sendForm" disabled style="display:none">구글 폼으로 보내기</button><button class="btn ghost" id="copyOut" disabled>제출 코드 복사</button><span class="copied" id="copiedOut"></span></div>
+      <div id="sendMsg"></div>
+      <p class="note" id="formNote" style="display:none;margin:4px 0 0">"구글 폼으로 보내기"를 누르면 김성곤의 구글 시트로 바로 가요. 안 되면 복사해서 <a id="formLink" target="_blank" rel="noopener noreferrer">구글 폼</a>에 직접 붙여요.</p>
+      <p class="note" style="margin-top:8px">복사한 코드를 단톡방이나 메시지로 김성곤에게 보내 주세요. 받은 코드는 레시피 파일에 그대로 붙여 넣어요.</p>
+    </div>
+  </div>
+</section>
+
+<p class="note" style="margin-top:24px"><span id="dataVer">알레르기 미리보기는 먹고죽자! 2026-10-31 버전 기준이에요(이 페이지에 복사된 데이터).</span> 이 페이지는 입력 내용을 서버로 보내지 않아요(작성 중인 내용만 이 브라우저에 임시 저장).</p>
+</div>
+
+<script>(function(){var t=Date.now();['diet-data.js','substitute-logic.js','recipes-data.js','review-checks.js','team.js'].forEach(function(f){document.write('<script src="'+f+'?t='+t+'"><\/script>')})})();</script>
+<script>
+if(typeof allergyMapping==='undefined'||typeof recipes==='undefined'||typeof REVIEW_HIDDEN_RULES==='undefined'){document.querySelector('.wrap').insertAdjacentHTML('afterbegin','<div style="background:#FBE9EA;color:#C5303E;border-radius:12px;padding:14px;font-weight:700;margin-bottom:12px">앱 데이터를 불러오지 못했어요<div style="font-weight:400;font-size:13px;margin-top:4px">이 페이지는 웹사이트 주소(sunggon03.github.io/mukgojugja/recipe-submit.html)로 열어야 해요. 파일을 내려받아 열면 데이터가 연결되지 않아요.</div></div>');throw new Error('앱 데이터 없음')}
+const EXISTING={names:Object.entries(recipes).map(function(e){return [e[0],e[1].keywords||[]]}),hidden:REVIEW_HIDDEN_RULES,vocab:Array.from(new Set([].concat.apply([],Object.values(recipes).map(function(r){return (r.ingredients||[]).map(function(i){return i.name})}))))};
+</script>
+<script>
+const PROMPT = `너는 레시피 데이터 변환기야. 맨 아래 [원본 레시피]에 붙여 넣은 글만 보고 JSON으로 바꿔 줘.
+
+[가장 중요한 규칙]
+A. [원본 레시피]의 "내용"이 비어 있거나 주소만 있으면 JSON을 만들지 말고 딱 한 줄만 출력해: 원본 본문을 붙여 주세요
+   (링크를 열어 보려고 하지 마. 너는 링크 내용을 확인할 수 없다고 생각해.)
+B. 원본에 없는 재료·분량·단계·칼로리를 지어내지 마. 헷갈리면 고치지 말고 "uncertain"에 적어.
+C. 레시피를 네가 새로 만들거나, 여러 레시피를 섞거나, "더 맛있게" 고치지 마. 너는 사람이 쓴 원본을 옮기기만 해.
+   - 원본이 AI가 만든 레시피(챗GPT·제미나이·클로드 등의 답변)로 보이거나, 내가 "레시피를 만들어 줘·추천해 줘"라고 하면 JSON을 만들지 말고 딱 한 줄만 출력해: 사람이 쓴 원본 레시피가 필요해요
+
+[출력 형식]
+1. 출력은 \`\`\`json 코드블록 하나만. 앞뒤 설명 쓰지 마.
+2. 키 이름을 바꾸거나 빼지 마:
+{
+  "name": "레시피 이름",
+  "category": "한식 | 양식 | 일식 | 중식 | 디저트 중 하나",
+  "keywords": ["레시피 이름", "다른 이름이나 줄임말"],
+  "baseIngredient": "주재료 하나",
+  "description": "30자 안팎 한 줄 소개 (예: 매콤달콤한 양념의 대표 한식 볶음 요리)",
+  "calories": null,
+  "difficulty": "쉬움 | 보통 | 어려움 중 하나",
+  "cookTime": "25분",
+  "source": "원본 레시피 주소 (내가 준 주소 그대로)",
+  "servingsInSource": 2,
+  "popularity": "후기 23개",
+  "ingredients": [
+    { "name": "돼지고기(목살)", "amountInSource": "600g", "amount": "300g", "required": true }
+  ],
+  "steps": [
+    { "step": 1, "instruction": "양파를 채 썬다." }
+  ],
+  "uncertain": []
+}
+
+[항목별 규칙]
+3. servingsInSource: 원본에 적힌 인분 수. 안 적혀 있으면 null.
+3-1. popularity: 원본에 적힌 후기 수·조회수·평점 수를 글자 그대로 (예: "후기 23개", "조회수 152만회"). 없으면 null. 숫자를 지어내지 마.
+4. calories: 원본에 칼로리가 적혀 있을 때만 1인분 kcal 숫자. 없으면 null (추정해서 넣지 마).
+5. amountInSource: 원본에 적힌 분량을 글자 그대로 복사해. 원본에 분량이 없으면 "".
+6. amount: amountInSource를 1인분으로 나눈 값. (servingsInSource가 null이면 원본 분량 그대로 쓰고 uncertain에 "인분 수 없음"이라고 적어)
+   - "숫자+단위"를 붙여 써. 단위는 g, ml, L, 개, 큰술, 작은술, 컵, 대, 모, 장, 쪽, 공기, 줌, 꼬집, 포기, 봉, 통, 마리, 조각, 팩, 캔, 줄기 중에서만.
+   - 분수는 "1/2개", 대분수는 "1과 1/2큰술". 나눠서 지저분한 숫자(0.333 등)는 가까운 1/4 단위로 반올림해.
+   - T·Ts·밥숟가락은 "큰술", t·티스푼은 "작은술"로 바꿔. 양이 없는 재료는 "약간"이나 "적당량".
+7. name: 일반 이름으로. 상표명은 빼 ("백설 부침가루" → "부침가루"). 부위·손질은 괄호로: "돼지고기(목살)", "대파(흰 부분)".
+8. 재료 하나에 한 줄. "소금, 후추"나 "소금/후추"처럼 묶지 마. 양념장·소스 재료와 물도 모두 넣어.
+9. required: 빼면 요리가 안 되는 재료는 true, 고명·토핑·"기호에 따라" 재료는 false.
+10. steps: 1부터 순서대로, 한 단계에 한두 동작, "~한다."로 끝내. 원본 순서를 바꾸지 마.
+
+[하지 말 것]
+11. 대체 재료, 알레르기, 건강 효과, 영양 정보는 쓰지 마. (우리 팀이 따로 판단해)
+
+[출력 전에 스스로 확인]
+- 원본의 재료 줄을 하나도 빼먹지 않았나? 원본에 없는 재료를 넣지 않았나?
+- 내가 만든 레시피가 아니라, 붙여 넣은 원본을 그대로 옮겼나?
+- 모든 amount가 amountInSource ÷ servingsInSource 인가?
+- step 번호가 1, 2, 3… 빠짐없이 이어지나?
+
+[원본 레시피]
+주소:
+내용:
+(여기에 레시피 페이지의 재료·분량·조리 순서를 그대로 복사해 붙여넣기. 유튜브라면 설명란이나 고정 댓글의 레시피를 붙여넣기)`;
+
+const CATS=['한식','양식','일식','중식','디저트'], DIFFS=['쉬움','보통','어려움'];
+const UNITS=['g','kg','ml','L','개','큰술','작은술','컵','대','모','장','쪽','공기','줌','꼬집','포기','봉','통','마리','조각','팩','캔','줄기','인분'];
+const VAGUE=/^(약간|적당량|조금|한줌|한 줌|한꼬집|한 꼬집)$/;
+const NUM='(?:\\d+과\\s*)?(?:\\d+\\/\\d+|\\d+\\.\\d+|\\d+)(?:\\s*~\\s*(?:\\d+\\/\\d+|\\d+\\.\\d+|\\d+))?';
+const AMOUNT_RE=new RegExp('^'+NUM+'\\s*('+UNITS.map(u=>u.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')(\\(.*\\))?$');
+const BAD_UNITS=[[/^\d.*\s*(T|Ts|tbsp|Tbsp|밥숟가락|숟가락|스푼|큰스푼)$/,'큰술'],[/^\d.*\s*(t|tsp|티스푼|작은스푼|찻숟가락)$/,'작은술']];
+const ALLOWED_KEYS=['name','category','keywords','baseIngredient','description','calories','difficulty','cookTime','source','ingredients','steps'];
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ---- 저장(임시) ----
+const store={get(k,d){try{const v=localStorage.getItem('rid_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('rid_'+k,JSON.stringify(v))}catch(e){}}};
+
+// ---- 탭 ----
+function showTab(id){document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===id));document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id===id));store.set('tab',id);window.scrollTo(0,0)}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
+
+// ---- 복사 ----
+async function copy(text,flagId){try{await navigator.clipboard.writeText(text);flash(flagId,'복사했어요')}catch(e){flash(flagId,'복사가 막혔어요. 길게 눌러 직접 복사해 주세요')}}
+function flash(id,msg){const el=document.getElementById(id);el.textContent=msg;clearTimeout(el._t);el._t=setTimeout(()=>el.textContent='',2500)}
+document.getElementById('promptText').textContent=PROMPT;
+document.getElementById('copyPrompt').onclick=()=>copy(PROMPT,'copiedPrompt');
+
+// ---- JSON 꺼내기 ----
+function extractJSON(raw){
+  let t=String(raw||'').trim();
+  if(!t)throw new Error('붙여넣은 내용이 없어요.');
+  if(/너는 레시피 데이터 변환기야/.test(t)&&!/```json/.test(t))throw new Error('프롬프트를 붙여넣었어요. 프롬프트는 AI에게 보내고, 여기에는 AI의 답변을 붙여 주세요.');
+  if(/사람이 쓴 원본 레시피가 필요해요/.test(t)&&!/[{[]/.test(t))throw new Error('AI가 "사람이 쓴 원본 레시피가 필요하다"고 답했어요. AI가 만든 레시피는 받지 않아요. 블로그·유튜브·만개의레시피 등 사람이 직접 쓴 레시피 페이지를 찾아 그 본문을 붙여 주세요.');
+  if(/원본 본문을 붙여 주세요/.test(t)&&!/[{[]/.test(t))throw new Error('AI가 "원본 본문이 없다"고 답했어요. 프롬프트 맨 아래 "내용:"에 레시피 글(재료·분량·순서)을 복사해 붙여서 다시 보내세요. 주소만 주면 AI가 재료를 지어낼 수 있어요.');
+  const fence=t.match(/```(?:json|JSON)?\s*([\s\S]*?)```/);
+  if(fence)t=fence[1].trim();
+  const a=Math.min(...['{','['].map(ch=>{const i=t.indexOf(ch);return i<0?Infinity:i}));
+  if(a===Infinity)throw new Error('JSON을 찾지 못했어요. AI 답변의 코드블록을 붙여넣어 주세요.');
+  const close=t[a]==='['?']':'}';t=t.slice(a,t.lastIndexOf(close)+1);
+  t=t.replace(/[“”]/g,'"').replace(/[‘’]/g,"'");
+  try{return JSON.parse(t)}catch(e1){
+    const t2=t.replace(/,\s*([}\]])/g,'$1');
+    try{return JSON.parse(t2)}catch(e2){
+      const m=String(e1.message).match(/position (\d+)/);let where='';
+      if(m){const p=+m[1];const line=t.slice(0,p).split('\n').length;where=` (${line}번째 줄 근처: "${t.slice(Math.max(0,p-20),p+20).replace(/\s+/g,' ')}")`}
+      throw new Error('JSON 형식이 깨져 있어요'+where+'. AI에게 "JSON 형식만 다시 출력해 줘"라고 요청해 보세요.');
+    }
+  }
+}
+
+// ---- 알레르기 그룹 ----
+const ALLERGY_OBJS=[...new Set(Object.values(allergyMapping))];
+const DISEASE_KEYS=[...new Map(Object.entries(diseaseMapping).map(([k,o])=>[o,k])).values()];
+const SHOW_TIERS=['계란 알레르기','우유 알레르기','밀 알레르기','글루텐 불내증','대두 알레르기','갑각류 알레르기','땅콩 알레르기','견과류 알레르기','생선 알레르기','돼지고기 알레르기','쇠고기 알레르기','닭고기 알레르기'];
+const TIER_TXT={safe:['안전','ok'],maybe:['성분표 확인','warn'],sub:['대체하면 가능','warn'],block:['대체 어려움','err']};
+const coreWord=n=>n.replace(/\(.*?\)/g,'').trim();
+
+function ingredientHits(name){
+  const a=ALLERGY_OBJS.filter(o=>(o.avoidFoods||[]).some(f=>isIngredientMatch(name,f))).map(o=>o.name);
+  const m=findMaybeContain(name,ALLERGY_OBJS).map(x=>x.allergen).filter(n=>!a.includes(n));
+  const d=DISEASE_KEYS.filter(k=>(diseaseMapping[k].avoidIngredients||[]).some(f=>isIngredientMatch(name,f))).map(k=>diseaseMapping[k].name);
+  const hidden=[];
+  (EXISTING.hidden||[]).forEach(r=>{if(r.words.some(w=>name.includes(w)))r.allergens.forEach(al=>{if(!a.includes(al)&&!m.includes(al))hidden.push(al+' ('+r.note+')')})});
+  return {a,m,d:[...new Set(d)],hidden};
+}
+
+// ---- 원본 사이트 기준 (많은 사람이 만들어 본 레시피만) ----
+const SOURCE_RULES=[
+  {kind:'10000',label:'만개의레시피',re:/(^|\.)10000recipe\.com$/,metric:'요리 후기 수',min:10},
+  {kind:'youtube',label:'유튜브',re:/(^|\.)(youtube\.com|youtu\.be)$/,metric:'조회수',min:100000},
+  {kind:'kr',label:'우리의식탁·해먹남녀',re:/(^|\.)(wtable\.co\.kr|haemukja\.com)$/,metric:'화면에 보이는 후기·스크랩·좋아요 수 (가장 큰 숫자)',short:'후기·스크랩·좋아요',min:10,allowZeroWithMemo:true,note:'우리의식탁의 "AI 레시피"는 받지 않아요. 푸드스타일리스트·사용자가 올린 레시피만 써요.'},
+  {kind:'intl',label:'해외 대형 레시피 사이트',re:/(^|\.)(allrecipes\.com|bbcgoodfood\.com|bbcgoodfoodme\.com|americastestkitchen\.com|seriouseats\.com|sallysbakingaddiction\.com|onceuponachef\.com|thewoksoflife\.com|williams-sonoma\.com|gordonramsay\.com|food\.com|foodnetwork\.com|bonappetit\.com|epicurious\.com|justonecookbook\.com|maangchi\.com|kingarthurbaking\.com|recipetineats\.com)$/,metric:'리뷰(평점) 수',min:50,allowZeroWithMemo:true}
+];
+const BLOG_RE=/(^|\.)(blog\.naver\.com|post\.naver\.com|cafe\.naver\.com|tistory\.com|brunch\.co\.kr|blog\.daum\.net|cafe\.daum\.net|velog\.io|instagram\.com|facebook\.com|threads\.net|tiktok\.com|medium\.com|wordpress\.com|blogspot\.com|egloos\.com)$/;
+const AI_SITE_RE=/chatgpt\.com|chat\.openai\.com|gemini\.google\.com|bard\.google\.com|claude\.ai|perplexity\.ai|copilot\.microsoft\.com|wrtn\.ai|clova-x|naver\.me\/ai/i;
+function hostOf(u){const m=String(u||'').match(/^https?:\/\/([^/?#]+)/i);return m?m[1].toLowerCase().replace(/^m\./,'').replace(/^www\./,''):''}
+function sourceRule(u){const h=hostOf(u);return SOURCE_RULES.find(r=>r.re.test(h))||null}
+
+// ---- 실수 잡는 도우미 ----
+const BRANDS=['백설','오뚜기','청정원','샘표','해찬들','풀무원','비비고','다담','이금기','하인즈','큐피','cj','CJ','동원','사조','대상','농심','롯데','삼양','진로','미원','다시다'];
+const VOCAB=new Set([...(EXISTING.vocab||[]),...Object.keys(substituteInfo),...ALLERGY_OBJS.flatMap(o=>o.avoidFoods||[]),...DISEASE_KEYS.flatMap(k=>diseaseMapping[k].avoidIngredients||[])].map(s=>String(s).replace(/\(.*?\)/g,'').replace(/\s/g,'')));
+function knownName(n){const k=n.replace(/\(.*?\)/g,'').replace(/\s/g,'');return !k||VOCAB.has(k)}
+function parseQty(s){const m=String(s||'').trim().match(/^(?:(\d+)과\s*)?(\d+\/\d+|\d+\.\d+|\d+)\s*([^\d\s(]+)/);if(!m)return null;let v=m[1]?+m[1]:0;v+=m[2].includes('/')?(+m[2].split('/')[0]/+m[2].split('/')[1]):+m[2];
+  let u=m[3];const map={T:'큰술',Ts:'큰술',tbsp:'큰술',t:'작은술',tsp:'작은술',kg:'g',L:'ml'};if(u==='kg')v*=1000;if(u==='L')v*=1000;u=map[u]||u;return {v,u}}
+function checkConversion(src,am,sv){
+  if(src===undefined)return null;src=String(src).trim();
+  if(!src)return VAGUE.test(am)?null:['warn',`원본에 분량이 없는데 "${esc(am)}"으로 적혔어요. AI가 지어낸 분량일 수 있어요.`];
+  const a=parseQty(src),b=parseQty(am);
+  if(a&&!b&&VAGUE.test(am))return ['warn',`원본은 "${esc(src)}"인데 "${esc(am)}"으로 바뀌었어요. 숫자 분량을 살려 주세요.`];
+  if(!a||!b||!sv)return null;
+  if(a.u!==b.u)return ['warn',`원본 "${esc(src)}"과 단위가 달라요("${esc(am)}"). 단위를 바꿨다면 맞게 바꿨는지 확인해 주세요.`];
+  const want=a.v/sv;if(sv>1&&Math.abs(b.v-a.v)<1e-9)return ['err',`원본 "${esc(src)}"을 ${sv}인분으로 나누지 않고 그대로 적었어요. 1인분은 약 ${fmt(want)}${b.u}예요.`];
+  if(Math.abs(b.v-want)>Math.max(want*0.3,0.26))return ['warn',`1인분 환산이 맞지 않아 보여요. 원본 "${esc(src)}" ÷ ${sv}인분 ≈ ${fmt(want)}${b.u}인데 "${esc(am)}"로 적혔어요.`];
+  return null;
+}
+const fmt=v=>Math.round(v*100)/100;
+
+// ---- 검사 ----
+function checkRecipe(r){
+  const issues=[];const E=(t)=>issues.push(['err',t]),W=(t)=>issues.push(['warn',t]),I=(t)=>issues.push(['info',t]);
+  if(!r||typeof r!=='object'||Array.isArray(r)){E('레시피 하나가 객체({ })가 아니에요.');return issues}
+  const name=String(r.name||'').trim();
+  if(!name)E('name(레시피 이름)이 비어 있어요.');
+  else{
+    const dup=EXISTING.names.find(([n,kw])=>n===name||kw.includes(name)||n.replace(/\s/g,'')===name.replace(/\s/g,''));
+    if(dup)E(`이미 있는 레시피예요: "${dup[0]}". 다른 레시피를 골라 주세요.`);
+  }
+  if(!CATS.includes(r.category))E(`category는 ${CATS.join('·')} 중 하나여야 해요. (지금: ${esc(r.category)})`);
+  if(!DIFFS.includes(r.difficulty))E(`difficulty는 ${DIFFS.join('·')} 중 하나여야 해요. (지금: ${esc(r.difficulty)})`);
+  if(!/^(\d+시간\s*)?(\d+분)?$/.test(String(r.cookTime||''))||!r.cookTime)E(`cookTime은 "25분"이나 "1시간 30분"처럼 적어야 해요. (지금: ${esc(r.cookTime)})`);
+  if(!Array.isArray(r.keywords)||!r.keywords.length)E('keywords가 비어 있어요. 최소한 레시피 이름은 넣어 주세요.');
+  else if(name&&!r.keywords.includes(name))W('keywords에 레시피 이름이 없어요. 검색이 안 될 수 있어요.');
+  if(!r.description||String(r.description).length<6)E('description(한 줄 소개)이 비어 있거나 너무 짧아요.');
+  else if(String(r.description).length>45)W(`description이 길어요(${String(r.description).length}자). 30자 안팎으로 줄여 주세요.`);
+  if(r.calories===null||r.calories===undefined)I('원본에 칼로리가 없어 비워 뒀어요. 앱에는 칼로리가 표시되지 않아요.');
+  else if(typeof r.calories!=='number'||r.calories<30||r.calories>2000)E(`calories는 1인분 kcal 숫자여야 해요. (지금: ${esc(r.calories)})`);
+  if(!r.source)E('source(원본 주소)가 없어요. 프롬프트의 "주소:"에 레시피 링크를 넣어 다시 보내세요. 원본이 없으면 검수자가 대조할 수 없어요.');
+  else if(!/^https?:\/\/\S+\.\S+/.test(String(r.source))||/example\.|여기에|주소/.test(String(r.source)))E(`source가 실제 주소가 아니에요: ${esc(r.source)}`);
+  else if(BLOG_RE.test(hostOf(r.source)))E(`원본이 개인 블로그·카페·SNS예요 (${esc(hostOf(r.source))}). 검증이 안 된 레시피라 받지 않아요. 만개의레시피(후기 10개 이상)나 조회수 10만 이상 유튜브 영상에서 골라 주세요.`);
+  else if(!AI_SITE_RE.test(String(r.source))&&!sourceRule(r.source))E(`허용된 원본 사이트가 아니에요 (${esc(hostOf(r.source))}). ① 탭의 표에 있는 사이트에서 골라 주세요. 꼭 필요한 사이트면 김성곤에게 추가를 요청해 주세요.`);
+  else if(AI_SITE_RE.test(String(r.source)))E(`원본 주소가 AI 대화 페이지예요: ${esc(r.source)}. AI가 만든 레시피는 받지 않아요. 사람이 쓴 레시피 페이지를 원본으로 써 주세요.`);
+  const sv=r.servingsInSource;
+  if(sv!==null&&sv!==undefined&&(typeof sv!=='number'||sv<1||sv>20))E(`servingsInSource는 원본 인분 수(숫자) 또는 null이어야 해요. (지금: ${esc(sv)})`);
+  else if(sv)I(`원본은 ${esc(sv)}인분이에요. 아래에서 1인분으로 제대로 나눴는지 자동으로 확인해요.`);
+  else W('원본이 몇 인분인지 적혀 있지 않아요. 분량이 원본 그대로일 수 있어요. 검수자가 원본에서 인분 수를 확인해 주세요.');
+  if(Array.isArray(r.uncertain)&&r.uncertain.length)r.uncertain.forEach(u=>W('AI가 불확실하다고 한 점: '+esc(u)));
+  const extra=Object.keys(r).filter(k=>!ALLOWED_KEYS.includes(k)&&!['servingsInSource','uncertain','popularity','amountInSource'].includes(k));
+  if(r.popularity)I('원본 인기 지표(AI가 옮김): '+esc(r.popularity)+' — 검수자가 원본에서 직접 숫자를 다시 확인해요.');
+  const noSrcAmt=(Array.isArray(r.ingredients)?r.ingredients:[]).filter(g=>g&&g.amountInSource===undefined).length;
+  if(noSrcAmt)W(`재료 ${noSrcAmt}개에 amountInSource(원본 분량)가 없어요. 예전 프롬프트로 만든 것 같아요. ① 탭의 새 프롬프트로 다시 만들면 1인분 환산을 자동으로 확인할 수 있어요.`);
+  if(extra.length)I('형식에 없는 항목은 제출 코드에서 뺄게요: '+extra.map(esc).join(', '));
+
+  const ings=Array.isArray(r.ingredients)?r.ingredients:[];
+  if(ings.length<2)E('ingredients(재료)가 2개 미만이에요.');
+  const seen=new Set();
+  ings.forEach((g,i)=>{
+    const n=String(g&&g.name||'').trim(),am=String(g&&g.amount||'').trim(),tag=`재료 ${i+1}${n?` "${esc(n)}"`:''}`;
+    if(!n){E(tag+': 이름이 없어요.');return}
+    if(seen.has(n))W(tag+': 같은 재료가 두 번 있어요. 합칠지 확인해 주세요.');seen.add(n);
+    if(/[,/·]|\s및\s|\s또는\s/.test(n.replace(/\(.*?\)/g,'')))E(tag+': 재료 두 개가 한 줄에 묶여 있어요. 한 줄에 하나씩 나눠 주세요.');
+    if(typeof g.required!=='boolean')E(tag+': required가 true/false가 아니에요.');
+    const brand=BRANDS.find(b=>n.includes(b));if(brand)E(tag+`: 상표명 "${brand}"이 들어 있어요. 일반 재료 이름으로 바꿔 주세요.`);
+    if(!knownName(n))I(tag+': 우리 앱에서 처음 보는 재료 이름이에요. 맞춤법이나 다른 표기(예: 다진 마늘/다진마늘)를 확인해 주세요.');
+    const conv=checkConversion(g.amountInSource,am,sv);if(conv)(conv[0]==='err'?E:W)(tag+': '+conv[1]);
+    if(!am)E(tag+': 분량이 없어요. 모르면 "약간"이나 "적당량"으로 적어요.');
+    else if(!VAGUE.test(am)&&!AMOUNT_RE.test(am)){
+      const bad=BAD_UNITS.find(([re])=>re.test(am));
+      E(tag+`: 분량 "${esc(am)}"을 읽을 수 없어요.`+(bad?` "${bad[1]}"로 바꿔 주세요.`:` 단위는 ${UNITS.join(', ')} 중에서 써요.`));
+    }else{
+      const m=am.match(/^(?:(\d+)과\s*)?(\d+\/\d+|\d+\.\d+|\d+)\s*(g|kg|ml|L)$/);
+      if(m){let v=(m[1]?+m[1]:0)+(m[2].includes('/')?(+m[2].split('/')[0]/+m[2].split('/')[1]):+m[2]);v*=({g:1,kg:1000,ml:1,L:1000})[m[3]];
+        if(v>500)W(tag+`: ${esc(am)}는 1인분치고 많아요. 원본 전체 분량 그대로인지 확인해 주세요.`);}
+    }
+    if(n&&Array.isArray(r.steps)&&r.steps.length){const cw=coreWord(n);const key=cw.length>=2?cw.slice(0,Math.max(2,cw.length-1)):cw;
+      if(key&&!r.steps.some(s=>String(s&&s.instruction||'').includes(key)))I(tag+': 조리 단계에 이 재료가 나오지 않아요. 언제 넣는지 확인해 주세요.');}
+  });
+  if(r.baseIngredient&&ings.length&&!ings.some(g=>String(g.name||'').includes(coreWord(String(r.baseIngredient)))))W(`baseIngredient "${esc(r.baseIngredient)}"가 재료 목록에 없어요.`);
+
+  const steps=Array.isArray(r.steps)?r.steps:[];
+  if(steps.length<2)E('steps(조리 단계)가 2개 미만이에요.');
+  steps.forEach((s,i)=>{
+    if(!s||s.step!==i+1)E(`단계 번호가 1부터 순서대로가 아니에요 (${i+1}번째 단계의 step: ${esc(s&&s.step)}).`);
+    if(!s||!String(s.instruction||'').trim())E(`${i+1}단계 설명이 비어 있어요.`);
+  });
+  return issues;
+}
+
+function previewHTML(r){
+  const ings=(r.ingredients||[]).filter(g=>g&&g.name);
+  let rows='',anyHidden=false;
+  ings.forEach(g=>{const h=ingredientHits(g.name);if(h.hidden.length)anyHidden=true;
+    const chips=h.a.map(x=>`<span class="chip a">${esc(x)}</span>`).join('')+h.m.map(x=>`<span class="chip m">${esc(x)}·성분표</span>`).join('')+h.d.map(x=>`<span class="chip d">${esc(x)}</span>`).join('');
+    rows+=`<tr><td>${esc(g.name)}${g.required?'':' <small class="k">(선택)</small>'}<br><small class="k">${esc(g.amount)}</small></td><td>${chips||'<small class="k">걸리는 항목 없음</small>'}${h.hidden.length?`<div class="issue warn" style="margin-top:4px">🔎 DB가 못 잡았을 수 있어요: ${h.hidden.map(esc).join(', ')}</div>`:''}</td></tr>`});
+  const app=normalize(r);let tiers='';
+  SHOW_TIERS.forEach(nm=>{const o=ALLERGY_OBJS.find(x=>x.name===nm);if(!o)return;const t=recipeSafetyInfo(app,[o],[]).tier;const [txt,cls]=TIER_TXT[t];tiers+=`<span class="pill ${cls}">${esc(nm.replace(' 알레르기',''))}: ${txt}</span>`});
+  return `<div class="card"><h2>알레르기·질환 미리보기</h2><p class="note">앱이 이 재료들을 어떻게 판정할지 미리 보여줘요. 빨강=알레르기 회피 재료, 노랑=제품에 따라 들어 있을 수 있음, 파랑=기저질환에서 줄이면 좋은 재료.</p>
+  <div class="sum">${tiers}</div>
+  <table><tr><th style="width:38%">재료</th><th>걸리는 항목</th></tr>${rows}</table>
+  ${anyHidden?'<div class="issue warn">🔎 표시된 재료는 우리 DB가 알레르기로 못 잡는 이름일 수 있어요. 검수 때 김성곤에게 따로 알려 주세요.</div>':''}
+  <p class="note" style="margin-top:8px">상표가 붙은 가공품(○○소스, ○○믹스)이 "걸리는 항목 없음"이면 DB에 없는 재료일 수 있어요. 메모에 적어 주세요.</p></div>`;
+}
+
+// ---- 앱 형식으로 정리 ----
+function normalize(r){
+  const o={};ALLOWED_KEYS.filter(k=>k!=='name').forEach(k=>{if(r[k]!==undefined)o[k]=r[k]});
+  o.ingredients=(r.ingredients||[]).filter(g=>g&&g.name).map(g=>{const x={name:String(g.name).trim(),amount:String(g.amount||'').trim(),required:!!g.required};return x});
+  o.steps=(r.steps||[]).map((s,i)=>({step:i+1,instruction:String(s&&s.instruction||'').trim()}));
+  if(o.calories===undefined)o.calories=null;if(!o.source)o.source=null;
+  return o;
+}
+
+// ---- 상태 ----
+let current=null; // {raw, recipe}
+function runCheck(){
+  const raw=document.getElementById('input').value;store.set('input',raw);
+  const box=document.getElementById('result');current=null;
+  let data;try{data=extractJSON(raw)}catch(e){box.innerHTML=`<div class="card"><div class="issue err">${esc(e.message)}</div></div>`;renderReview();return}
+  const list=Array.isArray(data)?data:[data];
+  if(list.length>1){box.innerHTML=`<div class="card"><div class="issue err">레시피가 ${list.length}개 들어 있어요. 한 번에 1개씩 붙여넣어 주세요.</div></div>`;renderReview();return}
+  const r=list[0];const issues=checkRecipe(r);
+  const ne=issues.filter(i=>i[0]==='err').length,nw=issues.filter(i=>i[0]==='warn').length;
+  box.innerHTML=`<div class="card"><div class="rname">${esc(r&&r.name||'(이름 없음)')}</div><small class="k">${esc(r&&r.category||'')} · ${esc(r&&r.difficulty||'')} · ${esc(r&&r.cookTime||'')} · 재료 ${(r&&r.ingredients||[]).length}개 · 단계 ${(r&&r.steps||[]).length}개</small>
+    <div class="sum" style="margin-top:8px"><span class="pill ${ne?'err':'ok'}">오류 ${ne}</span><span class="pill ${nw?'warn':'ok'}">확인 필요 ${nw}</span></div>
+    ${ne?'<div class="issue err">빨간 오류는 AI에게 "다음 문제를 고쳐서 JSON만 다시 줘"라고 아래 목록을 복사해 보내면 대부분 해결돼요.</div>':'<div class="okbox">형식 오류가 없어요. 노란 항목을 확인하고 <b>③ 검수·제출</b>로 넘어가세요.</div>'}
+    ${issues.map(([k,t])=>`<div class="issue ${k}">${k==='err'?'❌':k==='warn'?'⚠️':'ℹ️'} ${t}</div>`).join('')}
+    ${ne?`<div class="row"><button class="btn ghost" id="copyFix">AI에게 보낼 수정 요청 복사</button><span class="copied" id="copiedFix"></span></div>`:''}
+  </div>`+(r&&Array.isArray(r.ingredients)?previewHTML(r):'');
+  const fix=document.getElementById('copyFix');
+  if(fix)fix.onclick=()=>copy('아래 문제를 고쳐서, 처음 규칙대로 ```json 코드블록 하나만 다시 출력해 줘.\n'+issues.filter(i=>i[0]==='err').map(i=>'- '+i[1].replace(/<[^>]+>/g,'').replace(/&quot;/g,'"').replace(/&amp;/g,'&')).join('\n'),'copiedFix');
+  if(!ne)current={recipe:r,issues};
+  renderReview();
+}
+document.getElementById('runCheck').onclick=runCheck;
+document.getElementById('clearInput').onclick=()=>{document.getElementById('input').value='';store.set('input','');document.getElementById('result').innerHTML='';current=null;renderReview()};
+
+// ---- 검수 ----
+const CHECKS=[
+  '원본 링크를 직접 열어 봤고, 이 레시피가 맞다',
+  '원본은 사람이 쓴 레시피다 (AI 답변·AI가 만든 레시피가 아님)',
+  '재료가 원본과 같다 (빠지거나 추가된 재료 없음, 양념장·물 포함)',
+  '분량을 원본 인분 수로 나눠 1인분으로 맞게 바꿨다',
+  '조리 단계 순서와 내용이 원본과 같다 (AI가 지어낸 단계 없음)',
+  '필수(required)와 선택 재료 구분이 맞다',
+  '칼로리는 추정치로 그럴듯하다 (또는 비워 두기로 했다)',
+  '알레르기 미리보기에서 못 잡힌 가공품·소스가 있으면 메모에 적었다'
+];
+function renderReview(){
+  if(typeof reqState==='function')try{reqState()}catch(e){}
+  const has=!!current;document.getElementById('reviewEmpty').style.display=has?'none':'block';document.getElementById('reviewArea').style.display=has?'block':'none';
+  if(!has)return;
+  const r=current.recipe;const hasUnc=Array.isArray(r.uncertain)&&r.uncertain.length;
+  const list=CHECKS.concat(hasUnc?['AI가 불확실하다고 한 점을 원본으로 확인했다']:[]);
+  const saved=store.get('checks_'+r.name,[]);
+  document.getElementById('checks').innerHTML=list.map((t,i)=>`<label class="chk"><input type="checkbox" data-i="${i}" ${saved.includes(i)?'checked':''}><span>${esc(t)}</span></label>`).join('');
+  document.querySelectorAll('#checks input').forEach(cb=>cb.onchange=()=>{store.set('checks_'+r.name,[...document.querySelectorAll('#checks input:checked')].map(x=>+x.dataset.i));buildOut()});
+  const savedCore=store.get('core_'+r.name,[]);
+  const cands=(r.ingredients||[]).filter(g=>g&&g.name&&g.required&&ingredientHits(g.name).a.length);
+  document.getElementById('coreList').innerHTML=cands.length?cands.map(g=>`<label class="chk"><input type="checkbox" data-n="${esc(g.name)}" ${savedCore.includes(g.name)?'checked':''}><span><b>${esc(g.name)}</b> <small class="k">${ingredientHits(g.name).a.map(esc).join(', ')}</small></span></label>`).join(''):'<div class="note">알레르기에 걸리는 필수 재료가 없어요.</div>';
+  document.querySelectorAll('#coreList input').forEach(cb=>cb.onchange=()=>{store.set('core_'+r.name,[...document.querySelectorAll('#coreList input:checked')].map(x=>x.dataset.n));buildOut()});
+  renderPop();
+  buildOut();
+}
+function renderPop(){
+  const box=document.getElementById('popBox');if(!current){box.innerHTML='';return}
+  const rule=sourceRule(current.recipe.source);if(!rule){box.innerHTML='';return}
+  const v=store.get('rvPop_'+current.recipe.name,'');
+  box.innerHTML=(rule.note?`<div class="issue warn">⚠️ ${rule.note}</div>`:'')+`<div class="note">${rule.label}의 <b>${rule.metric}</b>는? (원본 화면의 숫자를 그대로, 기준 ${rule.min.toLocaleString()} 이상${rule.allowZeroWithMemo?', 리뷰가 없는 사이트면 0 + 메모':''})</div><input type="text" id="rvPop" inputmode="numeric" maxlength="12" value="${esc(v)}" placeholder="${rule.kind==='youtube'?'예: 152000':'예: 23'}">`;
+  document.getElementById('rvPop').oninput=e=>{store.set('rvPop_'+current.recipe.name,e.target.value);buildOut()};
+}
+['who1','who2','memo','rvServ','rvCount'].forEach(id=>{const el=document.getElementById(id);el.value=store.get(id,'');el.oninput=()=>{store.set(id,el.value);buildOut()}});
+setTimeout(reqState,0);
+try{const c=formCfg();if(c){document.getElementById('sendForm').style.display='inline-block';document.getElementById('formLink').href=c.view;document.getElementById('formNote').style.display='block'}}catch(e){}
+document.getElementById('sendForm').onclick=()=>{if(!current)return;sendToForm({KIND:'레시피',NAME:`제출 ${document.getElementById('who1').value.trim()} / 검수 ${document.getElementById('who2').value.trim()}`,ITEM:current.recipe.name||'',CONTENT:document.getElementById('out').value},document.getElementById('sendMsg'))};
+// 구글 폼으로 바로 보내기 (team.js의 formPrefill 하나만 있으면 동작)
+function formCfg(){try{if(typeof TEAM==='undefined'||!TEAM.formPrefill)return null;const u=new URL(TEAM.formPrefill);
+  if(!/docs\.google\.com$/.test(u.hostname)||!/\/forms\//.test(u.pathname))return null;
+  const action=u.origin+u.pathname.replace(/\/(viewform|formResponse)\/?$/,'')+'/formResponse';const view=action.replace(/formResponse$/,'viewform');
+  const ent=[...u.searchParams.entries()].filter(([k])=>/^entry\.\d+$/.test(k));const f={};const keys=['KIND','NAME','ITEM','CONTENT'];
+  ent.forEach(([k,v])=>{const m=keys.find(x=>String(v).trim().toUpperCase()===x);if(m)f[m]=k});
+  if(!f.CONTENT){const rest=ent.map(e=>e[0]);['KIND','NAME','ITEM','CONTENT'].forEach((x,i)=>{if(!f[x]&&rest[i])f[x]=rest[i]})}
+  return f.CONTENT?{action,view,f}:null}catch(e){return null}}
+async function sendToForm(data,msgEl){const c=formCfg();if(!c){msgEl.innerHTML='<div class="issue err">구글 폼 설정이 없어요. 김성곤에게 알려 주세요.</div>';return false}
+  const sentKey='sent_'+hashForm(data.CONTENT);let prev=null;try{prev=localStorage.getItem(sentKey)}catch(e){}
+  if(prev&&!confirm2(msgEl,sentKey))return false;
+  const body=new URLSearchParams();Object.entries(c.f).forEach(([k,entry])=>{if(data[k]!=null)body.append(entry,data[k])});
+  msgEl.innerHTML='<div class="issue info">보내는 중…</div>';
+  try{await fetch(c.action,{method:'POST',mode:'no-cors',body});try{localStorage.setItem(sentKey,new Date().toISOString())}catch(e){}
+    msgEl.innerHTML='<div class="issue ok">구글 폼으로 보냈어요. 성곤의 시트에 들어갔는지는 성곤이 확인해요. 혹시 모르니 복사한 내용은 지우지 말고 남겨 두세요.</div>';return true}
+  catch(e){msgEl.innerHTML='<div class="issue err">이 화면에서는 바로 보내기가 막혀 있어요. 웹사이트 주소(sunggon03.github.io/mukgojugja/…)로 열거나, 복사해서 구글 폼에 직접 붙여 주세요.'+(c.view?` <a href="${c.view}" target="_blank" rel="noopener noreferrer">구글 폼 열기</a>`:'')+'</div>';return false}}
+function hashForm(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36)}
+function confirm2(msgEl,key){if(msgEl.dataset.again===key){msgEl.dataset.again='';return true}msgEl.dataset.again=key;msgEl.innerHTML='<div class="issue warn">이 내용은 이미 보냈어요. 정말 한 번 더 보내려면 버튼을 다시 누르세요.</div>';return false}
+
+
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36).toUpperCase()}
+const q=s=>"'"+String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'")+"'";
+function toCode(r,core){
+  const o=normalize(r);const L=[];
+  L.push(`    ${q(String(r.name).trim())}: {`);
+  L.push(`        category: ${q(o.category)},`);
+  L.push(`        keywords: [${(o.keywords||[]).map(q).join(', ')}],`);
+  L.push(`        baseIngredient: ${q(o.baseIngredient||'')},`);
+  L.push(`        description: ${q(o.description||'')},`);
+  L.push(`        calories: ${o.calories==null?'null':Math.round(o.calories)},`);
+  L.push(`        difficulty: ${q(o.difficulty)},`);
+  L.push(`        cookTime: ${q(o.cookTime)},`);
+  L.push(`        source: ${o.source?q(o.source):'null'},`);
+  L.push(`        teamSubmitted: true,`);
+  L.push(`        ingredients: [`);
+  o.ingredients.forEach((g,i)=>L.push(`            { name: ${q(g.name)}, amount: ${q(g.amount)}, required: ${g.required}${core.includes(g.name)?', noSubstituteHere: true':''} }${i<o.ingredients.length-1?',':''}`));
+  L.push(`        ],`);
+  L.push(`        steps: [`);
+  o.steps.forEach((s,i)=>L.push(`            { step: ${s.step}, instruction: ${q(s.instruction)} }${i<o.steps.length-1?',':''}`));
+  L.push(`        ]`);
+  L.push(`    },`);
+  return L.join('\n');
+}
+function reqState(){const w1=document.getElementById('who1').value.trim();const b=document.getElementById('copyReq');if(!b)return;b.disabled=!(current&&w1);
+  document.getElementById('reqMsg').textContent=!current?'②에서 오류 없는 레시피를 먼저 만들어 주세요.':!w1?'아래 "제출자" 칸에 이름을 먼저 써 주세요.':'검수 요청을 복사해 검수자에게 보내세요. 검수자 칸은 비워 둬도 돼요.'}
+document.getElementById('copyReq').onclick=()=>{const w1=document.getElementById('who1').value.trim();const body=document.getElementById('input').value.trim();copy(`// 레시피 검수 요청 · ${current.recipe.name||''} · 제출: ${w1} · 코드 ${hash(body)}\n`+body,'copiedReq')};
+document.getElementById('loadReq').onclick=()=>{const raw=document.getElementById('reqBox').value.trim();const out=document.getElementById('reqOut');
+  const head=(raw.match(/^\/\/[^\n]*/)||[''])[0];if(!/레시피 검수 요청/.test(head)){out.innerHTML='<div class="issue err">검수 요청 형식이 아니에요. 제출자에게 받은 내용을 맨 윗줄(// 레시피 검수 요청 …)부터 통째로 붙여 주세요.</div>';return}
+  const body=raw.slice(head.length).trim();const code=(head.match(/코드 (\S+)/)||[])[1];const who=((head.match(/제출: (.*?) · 코드/)||[])[1]||'').trim();
+  document.getElementById('input').value=body;document.getElementById('who1').value=who;store.set('who1',who);
+  document.getElementById('who2').value='';store.set('who2','');runCheck();
+  out.innerHTML=(code&&hash(body)===code?'':'<div class="issue warn">코드가 안 맞아요. 복사하다 잘렸거나 내용이 바뀌었을 수 있어요. 제출자에게 다시 받아 주세요.</div>')+(current?`<div class="issue ok">${esc(current.recipe.name||'')} · 제출자 ${esc(who)}의 레시피를 열었어요. 아래에 검수자 이름을 쓰고 원본을 열어 확인해 주세요.</div>`:'<div class="issue err">열었지만 ② 자동 검사에서 오류가 나요. 제출자에게 고쳐서 다시 보내 달라고 해 주세요.</div>');
+  showTab('p3');reqState()};
+function buildOut(){
+  reqState();if(!current)return;const r=current.recipe;
+  const w1=document.getElementById('who1').value.trim(),w2=document.getElementById('who2').value.trim(),memo=document.getElementById('memo').value.trim().replace(/\s+/g,' ');
+  document.getElementById('sameWho').style.display=w1&&w2&&w1===w2?'block':'none';
+  const total=document.querySelectorAll('#checks input').length,done=document.querySelectorAll('#checks input:checked').length;
+  const core=[...document.querySelectorAll('#coreList input:checked')].map(x=>x.dataset.n);
+  const rs=document.getElementById('rvServ').value.trim(),rc=document.getElementById('rvCount').value.trim();
+  const aiServ=r.servingsInSource||0,aiCount=(r.ingredients||[]).filter(g=>g&&g.name).length;const notes=[];
+  if(rs!==''&&+rs!==aiServ)notes.push(`원본 인분(${esc(rs)})이 AI가 적은 값(${aiServ||'없음'})과 달라요. 분량 환산이 틀렸을 가능성이 커요. ② 자동 검사로 돌아가 AI에게 인분 수를 고쳐 달라고 하세요.`);
+  if(rc!==''&&+rc!==aiCount)notes.push(`원본 재료 수(${esc(rc)})와 AI 결과(${aiCount}개)가 달라요. 빠지거나 추가된 재료가 없는지 확인하고, 이유(예: "소금·후추를 두 줄로 나눔")를 메모에 적어 주세요.`);
+  document.getElementById('rvMsg').innerHTML=notes.map(n=>`<div class="issue warn">${n}</div>`).join('');
+  const missing=[];
+  const rule=sourceRule(r.source);const popEl=document.getElementById('rvPop');const popRaw=popEl?popEl.value.replace(/[,\s]/g,''):'';
+  let popTxt='';
+  if(rule){
+    const pv=/^\d+$/.test(popRaw)?+popRaw:NaN;
+    if(popRaw==='')missing.push(rule.metric+' 입력');
+    else if(isNaN(pv))missing.push(rule.metric+'는 숫자만 (예: 152000)');
+    else if(pv<rule.min&&!(rule.allowZeroWithMemo&&pv===0&&memo)){
+      notes.push(rule.allowZeroWithMemo&&pv===0?`숫자가 0이면 셰프·테스트키친·푸드스타일리스트처럼 믿을 만한 이유를 메모에 적어 주세요.`:`${rule.metric} ${pv.toLocaleString()}은 기준(${rule.min.toLocaleString()} 이상)에 못 미쳐요. 많은 사람이 만들어 본 다른 레시피를 골라 주세요.`);
+      missing.push(rule.allowZeroWithMemo&&pv===0?'리뷰 없는 이유 메모':'인기 기준 미달');
+    } else popTxt=`${rule.short||rule.metric} ${pv.toLocaleString()}`;
+    document.getElementById('rvMsg').innerHTML=notes.map(n=>`<div class="issue warn">${n}</div>`).join('');
+  } else missing.push('허용된 원본 사이트');
+  if(rs===''||rc==='')missing.push('원본 인분·재료 수 입력');
+  if(rs!==''&&+rs!==aiServ)missing.push('인분 수 불일치 해결');
+  if(rc!==''&&+rc!==aiCount&&!memo)missing.push('재료 수 차이 이유 메모');
+  if(!w1)missing.push('제출자 이름');if(!w2)missing.push('검수자 이름');if(w1&&w2&&w1===w2)missing.push('제출자와 다른 검수자');if(done<total)missing.push(`체크리스트 ${total-done}개`);
+  const blocked=document.getElementById('outBlocked'),out=document.getElementById('out'),btn=document.getElementById('copyOut');
+  if(missing.length){blocked.style.display='block';blocked.textContent='아직 남은 것: '+missing.join(', ');out.value='';btn.disabled=true;document.getElementById('sendForm').disabled=true;return}
+  blocked.style.display='none';
+  const d=new Date();const date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const warns=current.issues.filter(i=>i[0]==='warn').length;
+  const code=toCode(r,core);
+  out.value=`    // 제출: ${w1} · 검수: ${w2} · ${date} · 검사코드 ${hash(code)}${popTxt?` · ${popTxt}`:''}${r.servingsInSource?` · 원본 ${r.servingsInSource}인분→1인분`:''}${warns?` · 확인 필요 ${warns}건 검토함`:''}${memo?` · 메모: ${memo.replace(/\*\//g,'')}`:''}\n`+code;
+  btn.disabled=false;document.getElementById('sendForm').disabled=false;
+}
+document.getElementById('copyOut').onclick=()=>copy(document.getElementById('out').value,'copiedOut');
+
+// ---- 시작 ----
+document.getElementById('input').value=store.get('input','');
+if(document.getElementById('input').value.trim())runCheck();
+showTab(store.get('tab','p1'));
+</script>
+<script>try{fetch('index.html',{cache:'no-store'}).then(function(r){return r.text()}).then(function(h){var m=h.match(/diet-data\.js\?v=([\w-]+)/);document.getElementById('dataVer').textContent='알레르기 미리보기·중복 검사는 웹사이트 데이터와 연동돼요'+(m?' (지금 버전 '+m[1]+', 레시피 '+Object.keys(recipes).length+'개)':'')+'.'}).catch(function(){})}catch(e){}</script>
+</body>
+</html>

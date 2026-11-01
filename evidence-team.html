@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>근거 확인 담당표</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6F4EF;--card:#FFFFFF;--ink:#1F2A22;--mut:#6B746D;--line:#E4DFD6;--g:#4F7F3F;--gl:#E8F1DF;--red:#C5303E;--rl:#FBE9EA;--amb:#9A6400;--al:#FFF3D6;--bl:#1F5FA8;--bll:#E7F0FB;--A:#1F5FA8;--Al:#E7F0FB;--B:#8A4FB0;--Bl:#F3EAF8;--C:#B4581F;--Cl:#FBEEE4}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141714;--card:#1D211D;--ink:#E9EEE8;--mut:#9AA49B;--line:#2F352F;--g:#8CC274;--gl:#22301D;--red:#F08A93;--rl:#3A1E21;--amb:#E8B75A;--al:#352A12;--bl:#8DB8F0;--bll:#17263A;--A:#8DB8F0;--Al:#17263A;--B:#C9A2E3;--Bl:#2A1F33;--C:#EDA875;--Cl:#33241A}}
+:root[data-theme="dark"]{--bg:#141714;--card:#1D211D;--ink:#E9EEE8;--mut:#9AA49B;--line:#2F352F;--g:#8CC274;--gl:#22301D;--red:#F08A93;--rl:#3A1E21;--amb:#E8B75A;--al:#352A12;--bl:#8DB8F0;--bll:#17263A;--A:#8DB8F0;--Al:#17263A;--B:#C9A2E3;--Bl:#2A1F33;--C:#EDA875;--Cl:#33241A}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 'Noto Sans KR',-apple-system,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:22px 16px 60px}
+h1{font-size:23px;margin:0 0 4px}
+h2{font-size:17px;margin:0 0 10px}
+.lead{color:var(--mut);font-size:14px;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.note{font-size:13px;color:var(--mut)}
+.goal{background:var(--gl);color:var(--g);border-radius:12px;padding:12px 14px;font-weight:700;font-size:15px}
+.goal small{display:block;font-weight:400;color:var(--ink);font-size:13px;margin-top:4px}
+a.go{display:block;text-align:center;background:var(--g);color:#fff;text-decoration:none;font-weight:700;border-radius:12px;padding:12px;margin:12px 0 0}
+.who{display:inline-block;font-weight:700;border-radius:99px;padding:2px 10px;font-size:13px}
+.who.A{background:var(--Al);color:var(--A)}.who.B{background:var(--Bl);color:var(--B)}.who.C{background:var(--Cl);color:var(--C)}
+.first{border-left:5px solid var(--line);padding:12px 12px 12px 14px;border-radius:10px;background:var(--bg);margin:10px 0}
+.first.A{border-color:var(--A)}.first.B{border-color:var(--B)}.first.C{border-color:var(--C)}
+.first h3{font-size:15px;margin:6px 0 4px}
+.first ol{margin:4px 0 0;padding-left:20px;font-size:13.5px}
+.first .q{font-size:13px;background:var(--card);border-radius:8px;padding:6px 9px;margin:4px 0}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td,th{border-top:1px solid var(--line);padding:8px 5px;text-align:left;vertical-align:top}
+th{font-size:12px;color:var(--mut);font-weight:500}
+td.ck{width:30px}td.ck input{width:18px;height:18px;accent-color:var(--g)}
+.tag{font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;white-space:nowrap}
+.tag.src{background:var(--rl);color:var(--red)}.tag.ok{background:var(--gl);color:var(--g)}.tag.first{background:var(--al);color:var(--amb)}
+.sum{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.sum span{font-size:12.5px;background:var(--bg);border-radius:8px;padding:3px 8px}
+ul.rules{margin:0;padding-left:20px;font-size:14px}ul.rules li{margin:4px 0}
+.rot{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:14px;margin:6px 0}
+.rot b{font-size:18px;color:var(--mut)}
+.warn{background:var(--al);color:var(--amb);border-radius:10px;padding:10px 12px;font-size:13.5px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>📋 근거 확인 담당표</h1>
+<p class="lead">먹고죽자! 앱 문장의 근거를 3명이 나눠 확인해요. 11/13 발표 전까지 끝내는 게 목표예요. 도우미 검색창 아래 <b>"나는 누구?"</b>에서 내 글자(A·B·C)를 누르면 내 담당만 보여요.</p>
+
+<div class="card">
+  <div class="goal">완료 기준: 기본 출처 교체 + 우선순위 "높음" 문장 확인<small>보통·낮음 문장은 이번에 하지 않아요. 높음 문장은 대체 재료 위험 문장까지 모두 약 103개(한 사람당 약 35개)지만, 문서 하나로 여러 문장을 확인할 수 있어서 실제로 열 문서는 20개 안팎이에요.</small></div>
+  <a class="go" href="https://sunggon03.github.io/mukgojugja/evidence-check.html" target="_blank" rel="noopener noreferrer">근거 확인 도우미 열기 →</a>
+  <p class="note" style="margin:6px 0 0;text-align:center">sunggon03.github.io/mukgojugja/evidence-check.html</p>
+</div>
+
+<div class="card">
+  <h2>① 11/3 (화) 첫 과제: 가장 쉬운 것 하나씩</h2>
+  <p class="note" style="margin:0">각자 이것 하나만 먼저 해서 성곤에게 보내요. 성곤이 원문과 직접 맞춰 보고, 방식이 맞으면 나머지를 시작해요.</p>
+  <div id="firsts"></div>
+</div>
+
+<div class="card">
+  <h2>② 담당 항목</h2>
+  <p class="note" style="margin:0 0 6px">체크는 각자 기기에만 저장돼요(진행 확인용). 결과는 도우미 ⑤에서 나온 제출 내용을 성곤에게 보내야 반영돼요.</p>
+  <div id="lists"></div>
+</div>
+
+<div class="card">
+  <h2>③ 검수는 돌아가면서</h2>
+  <p class="note" style="margin:0">확인한 사람과 검수하는 사람은 달라야 해요. 끝난 문서는 바로 다음 사람에게 넘겨요.</p>
+  <div class="rot" id="rot"></div>
+  <p class="note" style="margin:0">확인자: 도우미 ⑤ "검수 요청 복사" → 검수자에게 보내기. 검수자: ⑤ "받은 검수 요청 붙여넣기" → 같은 링크를 열어 붙인 문장이 정말 있는지 Ctrl+F로 다시 찾기 → 제출 내용을 성곤에게. 문서 하나에 10~15분이에요.</p>
+</div>
+
+<div class="card">
+  <h2>④ 일정</h2>
+  <table>
+    <tr><th>날짜</th><th>할 일</th><th>누가</th></tr>
+    <tr><td>11/2 (월)</td><td>도우미 업로드, 링크와 담당표 전달</td><td>성곤</td></tr>
+    <tr><td>11/3 (화)</td><td>첫 과제 1개 → 성곤에게 보내기 → 성곤이 원문과 대조</td><td class="abc"></td></tr>
+    <tr><td>11/4~11/7</td><td>나머지 확인 (한 사람당 문서 6~7개, 하루 1시간 정도)</td><td class="abc"></td></tr>
+    <tr><td>11/6~11/8</td><td>검수 (끝난 문서부터 바로)</td><td class="abc"></td></tr>
+    <tr><td>11/8~11/9</td><td>결과 모으기, 고칠 문장 정리, 앱 반영</td><td>성곤</td></tr>
+    <tr><td>11/10</td><td>최종 업로드, 확인</td><td>성곤</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>⑤ 꼭 지킬 것</h2>
+  <ul class="rules">
+    <li>도우미는 <b>위 링크(웹사이트 주소)</b>로 열어요. 파일을 내려받아 열면 데이터가 안 나와요.</li>
+    <li>AI는 <b>웹 검색이 되는 것</b>으로 써요. 검색 기능을 꼭 켜요.</li>
+    <li>AI가 준 링크는 <b>직접 열어서</b> 문장을 찾아요. AI의 말을 그대로 믿지 않아요.</li>
+    <li>찾은 문장은 <b>고치지 말고 그대로</b> 복사해요. 영어면 영어 그대로, 요약·번역 금지.</li>
+    <li>한 문서는 <b>같은 기기·같은 브라우저</b>에서 끝까지 해요. 진행 상태가 그 브라우저에만 저장돼요.</li>
+    <li>검수가 끝나면 도우미 ⑤의 <b>"구글 폼으로 보내기"</b>를 눌러요. 성곤에게 바로 가요. 검수자가 눌러요.</li>
+    <li>못 찾으면 <b>"문장 없음"</b>으로 넘어가요. 억지로 찾지 않아도 돼요. 고칠지 뺄지는 성곤이 정해요.</li>
+  </ul>
+  <div class="warn">막히면 혼자 오래 붙잡지 말고 바로 성곤에게 물어봐요. 특히 링크가 안 열리거나, 문서가 너무 길어서 어디를 봐야 할지 모를 때요.</div>
+</div>
+
+<p class="note">높음 문장 수는 2026-11-01 앱 데이터 기준이에요. 앱 문장이 바뀌면 도우미의 숫자가 더 정확해요.</p>
+</div>
+
+<script>document.write('<script src="team.js?t='+Date.now()+'"><\/script>')</script>
+<script>
+// 이름은 team.js에서 바꾸면 담당표와 근거 확인 도우미에 같이 바뀌어요
+const NAMES = (typeof TEAM!=='undefined'&&TEAM.names)?TEAM.names:{ A: '조원 A', B: '조원 B', C: '조원 C' };
+
+const PLAN = {
+  A: { focus:'밀·글루텐·셀리악 + 당뇨·고혈압·위산역류', items:[
+    ['밀 알레르기',3,true,'first'],['글루텐 불내증',4,true],['글루텐 불내증(셀리악병)',5,true],['위산역류',6,true],['고혈압',8,true],['당뇨병',9,true]]},
+  B: { focus:'우유·유당·유제품 + 고콜레스테롤·신장', items:[
+    ['유제품 불내증',2,false,'first'],['유당불내증',6,true],['우유 알레르기',15,true],['고콜레스테롤',6,false],['신장질환',6,true]]},
+  C: { focus:'나머지 알레르기 15개 + 통풍', items:[
+    ['땅콩',2,true,'first'],['견과류',2,true],['갑각류',2,true],['조개류',1,true],['계란',2,true],['대두',5,true],['메밀',1,true],['생선',1,true],['돼지고기',2,true],['복숭아',2,true],['토마토',1,true],['닭고기',1,true],['쇠고기',1,true],['오징어',1,true],['아황산류',2,true],['통풍',7,true]]}
+};
+const FIRST = {
+  A:{item:'밀 알레르기',search:'밀 알레르기',why:'높음 문장 3개. 지금 출처가 환자 단체 안내라서, 학회의 밀 알레르기 안내 페이지 하나로 출처 교체와 문장 확인이 같이 끝나요.',
+     qs:['밀 단백질에 면역계가 과민 반응해 두드러기·구토·호흡곤란, 심하면 아나필락시스를 일으킬 수 있어요','밀이 든 음식은 소량도 피하세요.','셀리악병과 달리 보리·호밀은 대부분 먹을 수 있지만, 처음엔 의사와 확인하세요.']},
+  B:{item:'유제품 불내증',search:'유제품',why:'높음 문장 2개. 출처가 이미 좋아서(미국 국립보건원 유당불내증 안내) 출처 교체 없이 문장만 찾으면 돼요.',
+     qs:['버터 → 버터(소량은 대부분 괜찮음): 유당 함량이 매우 낮아 유당불내증이면 소량은 대부분 괜찮은 경우가 많음','치즈 → 저유당 치즈(숙성치즈): 오래 숙성되며 유당이 많이 분해된 치즈, 유당불내증이면 소량 섭취 가능한 경우가 많음']},
+  C:{item:'땅콩 알레르기',search:'땅콩',why:'높음 문장 2개. 지금 출처가 뉴스 기사라서, 학회의 땅콩 알레르기 안내 페이지 하나로 출처 교체와 문장 확인이 같이 끝나요.',
+     qs:['땅콩 단백질에 대한 면역 과민반응으로 심하면 아나필락시스(전신 쇼크)까지 유발할 수 있음','아나필락시스(전신 알레르기 쇼크) 위험이 높은 대표 알레르겐.']}
+};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const get=(k,d)=>{try{const v=localStorage.getItem('team_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}};
+const set=(k,v)=>{try{localStorage.setItem('team_'+k,JSON.stringify(v))}catch(e){}};
+const W=k=>`<span class="who ${k}">${k} · ${esc(NAMES[k])}</span>`;
+
+document.getElementById('firsts').innerHTML=['A','B','C'].map(k=>{const f=FIRST[k];return `<div class="first ${k}">${W(k)}<h3>${esc(f.item)}</h3><div class="note">${esc(f.why)}</div>
+  <ol><li>도우미 검색창에 <b>${esc(f.search)}</b> 쓰고 찾기</li><li>"높음만 선택" 누르기 → ② 프롬프트 복사 → 웹 검색 AI에 붙이기</li><li>AI 답을 ③에 붙이기 → ④에서 링크를 직접 열고 문장 그대로 붙이기</li><li>⑤에서 <b>"검수 요청 복사"</b>를 눌러 나온 내용을 보내요. 첫 과제의 검수는 이번만 <b>성곤</b>이 해요</li></ol>
+  <div class="note" style="margin-top:6px">확인할 문장</div>${f.qs.map(q=>`<div class="q">${esc(q)}</div>`).join('')}</div>`}).join('');
+
+const done=get('done',{});
+document.getElementById('lists').innerHTML=['A','B','C'].map(k=>{const p=PLAN[k];const hi=p.items.reduce((a,x)=>a+x[1],0),src=p.items.filter(x=>x[2]).length;
+  return `<div style="margin-top:14px">${W(k)} <span class="note">${esc(p.focus)}</span><div class="sum"><span>높음 문장 ${hi}개</span><span>출처 교체 ${src}개</span><span>항목 ${p.items.length}개</span></div>
+  <table><tr><th></th><th>항목</th><th>할 일</th></tr>${p.items.map(([n,h,s,f])=>{const id=k+':'+n;return `<tr><td class="ck"><input type="checkbox" data-id="${esc(id)}" ${done[id]?'checked':''}></td><td>${esc(n)} ${f?'<span class="tag first">첫 과제</span>':''}</td><td>높음 ${h}개 ${s?'<span class="tag src">출처 교체</span>':'<span class="tag ok">출처 좋음</span>'}</td></tr>`}).join('')}</table></div>`}).join('');
+document.querySelectorAll('#lists input').forEach(cb=>cb.onchange=()=>{const d=get('done',{});if(cb.checked)d[cb.dataset.id]=1;else delete d[cb.dataset.id];set('done',d)});
+
+document.querySelectorAll('td.abc').forEach(td=>td.innerHTML=['A','B','C'].map(k=>`<span class="who ${k}" style="margin:1px 0">${k}</span>`).join(' '));
+document.getElementById('rot').innerHTML=`${W('A')} 결과 → ${W('B')} 검수 <b>·</b> ${W('B')} 결과 → ${W('C')} 검수 <b>·</b> ${W('C')} 결과 → ${W('A')} 검수`;
+</script>
+</body>
+</html>

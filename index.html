@@ -453,6 +453,9 @@
             line-height: 1.6;
         }
 
+        /* 긴 출처·링크 줄바꿈 (폰에서 화면 밖으로 잘리지 않게) */
+        #resultsContent a, #modalBody a, #familyBody a, #infoBody a, #resultsContent details, #modalBody details { overflow-wrap: anywhere; word-break: break-word; }
+
         /* ===== 가족 등록 ===== */
         .fam-who{background:#FAF8F5;border:1px solid #E8E3DD;border-radius:12px;padding:10px 12px;margin:0 0 12px}
         .fam-who-title{font-size:12px;font-weight:700;color:#2B3E2F;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
@@ -816,16 +819,15 @@
             <div class="more-menu-row" id="moreLogoutRow" style="display:none;" onclick="toggleMoreMenu(); signOutUser();"><span class="more-ic">🔑</span>로그아웃</div>
 
             <div class="more-cat-label">나의 활동</div>
-            <div class="more-menu-row" onclick="comingSoon('최근 본 레시피');"><span class="more-ic">🕘</span>최근 본 레시피</div>
+            <div class="more-menu-row" onclick="toggleMoreMenu(); openInfo('recent');"><span class="more-ic">🕘</span>최근 본 레시피</div>
             <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('recipeBook'); toggleFavoritesFilter(true);"><span class="more-ic">⭐</span>즐겨찾기 (레시피북 바로가기)</div>
 
             <div class="more-cat-label">도구</div>
             <div class="more-menu-row" onclick="toggleMoreMenu(); showPage('shoppingList');"><span class="more-ic">🛒</span>장보기 리스트</div>
 
                         <div class="more-cat-label">기타</div>
-            <div class="more-menu-row" onclick="comingSoon('서비스 소개');"><span class="more-ic">ℹ️</span>서비스 소개</div>
-            <div class="more-menu-row" onclick="comingSoon('의견 보내기');"><span class="more-ic">✉️</span>의견 보내기</div>
-            <div class="more-menu-row" onclick="comingSoon('다크모드');"><span class="more-ic">🌙</span>다크모드</div>
+            <div class="more-menu-row" onclick="toggleMoreMenu(); openInfo('about');"><span class="more-ic">ℹ️</span>서비스 소개 · 이용 안내</div>
+            <div class="more-menu-row" onclick="toggleMoreMenu(); openInfo('privacy');"><span class="more-ic">🔒</span>개인정보 안내</div>
 
             <div class="more-cat-label">관리</div>
             <div class="more-menu-row" onclick="toggleMoreMenu(); openAdminReview();"><span class="more-ic">🔧</span>관리</div>
@@ -850,11 +852,11 @@
         <div id="home" class="page active">
         <div class="home-intro">
             <div class="home-intro-title">🍽️ 먹고죽자!</div>
-            <div class="home-intro-sub">알레르기·기저질환이 있어도 안심하고 고르는 레시피</div>
+            <div class="home-intro-sub">알레르기·기저질환을 함께 확인하며 고르는 레시피</div>
             <div class="home-intro-stats">
-                <span class="home-intro-stat">레시피 80개</span>
-                <span class="home-intro-stat">알레르기·기저질환 21종 지원</span>
-                <span class="home-intro-stat">대체식품 자동 안내</span>
+                <span class="home-intro-stat">한식·양식·일식·중식·디저트</span>
+                <span class="home-intro-stat">주요 알레르기·기저질환 지원</span>
+                <span class="home-intro-stat">대체 가능 여부 안내</span>
             </div>
         </div>
 
@@ -895,6 +897,8 @@
                 <span onclick="showPage('profile');" style="font-size: 13px; font-weight: 600; color: #5A8B4A; cursor: pointer;">내 정보에서 수정하기 →</span>
             </div>
         </div>
+
+        <div style="padding: 4px 20px 24px; font-size: 11px; color: #999; line-height: 1.6; text-align: center;">먹고죽자!는 의료 조언이 아니에요. 시판 제품은 원재료·알레르기 표시를 꼭 확인하세요.<br><span onclick="openInfo('about')" style="color: #5A8B4A; cursor: pointer; text-decoration: underline;">이용 안내</span> · <span onclick="openInfo('privacy')" style="color: #5A8B4A; cursor: pointer; text-decoration: underline;">개인정보 안내</span></div>
     </div>
 
     <!-- 검색 페이지 -->
@@ -1088,6 +1092,14 @@
         </div>
     </div>
 
+    <!-- 안내 모달 (서비스 소개·개인정보·최근 본 레시피) -->
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="closeInfo()">✕</div>
+            <div id="infoBody"></div>
+        </div>
+    </div>
+
     <!-- 가족 등록 모달 -->
     <div id="familyModal" class="modal">
         <div class="modal-content">
@@ -1097,9 +1109,9 @@
     </div>
 
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
-       <script src="diet-data.js?v=20261027g"></script>
-<script src="recipes-data.js?v=20261027g"></script>
-<script src="substitute-logic.js?v=20261027g"></script>
+       <script src="diet-data.js?v=20261031a"></script>
+<script src="recipes-data.js?v=20261031a"></script>
+<script src="substitute-logic.js?v=20261031a"></script>
     <script>
 
 
@@ -1921,6 +1933,7 @@
                 cartModeOn = false;
             }
             currentModalRecipe = recipeName;
+            if (!keepState) pushRecent(recipeName);
             const modal = document.getElementById('recipeModal');
             const modalBody = document.getElementById('modalBody');
             const allergyObjects = getUserAllergies();
@@ -2401,6 +2414,48 @@
             if (event.target === modal) {
                 modal.classList.remove('active');
             }
+        });
+
+        // ===== 안내 모달: 서비스 소개·이용 안내 / 개인정보 안내 / 최근 본 레시피 =====
+        const RECENT_KEY = 'recentRecipes';
+        function loadRecent() { try { const a = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); return Array.isArray(a) ? a.filter(n => typeof recipes !== 'undefined' && recipes[n]) : []; } catch (e) { return []; } }
+        function pushRecent(name) {
+            try { const a = loadRecent().filter(n => n !== name); a.unshift(name); localStorage.setItem(RECENT_KEY, JSON.stringify(a.slice(0, 10))); }
+            catch (e) { console.warn('localStorage 사용 불가:', e.message); }
+        }
+        function infoSection(title, body) { return `<div style="margin: 14px 0 6px; font-size: 14px; font-weight: 700; color: #2B3E2F;">${title}</div><div style="font-size: 13px; color: #444; line-height: 1.65;">${body}</div>`; }
+        function openInfo(kind) {
+            let h = '';
+            if (kind === 'recent') {
+                const list = loadRecent();
+                h += `<div class="modal-title">🕘 최근 본 레시피</div>`;
+                h += list.length ? list.map(n => `<div onclick="closeInfo(); showRecipeModal('${n.replace(/'/g, "\\'")}')" style="display: flex; justify-content: space-between; align-items: center; border: 1px solid #E8E3DD; border-radius: 10px; padding: 11px 13px; margin: 8px 0; cursor: pointer; font-size: 14px;"><span>${escapeHealthText(n)}</span><span style="color: #5A8B4A;">›</span></div>`).join('')
+                    + `<div onclick="try { localStorage.removeItem('${RECENT_KEY}'); } catch (e) {} openInfo('recent');" style="font-size: 12px; color: #888; text-align: right; margin-top: 8px; cursor: pointer; text-decoration: underline;">기록 지우기</div>`
+                    : `<div style="text-align: center; color: #999; font-size: 13px; padding: 20px 0;">아직 본 레시피가 없어요.</div>`;
+                h += `<div style="font-size: 11px; color: #999; margin-top: 10px;">최근 10개까지 이 기기에만 저장돼요.</div>`;
+            } else if (kind === 'privacy') {
+                h += `<div class="modal-title">🔒 개인정보 안내</div>`;
+                h += infoSection('어떤 정보를 쓰나요?', '알레르기·기저질환, 나이 구간, 가족 별명·건강정보(가족 등록을 켠 경우), 즐겨찾기·장보기 목록·최근 본 레시피예요. 생년월일·연락처는 받지 않아요. Google로 로그인하면 로그인 확인을 위해 Google 계정의 이름·이메일이 쓰여요.');
+                h += infoSection('어디에 저장되나요?', '<strong>이 기기(브라우저)</strong>에 저장돼요.<br>• Google로 로그인하면 <strong>내 알레르기·기저질환</strong>은 다른 기기에서도 쓸 수 있게 계정(Firebase)에 함께 저장돼요.<br>• <strong>가족 정보·나이 구간·즐겨찾기·장보기·최근 본 레시피</strong>는 로그인해도 서버로 보내지 않고 이 기기에만 있어요.');
+                h += infoSection('왜 쓰나요?', '레시피 재료가 나와 가족에게 맞는지 확인하고, 대체 재료와 주의 문구를 보여주기 위해서만 써요. 광고나 다른 목적으로 쓰지 않아요.');
+                h += infoSection('지우려면?', '• 가족 정보: 더보기 → 가족 등록 → "가족 정보 모두 지우기"<br>• 내 건강정보: 내 정보에서 체크를 모두 풀기<br>• 이 기기의 모든 정보: 브라우저 설정에서 이 사이트 데이터 삭제');
+                h += `<div style="font-size: 11px; color: #999; margin-top: 14px; line-height: 1.5;">이 안내는 서비스 준비 단계의 요약이에요. 정식 개인정보처리방침은 서비스 공개 전에 따로 마련할 예정이에요.</div>`;
+            } else {
+                h += `<div class="modal-title">ℹ️ 서비스 소개 · 이용 안내</div>`;
+                h += infoSection('먹고죽자!는', '알레르기·기저질환이 있는 사람과 가족이 레시피를 고를 때, 재료마다 피해야 하는지 확인하고 <strong>맛과 요리 역할이 이어지는 대체 재료</strong>를 알려주는 서비스예요.');
+                h += infoSection('표시 읽는 법', '• <span style="color:#DC3545;font-weight:700;">⚠️ 빨간 줄</span>: 내 알레르기에 해당하는 재료<br>• <span style="color:#1F5FA8;font-weight:700;">줄이면 좋은 재료</span>: 기저질환 기준으로 줄이면 좋은 재료<br>• 🔎 성분표 확인: 제품에 따라 들어 있을 수 있는 재료<br>• 🚫 대체할 수 있는 재료가 없어요: 맛·식감을 대신할 재료가 없어 억지로 권하지 않아요');
+                h += infoSection('대체 재료는 이렇게 골라요', '영양이 비슷한지가 아니라 <strong>맛·식감·요리 역할</strong>이 이어지는지를 기준으로 팀이 직접 검토했어요. 이어지지 않으면 "대체 어려움"으로 알려드려요.');
+                h += infoSection('근거', '식약처 알레르기 표시기준, 국내외 학회 지침, 병원·학회 환자 안내 자료를 바탕으로 했어요. 각 알레르기·질환 안내의 "출처"와 "근거 보기"에서 링크를 볼 수 있어요.');
+                h += `<div style="background: #FFF4DC; color: #7a4d00; border-radius: 10px; padding: 10px 12px; font-size: 12px; margin-top: 16px; line-height: 1.6;">⚠️ 먹고죽자!는 <strong>의료 조언이 아니에요.</strong> 진단·치료를 대신하지 않고, 모든 위험을 다 알려줄 수는 없어요. 시판 제품은 구매할 때마다 원재료와 알레르기 표시를 꼭 확인하고, 심한 알레르기나 질환이 있으면 의료진과 상의하세요.</div>`;
+                h += `<div onclick="openInfo('privacy')" style="font-size: 12px; color: #5A8B4A; margin-top: 12px; cursor: pointer; text-decoration: underline;">🔒 개인정보 안내 보기</div>`;
+            }
+            document.getElementById('infoBody').innerHTML = h;
+            document.getElementById('infoModal').classList.add('active');
+        }
+        function closeInfo() { document.getElementById('infoModal').classList.remove('active'); }
+        document.addEventListener('click', function(event) {
+            const im = document.getElementById('infoModal');
+            if (event.target === im) closeInfo();
         });
 
         // ===== 밀 알레르기 / 셀리악 분리: 예전 '밀가루'·'밀' 등록자에게 한 번 물어보기 =====
