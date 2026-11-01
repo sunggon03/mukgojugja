@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="app-build" content="202611011431">
-<script>(function(){var B="202611011431",path=location.pathname,last=0;
+<meta name="app-build" content="202611011445">
+<script>(function(){var B="202611011445",path=location.pathname,last=0;
 function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}}
 function bar(nb){if(document.getElementById('freshBar'))return;var d=document.createElement('div');d.id='freshBar';d.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#1F5FA8;color:#fff;border-radius:12px;padding:12px 14px;font:600 14px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;gap:10px;align-items:center;justify-content:space-between';
 d.innerHTML='<span>새 버전이 나왔어요. 입력한 내용은 저장돼 있어요.</span>';var b=document.createElement('button');b.textContent='새로고침';b.style.cssText='background:#fff;color:#1F5FA8;border:0;border-radius:8px;padding:6px 12px;font:700 13px sans-serif;cursor:pointer';b.onclick=function(){location.replace(path+'?v='+nb+location.hash)};d.appendChild(b);(document.body||document.documentElement).appendChild(d)}
@@ -103,6 +103,8 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
   <summary style="font-weight:700;font-size:16px;cursor:pointer">📥 조원 결과 모아 보기 · 성곤 검수 <span class="note" id="subsCount"></span></summary>
   <p class="note" style="margin:8px 0">"결과 모으기"에 붙인 제출 내용이 모두 여기 쌓여요. 링크를 열어 붙인 문장이 정말 있는지 보고 <b>"검수 OK"</b> 또는 <b>"고치기"</b>를 눌러요. 문장마다 판정, 붙인 원문, 링크, 확인·검수한 사람이 보여요.</p>
   <div class="seg" id="subsWho"></div><div class="seg" id="subsView"></div>
+  <div style="margin:8px 0;padding:10px;border:1px dashed var(--line);border-radius:10px"><b style="font-size:14px">✅ 완료 목록 만들기 (done.js)</b><div class="note">[검수 OK]를 누른 문장 중 근거 있음·제한적인 것을 완료 목록으로 만들어요. GitHub에 <b>done.js</b>로 덮어쓰면 조원 화면에서 그 문장은 체크가 막혀요.</div>
+  <div class="row"><button class="btn sm" id="mkDone">완료 목록 만들기</button><a class="btn sm ghost" id="dlDone" style="display:none;text-decoration:none" download="done.js">done.js 내려받기</a><button class="btn sm ghost" id="cpDone" style="display:none">복사</button><span class="copied" id="copiedDone"></span></div><div id="doneMsg" class="note"></div></div>
   <div id="subsList"></div>
 </details>
 
@@ -221,7 +223,7 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
 <p class="note" style="margin-top:20px"><span id="dataVer">앱 데이터 2026-10-31 버전 기준(이 페이지에 복사된 데이터)</span> · 입력 내용은 서버로 보내지 않고 이 브라우저에만 임시 저장돼요.</p>
 </div>
 
-<script>(function(){var t=Date.now();['diet-data.js','substitute-logic.js','team.js'].forEach(function(f){document.write('<script src="'+f+'?t='+t+'"><\/script>')})})();</script>
+<script>(function(){var t=Date.now();['diet-data.js','substitute-logic.js','team.js','done.js'].forEach(function(f){document.write('<script src="'+f+'?t='+t+'"><\/script>')})})();</script>
 <script>
 const ADMIN_MODE=/*__ADMIN__*/false;
 if(!ADMIN_MODE)['adminHead','progCard','subsCard','srcCard'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove()});
@@ -422,6 +424,17 @@ function renderSubs(){
   document.querySelectorAll('#subsList button[data-rk]').forEach(b=>b.onclick=()=>{const m=store.get('myRev',{});if(m[b.dataset.rk]===b.dataset.v)delete m[b.dataset.rk];else m[b.dataset.rk]=b.dataset.v;store.set('myRev',m);renderSubs()});
 }
 
+function buildDoneJs(){
+  const base=JSON.parse(JSON.stringify((typeof DONE!=='undefined'&&DONE)||{}));const subs=store.get('subs',[]);const myRev=store.get('myRev',{});let add=0;
+  subs.forEach(({j})=>{if(j.newItem)return;(j.results||[]).forEach(r=>{const rk=hash(j.target+'|'+r.claim+'|'+(r.links||[]).map(l=>l.quote).join('|'));if(myRev[rk]!=='ok'||!isGood(r.grade))return;
+    const key=hash(j.target+'|'+r.claim);base[j.target]=base[j.target]||{};if(!base[j.target][key])add++;base[j.target][key]={g:r.grade,d:String(j.date||'').slice(5),by:j.checkedBy||'',t:String(r.claim).slice(0,40)}})});
+  const n=Object.values(base).reduce((a,o)=>a+Object.keys(o).length,0);
+  return {n,add,text:`// 먹고죽자! 근거 확인이 끝난 문장 목록 (성곤 검수 OK). evidence-admin.html의 "완료 목록 만들기"로 새로 만들어 덮어써요.\n// 여기에 있는 문장은 조원 화면에서 체크가 막혀요. 앱 문장이 바뀌면 그 문장은 다시 확인 대상이 돼요.\nconst DONE = ${JSON.stringify(base,null,1)};\n`}}
+if(document.getElementById('mkDone'))document.getElementById('mkDone').onclick=()=>{const r=buildDoneJs();const dl=document.getElementById('dlDone');
+  try{dl.href=URL.createObjectURL(new Blob([r.text],{type:'text/javascript'}));dl.style.display='inline-block'}catch(e){}
+  document.getElementById('cpDone').style.display='inline-block';document.getElementById('cpDone').onclick=()=>copy(r.text,'copiedDone');
+  document.getElementById('doneMsg').textContent=`완료 문장 ${r.n}개 (이번에 새로 ${r.add}개). 내려받은 done.js를 GitHub에 덮어써요. 내려받기가 막히면 "복사"해서 GitHub에서 done.js를 열어 붙여 넣어요.`};
+
 // ---- 출처 교체 표 ----
 const URGENT=/민원|뉴스|오래된|건강 정보 매체|블로그/;
 function renderSrc(){
@@ -458,6 +471,7 @@ function claimsFor(T){
   const o=T.obj,out=[];let n=0;
   const add=(type,text,extra={})=>{
     const v=VERIFIED.find(x=>x.owner===o.name&&x.m.test(text));
+    const dn=((typeof DONE!=='undefined'&&DONE&&DONE[o.name])||{})[hash(o.name+'|'+text)];
     let p='m',why=[];
     if(SAFETY.test(text)){p='h';why.push('안전 문장')}
     else if(SYMPTOM.test(text)&&type!=='대체'){p='h';why.push('증상 문장')}
@@ -470,11 +484,13 @@ function claimsFor(T){
       else{p=TASTE.test(text)&&!SAFETY.test(text)?'l':'m';why=['대체 ① 원재료가 다른 재료 → 공용 근거로 처리']}}
     else if(type==='대체'&&p==='m'&&TASTE.test(text)&&!SAFETY.test(text)){p='l';why.push('맛 설명 위주')}
     const base=p;let done=!!v,fix=false;
-    if(v){p='l';why=['10/27 원문 확인: '+v.g]}
+    let locked=false;
+    if(v){p='l';why=['10/27 원문 확인: '+v.g];locked=true}
+    if(dn&&!v){p='l';done=true;locked=true;why=[`확인 끝 (${dn.d||''} ${dn.g||''})`]}
     const im=(store.get('results',{})[T.id]||{})[text];
     if(im&&!v){if(isGood(im.g)){p='l';done=true;why=[`${im.d} 확인 끝: ${im.g} (${im.by})`]}else{fix=true;why=[`${im.d} 확인: ${im.g} → 문장 고치기 또는 빼기 필요 (${im.by})`]}}
     let id='C'+hash(type+'|'+text).slice(-4);while(out.some(x=>x.id===id))id+='X';
-    out.push({id,n:++n,type,text,p,base,why:why.join(' · '),done,fix,...extra});
+    out.push({id,n:++n,type,text,p,base,why:why.join(' · '),done,fix,locked,...extra});
   };
   const si=sourceIssue(o.source);
   if(o.reason)add('기본 설명',o.reason,si?{weakSrc:si}:{});
@@ -504,16 +520,17 @@ function pickTarget(id){
 }
 
 function renderTable(){
+  if(T&&S&&S.picked){const lk=new Set(CLAIMS.filter(c=>c.locked).map(c=>c.id));const np=S.picked.filter(id=>!lk.has(id));if(np.length!==S.picked.length){S.picked=np;save()}}
   document.getElementById('claimEmpty').style.display=T?'none':'block';document.getElementById('claimArea').style.display=T?'block':'none';if(!T)return;
   const P={h:['높음','h'],m:['보통','m'],l:['낮음','l']};
   const showAll=T.isNew||store.get('showAll',false);const shown=CLAIMS.filter(c=>showAll||c.p==='h'||S.picked.includes(c.id));const hid=CLAIMS.length-shown.length;
-  document.getElementById('claimTable').innerHTML='<tr><th></th><th>우선</th><th>'+(T.isNew?'찾을 질문 (새 항목이라 앱 문장 대신 질문이에요)':'확인할 문장')+'</th></tr>'+(shown.length?'':'<tr><td colspan="3" class="note">높음 문장이 없어요. 이 항목은 높음 문장 확인이 끝났거나 해당이 없어요.</td></tr>')+shown.map(c=>`<tr><td class="ck"><input type="checkbox" data-id="${c.id}" ${S.picked.includes(c.id)?'checked':''}></td><td><span class="pr ${P[c.p][1]}">${P[c.p][0]}</span></td><td><span class="tag ${c.done?'done':''}">${esc(c.type)}</span>${esc(c.text)}${c.why?`<div class="why"${c.fix?' style="color:var(--red)"':''}>${esc(c.why)}</div>`:''}</td></tr>`).join('')+(T.isNew?'':`<tr><td colspan="3"><button class="btn sm ghost" id="toggleAll">${showAll?'높음만 보기':`보통·낮음 문장도 보기 (${hid}개)`}</button></td></tr>`);
+  document.getElementById('claimTable').innerHTML='<tr><th></th><th>우선</th><th>'+(T.isNew?'찾을 질문 (새 항목이라 앱 문장 대신 질문이에요)':'확인할 문장')+'</th></tr>'+(shown.length?'':'<tr><td colspan="3" class="note">높음 문장이 없어요. 이 항목은 높음 문장 확인이 끝났거나 해당이 없어요.</td></tr>')+shown.map(c=>`<tr${c.locked?' style="opacity:.55"':''}><td class="ck">${c.locked?'<span title="확인 끝">✅</span>':`<input type="checkbox" data-id="${c.id}" ${S.picked.includes(c.id)?'checked':''}>`}</td><td><span class="pr ${P[c.p][1]}">${P[c.p][0]}</span></td><td><span class="tag ${c.done?'done':''}">${esc(c.type)}</span>${esc(c.text)}${c.why?`<div class="why"${c.fix?' style="color:var(--red)"':''}>${esc(c.why)}</div>`:''}</td></tr>`).join('')+(T.isNew?'':`<tr><td colspan="3"><button class="btn sm ghost" id="toggleAll">${showAll?'높음만 보기':`보통·낮음 문장도 보기 (${hid}개)`}</button></td></tr>`);
   const ta=document.getElementById('toggleAll');if(ta)ta.onclick=()=>{store.set('showAll',!showAll);renderTable()};
   document.querySelectorAll('#claimTable input').forEach(cb=>cb.onchange=()=>{S.picked=[...document.querySelectorAll('#claimTable input:checked')].map(x=>x.dataset.id);save();renderPrompt();countSel()});
   countSel();
 }
 function countSel(){const n=S.picked.length;document.getElementById('selCount').textContent=`${n}개 선택${n>12?' · 많아요. 10개 안팎을 권해요':''}`}
-document.getElementById('selHigh').onclick=()=>{if(!T)return;S.picked=CLAIMS.filter(c=>c.p==='h').map(c=>c.id);save();renderTable();renderPrompt()};
+document.getElementById('selHigh').onclick=()=>{if(!T)return;S.picked=CLAIMS.filter(c=>c.p==='h'&&!c.locked).map(c=>c.id);save();renderTable();renderPrompt()};
 document.getElementById('selNone').onclick=()=>{S.picked=[];save();renderTable();renderPrompt()};
 
 const TOOLS={
