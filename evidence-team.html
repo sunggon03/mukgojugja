@@ -2,6 +2,16 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
+<meta name="app-build" content="202611011431">
+<script>(function(){var B="202611011431",path=location.pathname,last=0;
+function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}}
+function bar(nb){if(document.getElementById('freshBar'))return;var d=document.createElement('div');d.id='freshBar';d.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#1F5FA8;color:#fff;border-radius:12px;padding:12px 14px;font:600 14px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;gap:10px;align-items:center;justify-content:space-between';
+d.innerHTML='<span>새 버전이 나왔어요. 입력한 내용은 저장돼 있어요.</span>';var b=document.createElement('button');b.textContent='새로고침';b.style.cssText='background:#fff;color:#1F5FA8;border:0;border-radius:8px;padding:6px 12px;font:700 13px sans-serif;cursor:pointer';b.onclick=function(){location.replace(path+'?v='+nb+location.hash)};d.appendChild(b);(document.body||document.documentElement).appendChild(d)}
+function chk(auto){var now=Date.now();if(!auto&&now-last<30000)return;last=now;
+try{fetch(path+'?nc='+now,{cache:'no-store'}).then(function(r){return r.ok?r.text():''}).then(function(h){var m=h.match(/name="app-build" content="(\w+)"/);if(!m||m[1]===B)return;
+if(auto&&!ss('fresh_'+m[1])){ss('fresh_'+m[1],'1');location.replace(path+'?v='+m[1]+location.hash)}else bar(m[1])}).catch(function(){})}catch(e){}}
+if(location.protocol.indexOf('http')===0){chk(true);document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')chk(false)});setInterval(function(){chk(false)},10*60000)}})();</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>근거 확인 담당표</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
