@@ -78,7 +78,8 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
   <div id="teamBox" style="display:none;margin-top:10px;border-top:1px solid var(--line);padding-top:8px"><div class="note">나는 누구? (내 담당만 보여요)</div><div class="seg" id="meSeg"></div><div id="myItems" class="note"></div></div>
 </div>
 
-<details class="card" id="progCard">
+<div id="adminHead" class="card" style="background:var(--bll);border-color:var(--bl)"><b>🔒 성곤 검수용 페이지</b><div class="note">조원에게 보내지 않는 페이지예요. 결과 모으기·검수 기록은 이 브라우저에만 저장돼요. 검수는 항상 같은 컴퓨터, 같은 브라우저에서 해요.</div></div>
+<details class="card" id="progCard" open>
   <summary style="font-weight:700;font-size:16px;cursor:pointer">📊 진행 현황 <span class="note" id="progCount"></span></summary>
   <p class="note" style="margin:8px 0">완료 = <b>기본 출처 교체</b>(필요한 항목만) + <b>우선순위 높음 문장 확인</b>. 높음 문장은 조원 결과를 아래 "결과 모으기"에 붙이면 자동으로 줄어요. 이 표는 이 브라우저에만 저장돼서, 결과는 한 사람(김성곤)이 모아요.</p>
   <table id="progTable"></table>
@@ -88,7 +89,7 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
   <div class="row"><button class="btn sm" id="importBtn">결과 반영</button><button class="btn sm ghost" id="importUndo">마지막 반영 되돌리기</button></div><div id="importOut"></div></div>
 </details>
 
-<details class="card" id="subsCard">
+<details class="card" id="subsCard" open>
   <summary style="font-weight:700;font-size:16px;cursor:pointer">📥 조원 결과 모아 보기 · 성곤 검수 <span class="note" id="subsCount"></span></summary>
   <p class="note" style="margin:8px 0">"결과 모으기"에 붙인 제출 내용이 모두 여기 쌓여요. 링크를 열어 붙인 문장이 정말 있는지 보고 <b>"검수 OK"</b> 또는 <b>"고치기"</b>를 눌러요. 문장마다 판정, 붙인 원문, 링크, 확인·검수한 사람이 보여요.</p>
   <div class="seg" id="subsWho"></div><div class="seg" id="subsView"></div>
@@ -211,6 +212,9 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
 
 <script>(function(){var t=Date.now();['diet-data.js','substitute-logic.js','team.js'].forEach(function(f){document.write('<script src="'+f+'?t='+t+'"><\/script>')})})();</script>
 <script>
+const ADMIN_MODE=/*__ADMIN__*/false;
+if(!ADMIN_MODE)['adminHead','progCard','subsCard','srcCard'].forEach(id=>{const e=document.getElementById(id);if(e)e.remove()});
+else{document.title='근거 검수 (성곤용)';const h=document.querySelector('h1');if(h)h.textContent='🔒 근거 검수 (성곤용)'}
 if(typeof allergyMapping==='undefined'||typeof getSubstituteInfo==='undefined'){document.querySelector('.wrap').insertAdjacentHTML('afterbegin','<div class="nf" style="margin-bottom:12px">앱 데이터를 불러오지 못했어요<small>이 페이지는 웹사이트 주소(sunggon03.github.io/mukgojugja/evidence-check.html)로 열어야 해요. 파일을 내려받아 열면 데이터가 연결되지 않아요.</small></div>');throw new Error('앱 데이터 없음')}
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const store={get(k,d){try{const v=localStorage.getItem('evh_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('evh_'+k,JSON.stringify(v))}catch(e){}}};
@@ -343,6 +347,7 @@ document.getElementById('findForm').onsubmit=e=>{e.preventDefault();doFind(docum
 function progressOf(t){const c=claimsFor(t);const high=c.filter(x=>x.base==='h'||(x.p==='h'));const left=high.filter(x=>!x.done);const fix=c.filter(x=>x.fix).length;
   const si=sourceIssue(t.obj.source);const srcOk=!si||!!store.get('srcDone',{})[t.id];return {high:high.length,left:left.length,fix,si,srcOk,done:srcOk&&left.length===0}}
 function renderProg(){
+  if(!document.getElementById('progTable'))return;
   const rows=TARGETS.filter(t=>!t.isNew&&(!me()||whoOf(t.label)===me())).map(t=>({t,g:progressOf(t)})).sort((a,b)=>(a.g.done-b.g.done)||(b.g.left-a.g.left));
   const n=rows.filter(r=>r.g.done).length;document.getElementById('progCount').textContent=`· ${me()?me()+' 담당 ':''}완료 ${n} / ${rows.length}`;
   document.getElementById('progTable').innerHTML='<tr><th>항목</th><th>출처</th><th>높음 문장</th></tr>'+rows.map(({t,g})=>`<tr><td>${g.done?'✅ ':''}<button class="lk" data-l="${esc(t.label)}">${esc(t.label.replace(/ 알레르기$/,''))}</button>${whoBadge(t.label)}${t.kind==='기저질환'?'<div class="why">기저질환</div>':''}</td><td>${!g.si?'<span class="pr l">좋음</span>':g.srcOk?'<span class="pr l">교체함</span>':'<span class="pr h">교체 필요</span>'}</td><td>${g.left?`<span class="pr ${g.left>=5?'h':'m'}">${g.left}개 남음</span>`:'<span class="pr l">끝</span>'} <span class="why">/ ${g.high}개</span>${g.fix?`<div class="why" style="color:var(--red)">고치기·판단 필요 ${g.fix}개</div>`:''}</td></tr>`).join('');
@@ -375,12 +380,13 @@ function importResults(raw){
   document.getElementById('importOut').innerHTML=msgs.map(([k,t])=>`<div class="issue ${k}">${t}</div>`).join('')||'<div class="issue warn">붙여 넣은 결과가 없어요.</div>';
   renderProg();if(T){CLAIMS=claimsFor(T);renderTable()}
 }
-document.getElementById('csvFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{importResults(String(r.result));e.target.value=''};r.readAsText(f,'utf-8')};
-document.getElementById('importBtn').onclick=()=>importResults(document.getElementById('importBox').value);
-document.getElementById('importUndo').onclick=()=>{const prev=store.get('results_prev',null);if(!prev){document.getElementById('importOut').innerHTML='<div class="issue info">되돌릴 내용이 없어요.</div>';return}store.set('results',prev);store.set('results_prev',null);store.set('subs',store.get('subs_prev',[]));store.set('subs_prev',null);renderSubs();document.getElementById('importOut').innerHTML='<div class="issue ok">마지막 반영을 되돌렸어요.</div>';renderProg();if(T){CLAIMS=claimsFor(T);renderTable()}};
+if(document.getElementById('csvFile'))document.getElementById('csvFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{importResults(String(r.result));e.target.value=''};r.readAsText(f,'utf-8')};
+if(document.getElementById('importBtn'))document.getElementById('importBtn').onclick=()=>importResults(document.getElementById('importBox').value);
+if(document.getElementById('importUndo'))document.getElementById('importUndo').onclick=()=>{const prev=store.get('results_prev',null);if(!prev){document.getElementById('importOut').innerHTML='<div class="issue info">되돌릴 내용이 없어요.</div>';return}store.set('results',prev);store.set('results_prev',null);store.set('subs',store.get('subs_prev',[]));store.set('subs_prev',null);renderSubs();document.getElementById('importOut').innerHTML='<div class="issue ok">마지막 반영을 되돌렸어요.</div>';renderProg();if(T){CLAIMS=claimsFor(T);renderTable()}};
 
 // ---- 조원 검수 결과 모아 보기 ----
 function renderSubs(){
+  if(!document.getElementById('subsList'))return;
   const subs=store.get('subs',[]);const fw=store.get('subsWho',''),fv=store.get('subsView','todo');
   document.getElementById('subsCount').textContent=`· ${subs.length}건`;
   document.getElementById('subsWho').innerHTML=[['','전체']].concat(TEAMC?['A','B','C','D','E'].map(k=>[k,k+' · '+(TEAMC.names[k]||k)]):[]).map(([k,l])=>`<button data-k="${k}" class="${k===fw?'on':''}">${esc(l)}</button>`).join('');
@@ -408,6 +414,7 @@ function renderSubs(){
 // ---- 출처 교체 표 ----
 const URGENT=/민원|뉴스|오래된|건강 정보 매체|블로그/;
 function renderSrc(){
+  if(!document.getElementById('srcTable'))return;
   const done=store.get('srcDone',{});
   const rows=TARGETS.filter(t=>!me()||whoOf(t.label)===me()).map(t=>({t,si:sourceIssue(t.obj.source)})).filter(x=>x.si).sort((a,b)=>(URGENT.test(b.si)-URGENT.test(a.si)));
   const left=rows.filter(r=>!done[r.t.id]).length;
@@ -706,8 +713,7 @@ document.getElementById('sendForm').onclick=()=>{const w1=String(S.who1!=null?S.
 document.getElementById('copyOut').onclick=()=>copy(document.getElementById('out').value,'copiedOut');
 
 renderTools();renderForm();renderTeam();renderSrc();renderNewList();renderProg();renderSubs();clearTarget();{const q=store.get('q','');if(q){document.getElementById('q').value=q;doFind(q)}}
-try{document.getElementById('srcCard').open=store.get('srcOpen',false)}catch(e){}
-document.getElementById('srcCard').addEventListener('toggle',e=>store.set('srcOpen',e.target.open));
+try{document.getElementById('srcCard').open=store.get('srcOpen',false);document.getElementById('srcCard').addEventListener('toggle',e=>store.set('srcOpen',e.target.open))}catch(e){}
 showTab(store.get('tab','p1'));
 </script>
 <script>try{fetch('index.html',{cache:'no-store'}).then(function(r){return r.text()}).then(function(h){var m=h.match(/diet-data\.js\?v=([\w-]+)/);document.getElementById('dataVer').textContent='웹사이트 데이터와 연동됨'+(m?' · 지금 웹사이트 버전 '+m[1]:'')}).catch(function(){document.getElementById('dataVer').textContent='웹사이트 데이터와 연동됨'})}catch(e){}</script>
