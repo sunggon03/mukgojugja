@@ -148,6 +148,7 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
     <h2>AI 답변 붙여넣기</h2>
     <textarea class="code" id="aiInput" placeholder="AI 답변을 통째로 붙여넣으세요"></textarea>
     <div class="row"><button class="btn" id="runCheck">검사하기</button><button class="btn ghost" id="clearAi">지우기</button></div>
+    <div class="row" style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px"><button class="btn sm ghost" id="skipAi">AI 답 없이 ④로 가기</button><span class="note">AI가 웹 검색을 못 하거나 링크를 직접 찾았을 때. ④에서 링크를 직접 넣을 수 있어요</span></div>
   </div>
   <div id="checkOut"></div>
 </section>
@@ -635,6 +636,13 @@ function renderCheck(fromRun){
   renderConfirm();renderReview();
 }
 document.getElementById('runCheck').onclick=runCheck;
+document.getElementById('skipAi').onclick=()=>{if(!T||!S.picked.length){document.getElementById('checkOut').innerHTML='<div class="card"><div class="issue warn">①에서 확인할 문장을 먼저 체크해 주세요.</div></div>';return}
+  const keep={};(S.parsed||[]).forEach(c=>keep[c.id]=c);
+  S.parsed=S.picked.map(id=>keep[id]||(()=>{const c=CLAIMS.find(x=>x.id===id);return c?{id,claim:c.text,type:c.type,links:[],notFound:''}:null})()).filter(Boolean);save();
+  document.getElementById('checkOut').innerHTML='<div class="card"><div class="issue ok">AI 답 없이 진행해요. ④에서 문장마다 링크를 직접 넣거나, 못 찾았으면 그대로 두면 "못 찾음"이 돼요.</div></div>';
+  renderConfirm();renderReview();showTab('p4')};
+function addLink(id,url,title){url=String(url||'').trim();if(!/^https?:\/\/\S+\.\S+/.test(url))return '주소는 https:// 로 시작해야 해요.';const tr=tierOf(url);if(tr==='X')return '받지 않는 출처예요(기사·블로그·AI 등).';
+  const c=S.parsed.find(x=>x.id===id);if(!c)return '';c.links.push({url,title:String(title||'').trim(),publisher:'',year:'',type:'직접 입력',free:true,tier:tr,hint:'',keywords:[]});save();renderConfirm();renderReview();return ''}
 document.getElementById('clearAi').onclick=()=>{document.getElementById('aiInput').value='';S.ai='';S.parsed=null;S.conf={};S.rev={};save();renderCheck()};
 
 // ---- ④ 문서 확인 ----
@@ -656,7 +664,9 @@ function renderConfirm(){
       <div><div class="note">이 문장의 대상</div><select data-f="pop">${TARGETS_POP.map(x=>`<option ${v.pop===x?'selected':''} value="${x}">${x||'선택'}</option>`).join('')}</select></div></div>
       <div class="note" style="margin-top:6px">${T.isNew?'질문과 비교하면':'앱 문장과 비교하면'}</div><select data-f="verdict">${VERDICTS.map(x=>`<option ${v.verdict===x?'selected':''} value="${x}">${(T.isNew?VLABEL_NEW[x]:VLABEL[x])||'선택'}</option>`).join('')}</select>
       ${T.isNew?`<div class="note" style="margin-top:6px">문장에 나온 음식·재료·성분 이름 (원문 표기 그대로, 쉼표로. 없으면 비워요)</div><input type="text" data-f="foods" value="${esc(v.foods||'')}" placeholder="예: kiwifruit, gold kiwi">`:''}
-      <div class="qw"></div></div>`}).join(''):`<div class="issue info">AI가 문서를 못 찾았어요. ${esc(c.notFound)}</div>`}</div>`).join('');
+      <div class="qw"></div></div>`}).join(''):`<div class="issue info">아직 링크가 없어요${c.notFound?' (AI: '+esc(c.notFound)+')':''}. 그대로 두면 "못 찾음"이 돼요.</div>`}
+    <details style="margin-top:8px"><summary class="note" style="cursor:pointer">+ 링크 직접 추가</summary><div style="margin-top:6px"><input type="text" class="addUrl" data-id="${c.id}" placeholder="https://..."><input type="text" class="addTitle" data-id="${c.id}" placeholder="문서 제목 (선택)" style="margin-top:4px"><div class="row" style="margin-top:4px"><button class="btn sm ghost addBtn" data-id="${c.id}">추가</button><span class="note addMsg" data-id="${c.id}"></span></div></div></details></div>`).join('');
+  document.querySelectorAll('#confirmList .addBtn').forEach(b=>b.onclick=()=>{const id=b.dataset.id;const q=x=>document.querySelector(`#confirmList ${x}[data-id="${id}"]`);const m=addLink(id,q('.addUrl').value,q('.addTitle').value);if(m)q('.addMsg').textContent=m});
   document.querySelectorAll('#confirmList .link').forEach(el=>{const k=el.dataset.k;el.querySelectorAll('[data-f]').forEach(inp=>{const h=()=>{S.conf[k]=S.conf[k]||{};S.conf[k][inp.dataset.f]=inp.type==='checkbox'?inp.checked:inp.value;save();warnLink(el,k);renderReview()};inp.oninput=h;inp.onchange=h});warnLink(el,k)});
 }
 function warnLink(el,k){const [id]=k.split('_');const c=S.parsed.find(x=>x.id===id);const v=S.conf[k]||{};const ws=[];
