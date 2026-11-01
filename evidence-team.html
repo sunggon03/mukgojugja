@@ -6,7 +6,7 @@
 <title>근거 확인 담당표</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#F6F4EF;--card:#FFFFFF;--ink:#1F2A22;--mut:#6B746D;--line:#E4DFD6;--g:#4F7F3F;--gl:#E8F1DF;--red:#C5303E;--rl:#FBE9EA;--amb:#9A6400;--al:#FFF3D6;--bl:#1F5FA8;--bll:#E7F0FB;--A:#1F5FA8;--Al:#E7F0FB;--B:#8A4FB0;--Bl:#F3EAF8;--C:#B4581F;--Cl:#FBEEE4}
+:root{--bg:#F6F4EF;--card:#FFFFFF;--ink:#1F2A22;--mut:#6B746D;--line:#E4DFD6;--g:#4F7F3F;--gl:#E8F1DF;--red:#C5303E;--rl:#FBE9EA;--amb:#9A6400;--al:#FFF3D6;--bl:#1F5FA8;--bll:#E7F0FB;--A:#1F5FA8;--Al:#E7F0FB;--B:#8A4FB0;--Bl:#F3EAF8;--C:#B4581F;--Cl:#FBEEE4;--D:#1F7A5C;--E:#B03A66}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141714;--card:#1D211D;--ink:#E9EEE8;--mut:#9AA49B;--line:#2F352F;--g:#8CC274;--gl:#22301D;--red:#F08A93;--rl:#3A1E21;--amb:#E8B75A;--al:#352A12;--bl:#8DB8F0;--bll:#17263A;--A:#8DB8F0;--Al:#17263A;--B:#C9A2E3;--Bl:#2A1F33;--C:#EDA875;--Cl:#33241A}}
 :root[data-theme="dark"]{--bg:#141714;--card:#1D211D;--ink:#E9EEE8;--mut:#9AA49B;--line:#2F352F;--g:#8CC274;--gl:#22301D;--red:#F08A93;--rl:#3A1E21;--amb:#E8B75A;--al:#352A12;--bl:#8DB8F0;--bll:#17263A;--A:#8DB8F0;--Al:#17263A;--B:#C9A2E3;--Bl:#2A1F33;--C:#EDA875;--Cl:#33241A}
 *{box-sizing:border-box}
@@ -21,9 +21,9 @@ h2{font-size:17px;margin:0 0 10px}
 .goal small{display:block;font-weight:400;color:var(--ink);font-size:13px;margin-top:4px}
 a.go{display:block;text-align:center;background:var(--g);color:#fff;text-decoration:none;font-weight:700;border-radius:12px;padding:12px;margin:12px 0 0}
 .who{display:inline-block;font-weight:700;border-radius:99px;padding:2px 10px;font-size:13px}
-.who.A{background:var(--Al);color:var(--A)}.who.B{background:var(--Bl);color:var(--B)}.who.C{background:var(--Cl);color:var(--C)}
+.who.A{background:var(--Al);color:var(--A)}.who.B{background:var(--Bl);color:var(--B)}.who.C{background:var(--Cl);color:var(--C)}.who.D{background:#E3F4EE;color:#1F7A5C}.who.E{background:#FBE9EF;color:#B03A66}
 .first{border-left:5px solid var(--line);padding:12px 12px 12px 14px;border-radius:10px;background:var(--bg);margin:10px 0}
-.first.A{border-color:var(--A)}.first.B{border-color:var(--B)}.first.C{border-color:var(--C)}
+.first.A{border-color:var(--A)}.first.B{border-color:var(--B)}.first.C{border-color:var(--C)}.first.D{border-color:var(--D)}.first.E{border-color:var(--E)}
 .first h3{font-size:15px;margin:6px 0 4px}
 .first ol{margin:4px 0 0;padding-left:20px;font-size:13.5px}
 .first .q{font-size:13px;background:var(--card);border-radius:8px;padding:6px 9px;margin:4px 0}
@@ -47,7 +47,7 @@ ul.rules{margin:0;padding-left:20px;font-size:14px}ul.rules li{margin:4px 0}
 <p class="lead">먹고죽자! 앱 문장의 근거를 3명이 나눠 확인해요. 11/13 발표 전까지 끝내는 게 목표예요. 도우미 검색창 아래 <b>"나는 누구?"</b>에서 내 글자(A·B·C)를 누르면 내 담당만 보여요.</p>
 
 <div class="card">
-  <div class="goal">완료 기준: 기본 출처 교체 + 우선순위 "높음" 문장 확인<small>보통·낮음 문장은 이번에 하지 않아요. 높음 문장은 대체 재료 위험 문장까지 모두 약 103개(한 사람당 약 35개)지만, 문서 하나로 여러 문장을 확인할 수 있어서 실제로 열 문서는 20개 안팎이에요.</small></div>
+  <div class="goal">완료 기준: 기본 출처 교체 + 우선순위 "높음" 문장 확인<small>보통·낮음 문장은 이번에 하지 않아요. 높음 문장은 대체 재료 위험 문장까지 모두 약 103개(한 사람당 약 21개)지만, 문서 하나로 여러 문장을 확인할 수 있어서 실제로 열 문서는 20개 안팎이에요.</small></div>
   <a class="go" href="https://sunggon03.github.io/mukgojugja/evidence-check.html" target="_blank" rel="noopener noreferrer">근거 확인 도우미 열기 →</a>
   <p class="note" style="margin:6px 0 0;text-align:center">sunggon03.github.io/mukgojugja/evidence-check.html</p>
 </div>
@@ -107,38 +107,37 @@ ul.rules{margin:0;padding-left:20px;font-size:14px}ul.rules li{margin:4px 0}
 const NAMES = (typeof TEAM!=='undefined'&&TEAM.names)?TEAM.names:{ A: '조원 A', B: '조원 B', C: '조원 C' };
 
 const PLAN = {
-  A: { focus:'밀·글루텐·셀리악 + 당뇨·고혈압·위산역류', items:[
-    ['밀 알레르기',3,true,'first'],['글루텐 불내증',4,true],['글루텐 불내증(셀리악병)',5,true],['위산역류',6,true],['고혈압',8,true],['당뇨병',9,true]]},
-  B: { focus:'우유·유당·유제품 + 고콜레스테롤·신장', items:[
-    ['유제품 불내증',2,false,'first'],['유당불내증',6,true],['우유 알레르기',15,true],['고콜레스테롤',6,false],['신장질환',6,true]]},
-  C: { focus:'나머지 알레르기 15개 + 통풍', items:[
-    ['땅콩',2,true,'first'],['견과류',2,true],['갑각류',2,true],['조개류',1,true],['계란',2,true],['대두',5,true],['메밀',1,true],['생선',1,true],['돼지고기',2,true],['복숭아',2,true],['토마토',1,true],['닭고기',1,true],['쇠고기',1,true],['오징어',1,true],['아황산류',2,true],['통풍',7,true]]}
+  A: { focus:'밀·글루텐·셀리악 + 위산역류 + 계란', items:[['밀 알레르기',3,true,'first'],['글루텐 불내증',4,true],['글루텐 불내증(셀리악병)',5,true],['위산역류',6,true],['계란',2,true]]},
+  B: { focus:'우유·유당·유제품 + 생선·닭고기', items:[['유제품 불내증',2,false,'first'],['유당불내증',6,true],['우유 알레르기',15,true],['생선',1,true],['닭고기',1,true]]},
+  C: { focus:'당뇨·고혈압·고콜레스테롤 + 오징어·쇠고기', items:[['고콜레스테롤',6,false,'first'],['고혈압',8,true],['당뇨병',9,true],['오징어',1,true],['쇠고기',1,true]]},
+  D: { focus:'통풍·신장 + 땅콩·견과류·갑각류·조개류', items:[['땅콩',2,true,'first'],['견과류',2,true],['갑각류',2,true],['조개류',1,true],['신장질환',6,true],['통풍',7,true]]},
+  E: { focus:'토마토·대두·메밀·돼지고기·복숭아·아황산류', items:[['토마토',1,true,'first'],['대두',5,true],['메밀',1,true],['돼지고기',2,true],['복숭아',2,true],['아황산류',2,true]]}
 };
 const FIRST = {
-  A:{item:'밀 알레르기',search:'밀 알레르기',why:'높음 문장 3개. 지금 출처가 환자 단체 안내라서, 학회의 밀 알레르기 안내 페이지 하나로 출처 교체와 문장 확인이 같이 끝나요.',
-     qs:['밀 단백질에 면역계가 과민 반응해 두드러기·구토·호흡곤란, 심하면 아나필락시스를 일으킬 수 있어요','밀이 든 음식은 소량도 피하세요.','셀리악병과 달리 보리·호밀은 대부분 먹을 수 있지만, 처음엔 의사와 확인하세요.']},
-  B:{item:'유제품 불내증',search:'유제품',why:'높음 문장 2개. 출처가 이미 좋아서(미국 국립보건원 유당불내증 안내) 출처 교체 없이 문장만 찾으면 돼요.',
-     qs:['버터 → 버터(소량은 대부분 괜찮음): 유당 함량이 매우 낮아 유당불내증이면 소량은 대부분 괜찮은 경우가 많음','치즈 → 저유당 치즈(숙성치즈): 오래 숙성되며 유당이 많이 분해된 치즈, 유당불내증이면 소량 섭취 가능한 경우가 많음']},
-  C:{item:'땅콩 알레르기',search:'땅콩',why:'높음 문장 2개. 지금 출처가 뉴스 기사라서, 학회의 땅콩 알레르기 안내 페이지 하나로 출처 교체와 문장 확인이 같이 끝나요.',
-     qs:['땅콩 단백질에 대한 면역 과민반응으로 심하면 아나필락시스(전신 쇼크)까지 유발할 수 있음','아나필락시스(전신 알레르기 쇼크) 위험이 높은 대표 알레르겐.']}
+  A:{item:'밀 알레르기',search:'밀 알레르기',why:'높음 문장 3개. 지금 출처가 환자 단체 안내라서, 학회의 밀 알레르기 안내 페이지 하나로 출처 교체와 문장 확인이 같이 끝나요.',qs:['밀 단백질에 면역계가 과민 반응해 두드러기·구토·호흡곤란, 심하면 아나필락시스를 일으킬 수 있어요','밀이 든 음식은 소량도 피하세요.','셀리악병과 달리 보리·호밀은 대부분 먹을 수 있지만, 처음엔 의사와 확인하세요.']},
+  B:{item:'유제품 불내증',search:'유제품',why:'높음 문장 2개. 출처가 이미 좋아서(미국 국립보건원 유당불내증 안내) 출처 교체 없이 문장만 찾으면 돼요.',qs:['버터 → 버터(소량은 대부분 괜찮음): 유당 함량이 매우 낮아 유당불내증이면 소량은 대부분 괜찮은 경우가 많음','치즈 → 저유당 치즈(숙성치즈): 오래 숙성되며 유당이 많이 분해된 치즈, 유당불내증이면 소량 섭취 가능한 경우가 많음']},
+  C:{item:'고콜레스테롤',search:'고콜레스테롤',why:'출처가 이미 한국지질·동맥경화학회 진료지침 원문이라 출처 교체가 없어요. 높음 문장 6개를 그 지침(한국어) 안에서 찾으면 돼요.',
+     qs:['포화지방·콜레스테롤이 많은 음식은 혈중 콜레스테롤을 높여 심혈관 질환 위험을 높임','포화지방은 하루 에너지의 7% 이내, 트랜스지방은 최대한 적게, 식이섬유는 하루 25g 이상, 당류는 에너지의 10~20% 이내, 술은 하루 1~2잔 이내(가급적 금주)로 권고돼요.']},
+  D:{item:'땅콩 알레르기',search:'땅콩',why:'높음 문장 2개. 지금 출처가 뉴스 기사라서, 학회의 땅콩 알레르기 안내 페이지 하나로 출처 교체와 문장 확인이 같이 끝나요.',qs:['땅콩 단백질에 대한 면역 과민반응으로 심하면 아나필락시스(전신 쇼크)까지 유발할 수 있음','아나필락시스(전신 알레르기 쇼크) 위험이 높은 대표 알레르겐.']},
+  E:{item:'토마토 알레르기',search:'토마토',why:'높음 문장 1개뿐이에요. 지금 출처가 정부 민원 상담 답변이라, 알레르기 학회나 공공기관 자료 하나를 찾아 교체하는 연습이에요.',qs:['토마토 단백질에 대한 면역 과민반응으로 두드러기·입안 가려움 등을 일으킬 수 있음']}
 };
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const get=(k,d)=>{try{const v=localStorage.getItem('team_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}};
 const set=(k,v)=>{try{localStorage.setItem('team_'+k,JSON.stringify(v))}catch(e){}};
 const W=k=>`<span class="who ${k}">${k} · ${esc(NAMES[k])}</span>`;
 
-document.getElementById('firsts').innerHTML=['A','B','C'].map(k=>{const f=FIRST[k];return `<div class="first ${k}">${W(k)}<h3>${esc(f.item)}</h3><div class="note">${esc(f.why)}</div>
+document.getElementById('firsts').innerHTML=['A','B','C','D','E'].map(k=>{const f=FIRST[k];return `<div class="first ${k}">${W(k)}<h3>${esc(f.item)}</h3><div class="note">${esc(f.why)}</div>
   <ol><li>도우미 검색창에 <b>${esc(f.search)}</b> 쓰고 찾기</li><li>"높음만 선택" 누르기 → ② 프롬프트 복사 → 웹 검색 AI에 붙이기</li><li>AI 답을 ③에 붙이기 → ④에서 링크를 직접 열고 문장 그대로 붙이기</li><li>⑤에서 <b>"검수 요청 복사"</b>를 눌러 나온 내용을 보내요. 첫 과제의 검수는 이번만 <b>성곤</b>이 해요</li></ol>
   <div class="note" style="margin-top:6px">확인할 문장</div>${f.qs.map(q=>`<div class="q">${esc(q)}</div>`).join('')}</div>`}).join('');
 
 const done=get('done',{});
-document.getElementById('lists').innerHTML=['A','B','C'].map(k=>{const p=PLAN[k];const hi=p.items.reduce((a,x)=>a+x[1],0),src=p.items.filter(x=>x[2]).length;
+document.getElementById('lists').innerHTML=['A','B','C','D','E'].map(k=>{const p=PLAN[k];const hi=p.items.reduce((a,x)=>a+x[1],0),src=p.items.filter(x=>x[2]).length;
   return `<div style="margin-top:14px">${W(k)} <span class="note">${esc(p.focus)}</span><div class="sum"><span>높음 문장 ${hi}개</span><span>출처 교체 ${src}개</span><span>항목 ${p.items.length}개</span></div>
   <table><tr><th></th><th>항목</th><th>할 일</th></tr>${p.items.map(([n,h,s,f])=>{const id=k+':'+n;return `<tr><td class="ck"><input type="checkbox" data-id="${esc(id)}" ${done[id]?'checked':''}></td><td>${esc(n)} ${f?'<span class="tag first">첫 과제</span>':''}</td><td>높음 ${h}개 ${s?'<span class="tag src">출처 교체</span>':'<span class="tag ok">출처 좋음</span>'}</td></tr>`}).join('')}</table></div>`}).join('');
 document.querySelectorAll('#lists input').forEach(cb=>cb.onchange=()=>{const d=get('done',{});if(cb.checked)d[cb.dataset.id]=1;else delete d[cb.dataset.id];set('done',d)});
 
-document.querySelectorAll('td.abc').forEach(td=>td.innerHTML=['A','B','C'].map(k=>`<span class="who ${k}" style="margin:1px 0">${k}</span>`).join(' '));
-document.getElementById('rot').innerHTML=`${W('A')} 결과 → ${W('B')} 검수 <b>·</b> ${W('B')} 결과 → ${W('C')} 검수 <b>·</b> ${W('C')} 결과 → ${W('A')} 검수`;
+document.querySelectorAll('td.abc').forEach(td=>td.innerHTML=['A','B','C','D','E'].map(k=>`<span class="who ${k}" style="margin:1px 0">${k}</span>`).join(' '));
+const KS=['A','B','C','D','E'];document.getElementById('rot').innerHTML=KS.map((k,i)=>`${W(k)} 결과 → ${W(KS[(i+1)%KS.length])} 검수`).join(' <b>·</b> ');
 </script>
 </body>
 </html>
