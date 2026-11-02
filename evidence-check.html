@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="app-build" content="202611020857">
-<script>(function(){var B="202611020857",path=location.pathname,last=0;
+<meta name="app-build" content="202611020913">
+<script>(function(){var B="202611020913",path=location.pathname,last=0;
 function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}}
 function bar(nb){if(document.getElementById('freshBar'))return;var d=document.createElement('div');d.id='freshBar';d.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#1F5FA8;color:#fff;border-radius:12px;padding:12px 14px;font:600 14px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;gap:10px;align-items:center;justify-content:space-between';
 d.innerHTML='<span>새 버전이 나왔어요. 입력한 내용은 저장돼 있어요.</span>';var b=document.createElement('button');b.textContent='새로고침';b.style.cssText='background:#fff;color:#1F5FA8;border:0;border-radius:8px;padding:6px 12px;font:700 13px sans-serif;cursor:pointer';b.onclick=function(){location.replace(path+'?v='+nb+location.hash)};d.appendChild(b);(document.body||document.documentElement).appendChild(d)}
@@ -242,7 +242,7 @@ document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>showTab(b.dat
 // ---- 출처 등급 ----
 const TIER_A=/(\.go\.kr|\.gov|who\.int|europa\.eu|nhs\.uk|food\.gov\.uk|fsai\.ie|foodstandards\.gov\.au|ncbi\.nlm\.nih\.gov|pubmed|doi\.org|koreamed\.org|kci\.go\.kr|koreascience\.(or\.)?kr|allergy\.org\.au|aaaai\.org|acaai\.org|eaaci\.org|worldallergy\.org|waojournal|allergy\.or\.kr|kapard|e-allergy\.org|diabetes\.or\.kr|koreanhypertension|lipid\.or\.kr|ksn\.or\.kr|kdigo\.org|diabetesjournals\.org|ahajournals\.org|acc\.org|gastrojournal|journals\.lww\.com|sciencedirect\.com|springer|wiley\.com|nature\.com|bmj\.com|thelancet\.com|jamanetwork\.com|nejm\.org|karger\.com|mdpi\.com|frontiersin\.org|academic\.oup\.com|tandfonline\.com|cambridge\.org|e-jkd\.org|e-cnr\.org|synapse\.koreamed|jkan|rheumatology\.org|gi\.org)/i;
 const TIER_B=/(allergyuk\.org|anaphylaxis\.org\.uk|foodallergy\.org|kidney\.org|beyondceliac\.org|celiac\.org|gluten\.org|amc\.seoul\.kr|snuh\.org|severance|samsunghospital|cmcseoul|mayoclinic\.org|clevelandclinic\.org|hopkinsmedicine\.org|guidelinecentral\.com|medlineplus|healthdirect\.gov\.au|schn\.health\.nsw|rch\.org\.au|poison\.org|eatright\.org|diabetes\.org|heart\.org)/i;
-const TIER_X=/(blog\.|tistory|brunch\.co\.kr|cafe\.|instagram|facebook|youtube|youtu\.be|namu\.wiki|wikipedia|chatgpt|openai|gemini\.google|claude\.ai|perplexity|news|sidae\.com|doctornow|sedaily|chosun|joongang|donga|hani|kmib|yna\.co\.kr|kormedi|medigate|healthline|webmd|verywell)/i;
+const TIER_X=/(blog\.|tistory|brunch\.co\.kr|cafe\.|instagram|facebook|youtube|youtu\.be|namu\.wiki|wikipedia|chatgpt|openai|gemini\.google|claude\.ai|perplexity|news|sidae\.com|doctornow|sedaily|chosun|joongang|donga|hani|kmib|yna\.co\.kr|kormedi|medigate|healthline|webmd|verywell|hankyung|mk\.co\.kr|mt\.co\.kr|edaily|newsis|news1|heraldcorp|ytn\.co|sbs\.co|kbs\.co|imbc|mbc\.co|jtbc|nocutnews|khan\.co|ohmynews|pressian|asiae|fnnews|hankookilbo|segye|seoul\.co\.kr|munhwa|dt\.co\.kr|etnews|zdnet|bloter|docdocdoc|hidoc|healthchosun|mdtoday|medicaltimes|dailymedi|monews|rapportian|bosa\.co|medipana|pharmnews|yakup|dailypharm|hkn24|healthinnews|foodnews|thinkfood|foodtoday|reuters|cnn\.com|bbc\.co\.uk\/news|bbc\.com\/news|nytimes|washingtonpost|theguardian|foxnews|nbcnews|cbsnews|abcnews|usatoday|apnews|bloomberg|forbes|medicalnewstoday|sciencedaily|everydayhealth|\/\/(www\.)?health\.com|\/\/(www\.)?prevention\.com|eatingwell|\/\/(www\.)?self\.com|\/\/(www\.)?today\.com|businessinsider|buzzfeed)/i;
 function tierOf(u){const h=String(u||'').toLowerCase();if(TIER_X.test(h)&&!TIER_A.test(h))return 'X';if(TIER_A.test(h))return 'A';if(TIER_B.test(h))return 'B';return 'C'}
 // 지금 앱에 들어 있는 출처의 약점 (출처 교체 항목용)
 function sourceIssue(u){u=String(u||'');
@@ -445,7 +445,7 @@ if(document.getElementById('mkDone'))document.getElementById('mkDone').onclick=(
   document.getElementById('doneMsg').textContent=`완료 문장 ${r.n}개 (이번에 새로 ${r.add}개). 내려받은 done.js를 GitHub에 덮어써요. 내려받기가 막히면 "복사"해서 GitHub에서 done.js를 열어 붙여 넣어요.`};
 
 // 원문에서 이 문장 보기: 크롬·엣지·사파리는 주소 끝 #:~:text= 로 그 문장에 바로 노란 표시를 해 줘요 (PDF는 안 돼요)
-function fragUrl(url,quote){const w=String(quote||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);if(w.length<3)return url;
+function fragUrl(url,quote){const lines=String(quote||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);const line=lines.reduce((m,x)=>x.length>m.length?x:m,'');const w=line.replace(/\s+/g,' ').replace(/[¹²³⁴⁵⁶⁷⁸⁹⁰]+/g,'').trim().split(' ').filter(Boolean);if(w.length<3)return url;
   const base=String(url).split('#')[0];const enc=x=>encodeURIComponent(x).replace(/-/g,'%2D').replace(/,/g,'%2C').replace(/&/g,'%26');
   const start=w.slice(0,Math.min(6,w.length)).join(' ');const end=w.length>12?w.slice(-5).join(' '):'';
   return base+'#:~:text='+enc(start)+(end?','+enc(end):'')}
@@ -603,7 +603,8 @@ ${TOOLS[curTool()].rule}
 [찾을 문서]
 1. 우선순위: ① 정부·공공기관(식약처, 질병관리청, WHO, CDC, NIH, FDA, NHS, 호주 FSANZ 등) ② 학회 진료지침·학회 환자 안내(대한천식알레르기학회, ASCIA, AAAAI, EAACI 등) ③ 논문(PubMed, PMC, KoreaMed, 학술지) ④ 대학병원 환자 안내
 2. 무료로 열리는 페이지를 우선해 (PMC 전문, 학회 PDF, 초록 페이지). 유료면 free를 false로.
-3. 받지 않는 출처: 뉴스 기사, 블로그, 카페, 유튜브, 위키, 건강 정보 매체(헬스라인·웹엠디 등), 쇼핑몰, AI 답변.
+3. 받지 않는 출처: **뉴스 기사 전부**(신문사·방송사·인터넷 신문·의학/건강 전문 뉴스·보도자료 기사), 블로그, 카페, 유튜브, 위키, 건강 정보 매체(헬스라인·웹엠디 등), 쇼핑몰, AI 답변.
+   - 기사가 정부 발표나 논문을 인용했더라도 기사 링크는 주지 마. 기사가 인용한 **원래 문서(정부 문서·학회 지침·논문)**를 찾아 그 링크를 줘. 원래 문서를 못 찾으면 links를 비워.
 4. 한국어 문서가 있으면 같이 찾아 줘.
 5. ${LBL} 하나에 링크는 1~3개.
 
