@@ -53,6 +53,17 @@ function getSubstituteInfo(foodName) {
     return substituteInfo[stripped] || null;
 }
 
+// 가공품 대체 재료는 제품마다 원재료가 달라서, 설명 뒤에 "성분표 확인" 안내를 한 줄 붙여요. (2026-11-02)
+// 이미 이름이나 설명에 "성분표"가 있으면 붙이지 않아요.
+const LABEL_CHECK_RE = /두유|밀크|음료|요구르트|가루|소스|간장|마요|카레|빵|면|믹스|크림|치즈|초콜릿|소시지|마가린|글루텐프리|비건|무첨가|튀김|연유|아미노스/;
+function labelCheckNote(foodName) {
+    const name = String(foodName || '');
+    if (/대체 어려움|없이 조리/.test(name) || /성분표/.test(name)) return '';
+    if (!LABEL_CHECK_RE.test(name)) return '';
+    if (/성분표/.test(getSubstituteInfo(name) || '')) return '';
+    return ' ⚠️ 제품마다 원재료가 달라요. 살 때 성분표를 확인하세요.';
+}
+
 // '고기류(닭고기·소고기 등)'처럼 괄호 안에 재료를 나열한 대체품은, 나열된 재료도 들어 있는 것으로 봐요.
 // (괄호 안은 보통 무시하지만, 이런 나열은 닭고기·소고기 알레르기와 겹치는지 따질 때 필요해요.)
 function listedInParens(foodName) {

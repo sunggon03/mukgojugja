@@ -798,7 +798,7 @@
         <div class="navbar-nav">
             <div class="nav-link" onclick="showPage('home');">홈</div>
             <div class="nav-link" onclick="showPage('recipeBook');">📖 레시피북</div>
-            <div class="nav-link" onclick="showPage('search');">🔍 대체식품검색</div>
+            <div class="nav-link" onclick="showPage('search');">🔍 재료 점검</div>
             <div class="nav-link" onclick="showPage('profile');">👤 내 정보</div>
         </div>
         <div class="more-btn" onclick="toggleMoreMenu();">☰ 더보기</div>
@@ -838,7 +838,7 @@
     <div class="bottom-nav">
         <div class="bottom-nav-item active" data-page="home" onclick="showPage('home');"><span class="bn-icon">🏠</span>홈</div>
         <div class="bottom-nav-item" data-page="recipeBook" onclick="showPage('recipeBook');"><span class="bn-icon">📖</span>레시피북</div>
-        <div class="bottom-nav-item" data-page="search" onclick="showPage('search');"><span class="bn-icon">🔍</span>대체식품검색</div>
+        <div class="bottom-nav-item" data-page="search" onclick="showPage('search');"><span class="bn-icon">🔍</span>재료 점검</div>
         <div class="bottom-nav-item" data-page="profile" onclick="showPage('profile');"><span class="bn-icon">👤</span>내정보</div>
     </div>
 
@@ -1109,9 +1109,9 @@
     </div>
 
     <!-- 데이터/로직 파일: 수정 후에는 ?v= 값을 바꿔야 캐시가 갱신돼요 -->
-       <script src="diet-data.js?v=20261031a"></script>
-<script src="recipes-data.js?v=20261031a"></script>
-<script src="substitute-logic.js?v=20261031a"></script>
+       <script src="diet-data.js?v=20261102b"></script>
+<script src="recipes-data.js?v=20261102b"></script>
+<script src="substitute-logic.js?v=20261102b"></script>
     <script>
 
 
@@ -2062,7 +2062,7 @@
                             </div>
                             ${alternativeFoods.map((food, foodIdx) => `
                                 <div id="${alternativeId}_tip_${foodIdx}" style="display: none; font-size: 11px; color: #2B3E2F; background: white; padding: 8px; border-radius: 4px; margin-bottom: 6px;">
-                                    💡 <strong>${food}</strong>: ${getSubstituteInfo(food) || allergyTip}
+                                    💡 <strong>${food}</strong>: ${getSubstituteInfo(food) || allergyTip}${labelCheckNote(food)}
                                 </div>
                                                         `).join('')}${excludedFoods.length ? `
                             <div style="font-size: 11px; color: #888;">다른 제약과 겹쳐서 뺀 대체품: ${excludedFoods.map(e => `${e.food} (${e.by}와 겹침)`).join(', ')}</div>` : ''}
@@ -2305,7 +2305,7 @@
                         res.alternativeFoods.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">🙅 ${esc(getSubstituteInfo(f) || '')}</div>`).join('');
                 } else if (res.alternativeFoods.length) {
                     h += '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #3B6D11;">✅ 대체 음식</div>' +
-                        res.alternativeFoods.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">💡 <strong>${esc(f)}</strong>: ${esc(getSubstituteInfo(f) || res.allergyTip || '')}</div>`).join('');
+                        res.alternativeFoods.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">💡 <strong>${esc(f)}</strong>: ${esc((getSubstituteInfo(f) || res.allergyTip || '') + labelCheckNote(f))}</div>`).join('');
                 }
                 if (res.excludedFoods.length) {
                     h += `<div style="margin-top: 4px; font-size: 11px; color: #888;">다른 제약과 겹쳐서 뺀 대체품: ${res.excludedFoods.map(e => esc(e.food) + ' (' + esc(e.by) + '와 겹침)').join(', ')}</div>`;
@@ -2362,7 +2362,7 @@
                     const hards = subsAll.filter(f => HARD_SUB_MARK.test(f));
                     const tip = anyHits[0].tips || '';
                     body = (anyHits[0].reason ? `<div style="font-size: 11px; color: #DC3545; margin-top: 6px;">⚠️ <strong>왜 피해야 하나요?</strong> ${esc(anyHits[0].reason)}</div>` : '') +
-                        (subs.length ? '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #3B6D11;">✅ 대체 음식</div>' + subs.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">💡 <strong>${esc(f)}</strong>: ${esc(getSubstituteInfo(f) || tip)}</div>`).join('') : '') +
+                        (subs.length ? '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #3B6D11;">✅ 대체 음식</div>' + subs.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">💡 <strong>${esc(f)}</strong>: ${esc((getSubstituteInfo(f) || tip) + labelCheckNote(f))}</div>`).join('') : '') +
                         (hards.length && !subs.length ? '<div style="margin-top: 8px; font-size: 12px; font-weight: 600; color: #a1232f;">🚫 대체할 수 있는 재료가 없어요</div>' + hards.map(f => `<div style="margin-top: 4px; font-size: 11px; color: #2B3E2F; background: #fff; padding: 6px 8px; border-radius: 4px;">🙅 ${esc(getSubstituteInfo(f) || '')}</div>`).join('') : '') +
                         maybeHTML(findMaybeContain(name, anyHits.filter(a => !a._dkey)));
                 } else {
