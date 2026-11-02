@@ -1,6 +1,10 @@
 // 먹고죽자! 근거 확인 담당 설정 — 이름·담당·구글 폼 주소는 여기만 고치면 담당표·도우미에 같이 바뀌어요
 // 사람이 3명으로 줄면 names에 이름을 넣고 assign을 A·B·C로 다시 나누면 돼요 (D, E는 쓰지 않으면 지워도 돼요)
 const TEAM = {
+  // 공유 현황: 구글 폼 "응답 시트" 주소를 붙여 넣으면(시트 공유: 링크가 있는 모든 사용자 → 뷰어),
+  // 조원 화면에 "⏳ 제출됨(검수 대기)"·"✅ 검수 끝"이 바로 반영돼서 같은 문장을 두 번 하지 않아요. 비워 두면 꺼져요.
+  liveSheet: '',
+  reviewer: '김성곤',  // 이 이름으로 온 "검수 결과"만 반영해요
   names: { A: '유보경', B: '김문성', C: '이동희', D: '김강민', E: '변성진' },  // 11/01 무작위 배정
   // 구글 폼 "미리 채워진 링크" (질문 4개: KIND, NAME, ITEM, CONTENT)
   formPrefill: 'https://docs.google.com/forms/d/e/1FAIpQLSf8ElPb8XXYk448QzYZhWxFoZNy4Ur-o9tQXl7eSxVuY64hfw/viewform?usp=pp_url&entry.37637079=KIND&entry.672579614=NAME&entry.400527930=ITEM&entry.697976610=CONTENT',
