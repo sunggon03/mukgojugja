@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="app-build" content="202611011445">
-<script>(function(){var B="202611011445",path=location.pathname,last=0;
+<meta name="app-build" content="202611020857">
+<script>(function(){var B="202611020857",path=location.pathname,last=0;
 function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}}
 function bar(nb){if(document.getElementById('freshBar'))return;var d=document.createElement('div');d.id='freshBar';d.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#1F5FA8;color:#fff;border-radius:12px;padding:12px 14px;font:600 14px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;gap:10px;align-items:center;justify-content:space-between';
 d.innerHTML='<span>새 버전이 나왔어요. 입력한 내용은 저장돼 있어요.</span>';var b=document.createElement('button');b.textContent='새로고침';b.style.cssText='background:#fff;color:#1F5FA8;border:0;border-radius:8px;padding:6px 12px;font:700 13px sans-serif;cursor:pointer';b.onclick=function(){location.replace(path+'?v='+nb+location.hash)};d.appendChild(b);(document.body||document.documentElement).appendChild(d)}
@@ -103,6 +103,8 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
   <summary style="font-weight:700;font-size:16px;cursor:pointer">📥 조원 결과 모아 보기 · 성곤 검수 <span class="note" id="subsCount"></span></summary>
   <p class="note" style="margin:8px 0">"결과 모으기"에 붙인 제출 내용이 모두 여기 쌓여요. 링크를 열어 붙인 문장이 정말 있는지 보고 <b>"검수 OK"</b> 또는 <b>"고치기"</b>를 눌러요. 문장마다 판정, 붙인 원문, 링크, 확인·검수한 사람이 보여요.</p>
   <div class="seg" id="subsWho"></div><div class="seg" id="subsView"></div>
+  <div style="margin:8px 0;padding:10px;border:1px dashed var(--line);border-radius:10px"><b style="font-size:14px">🤖 Claude 검수 의견 불러오기</b><div class="note">구글 시트 CSV를 Claude에게 주면, 인용마다 <b>한국어 번역 · 앱 문장과 같은 말인지 의견 · 출처가 믿을 만한지 · 성곤이 볼 것</b>을 만들어 줘요. 그걸 여기 붙이면 문장 아래에 보여요.</div>
+  <textarea class="code" id="notesBox" style="min-height:60px;margin-top:6px" placeholder='{"notes":[...]}'></textarea><div class="row"><button class="btn sm" id="notesBtn">의견 붙이기</button></div><div id="notesOut"></div></div>
   <div style="margin:8px 0;padding:10px;border:1px dashed var(--line);border-radius:10px"><b style="font-size:14px">✅ 완료 목록 만들기 (done.js)</b><div class="note">[검수 OK]를 누른 문장 중 근거 있음·제한적인 것을 완료 목록으로 만들어요. GitHub에 <b>done.js</b>로 덮어쓰면 조원 화면에서 그 문장은 체크가 막혀요.</div>
   <div class="row"><button class="btn sm" id="mkDone">완료 목록 만들기</button><a class="btn sm ghost" id="dlDone" style="display:none;text-decoration:none" download="done.js">done.js 내려받기</a><button class="btn sm ghost" id="cpDone" style="display:none">복사</button><span class="copied" id="copiedDone"></span></div><div id="doneMsg" class="note"></div></div>
   <div id="subsList"></div>
@@ -175,7 +177,7 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
         <li>링크를 눌러 문서를 열어요. <b>제목이 AI가 말한 것과 같은지</b> 봐요.</li>
         <li>찾을 단어로 <b>Ctrl+F</b>를 해서 관련 문장을 찾아요.</li>
         <li>아래 <b>"어디까지 복사하나요?"</b> 규칙대로 <b>고치지 말고 그대로</b> 복사해 붙여요. 영어면 영어 그대로.</li>
-        <li>판정을 골라요. 자신 없으면 <b>"잘 모르겠음"</b>을 골라도 돼요. 판정은 성곤이 다시 봐요. 안 열리거나 문장이 없으면 "문장 없음".</li>
+        <li>"찾은 문장이 앱 문장과 같은 말인가요?"에 답해요. 자신 없으면 <b>"잘 모르겠어요"</b>을 골라도 돼요. 판정은 성곤이 다시 봐요. 안 열리거나 문장이 없으면 "문장을 못 찾았어요".</li>
       </ol>
       <details open style="margin:8px 0 10px;background:var(--al);border-radius:10px;padding:10px 12px">
         <summary style="font-weight:700;cursor:pointer;color:var(--amb)">📌 어디까지 복사하나요? (헷갈리면 여기)</summary>
@@ -186,10 +188,10 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
           <tr><td>목록(•, 1. 2.) 안에 있음</td><td>그 항목 + <b>목록 바로 위 설명 한 줄</b>을 복사해요</td></tr>
           <tr><td>어디까지인지 정말 모르겠음</td><td><b>그 문단 전체</b>를 복사해요. 많이 복사하는 건 괜찮아요(성곤이 줄여요)</td></tr>
           <tr><td>단어가 여러 군데 나옴</td><td>앱 문장과 가장 비슷한 곳 하나만 복사하고, 다른 곳은 "위치" 칸에 적어요</td></tr>
-          <tr><td>영어라 뜻을 모르겠음</td><td><b>뜻을 몰라도 돼요.</b> 번역기로 읽어도 되지만 붙이는 건 영어 원문 그대로. 판정은 "잘 모르겠음"</td></tr>
+          <tr><td>영어라 뜻을 모르겠음</td><td><b>뜻을 몰라도 돼요.</b> 번역기로 읽어도 되지만 붙이는 건 영어 원문 그대로. 판정은 "잘 모르겠어요"</td></tr>
           <tr><td>PDF (글자 복사가 됨)</td><td>Ctrl+F로 단어를 찾아 3문장을 복사하고, <b>쪽 번호</b>를 "위치" 칸에 적어요. 처음부터 읽지 않아요</td></tr>
-          <tr><td>PDF (글자 복사가 안 됨)</td><td>그 부분을 <b>캡처</b>해요. 캡처는 <b>카톡으로 성곤에게</b> 보내요. 메시지에 <b>항목 이름과 문장 번호</b>(예: 땅콩 CIQIL)를 꼭 같이 적어요. 여기에는 "위치"에 쪽 번호만 적고 "잘 모르겠음"</td></tr>
-          <tr><td>찾을 단어가 안 나옴</td><td>단어를 줄여서 다시 찾아요(예: "sodium intake" → "sodium"). 그래도 없으면 "문장 없음". <b>30분 넘게 붙잡지 않아요</b></td></tr>
+          <tr><td>PDF (글자 복사가 안 됨)</td><td>그 부분을 <b>캡처</b>해요. 캡처는 <b>카톡으로 성곤에게</b> 보내요. 메시지에 <b>항목 이름과 문장 번호</b>(예: 땅콩 CIQIL)를 꼭 같이 적어요. 여기에는 "위치"에 쪽 번호만 적고 "잘 모르겠어요"</td></tr>
+          <tr><td>찾을 단어가 안 나옴</td><td>단어를 줄여서 다시 찾아요(예: "sodium intake" → "sodium"). 그래도 없으면 "문장을 못 찾았어요". <b>30분 넘게 붙잡지 않아요</b></td></tr>
           <tr><td>기기</td><td><b>컴퓨터나 노트북으로 해요.</b> 휴대폰은 PDF 검색·긴 문장 복사가 잘 안 돼요</td></tr>
         </table>
       </details>
@@ -205,7 +207,7 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
     <div class="card">
       <h2>결과 요약</h2>
       <div id="gradeList"></div>
-      <div class="note" style="margin-top:6px">조원이 고른 판정으로 등급이 정해져요. "잘 모르겠음"은 성곤이 판단해요. 검수는 나중에 성곤이 한꺼번에 해요. 근거 있음: 공공기관·학회·논문 문서의 문장이 뒷받침 / 제한적: 환자 안내 자료만 뒷받침 / 못 찾음: 뒷받침하는 문장이 없음 / 반대 근거: 반대하는 문장이 있음(김성곤이 따로 검토)</div>
+      <div class="note" style="margin-top:6px">조원이 고른 판정으로 등급이 정해져요. "잘 모르겠어요"은 성곤이 판단해요. 검수는 나중에 성곤이 한꺼번에 해요. 근거 있음: 공공기관·학회·논문 문서의 문장이 뒷받침 / 제한적: 환자 안내 자료만 뒷받침 / 못 찾음: 뒷받침하는 문장이 없음 / 반대 근거: 반대하는 문장이 있음(김성곤이 따로 검토)</div>
     </div>
     <div class="card">
       <h2>제출</h2>
@@ -371,9 +373,13 @@ function parseCells(text){const d=(text.split('\n')[0].includes('\t')||!/,/.test
   for(let i=0;i<text.length;i++){const ch=text[i];if(q){if(ch==='"'){if(text[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}
     else if(ch==='"'&&cur==='')q=true;else if(ch===d||ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;cells.push(cur);cur=''}else cur+=ch}
   cells.push(cur);return cells}
-function splitSubmissions(raw){raw=String(raw).replace(/^﻿/,'');
+function splitSubmissions(raw){raw=String(raw).replace(/^\uFEFF/,'').normalize('NFC');
   if(/"\/\/ 근거 확인 결과/.test(raw))return parseCells(raw).map(c=>c.trim()).filter(c=>/^\/\/ 근거 확인 결과/.test(c)).flatMap(c=>c.split(/(?=\/\/ 근거 확인 결과)/));
   return raw.split(/(?=\/\/ 근거 확인 결과)/)}
+// 검사코드 비교: 구글 폼·시트를 거치면 줄바꿈(\r\n)·줄 끝 공백·한글 조합 방식이 바뀔 수 있어서, 내용을 다시 정리한 뒤 비교해요
+function codeMatches(j,bodyStr,code){if(!code)return false;
+  const cands=[bodyStr,bodyStr.replace(/\r\n?/g,'\n'),JSON.stringify(j,null,1)];
+  return cands.some(t=>[t,t.normalize('NFC'),t.normalize('NFD')].some(x=>hash(x)===code))}
 function importResults(raw){
   const parts=splitSubmissions(raw).map(x=>x.trim()).filter(x=>/^\/\/ 근거 확인 결과/.test(x));const msgs=[];
   const all=store.get('results',{});store.set('results_prev',all);const subs=store.get('subs',[]);store.set('subs_prev',subs);
@@ -381,8 +387,10 @@ function importResults(raw){
     const head=(pt.match(/^\/\/[^\n]*/)||[''])[0];const body=pt.slice(head.length).trim();
     let j;try{j=JSON.parse(body.slice(body.indexOf('{'),body.lastIndexOf('}')+1))}catch(e){msgs.push(['err','형식이 깨진 결과가 있어요. 제출 내용을 통째로 다시 붙여 주세요.']);return}
     const code=(head.match(/검사코드 (\S+)/)||[])[1];const bodyStr=body.slice(body.indexOf('{'),body.lastIndexOf('}')+1);
-    if(!code||hash(bodyStr)!==code)msgs.push(['warn',`${esc(j.target)}: 검사코드가 안 맞아요. 복사하다 잘렸거나 내용이 바뀌었을 수 있어요. 그래도 반영은 했어요.`]);
-    {const key=code||hash(bodyStr);const i=subs.findIndex(x=>x.key===key);const rec={key,ok:!!code&&hash(bodyStr)===code,j};if(i>=0)subs[i]=rec;else subs.push(rec)}
+    const codeOk=codeMatches(j,bodyStr,code);
+    if(!code)msgs.push(['warn',`${esc(j.target)}: 검사코드 줄이 없어요. 맨 윗줄(// 근거 확인 결과 …)까지 복사됐는지 봐 주세요. 그래도 반영은 했어요.`]);
+    else if(!codeOk)msgs.push(['warn',`${esc(j.target)} (${esc(j.checkedBy||'')}): 검사코드가 안 맞아요. 줄바꿈·띄어쓰기 차이는 무시하고 비교했는데도 달라서, <b>내용(인용·판정)이 손으로 바뀌었거나 일부가 잘렸을</b> 수 있어요. 원래 제출 내용과 비교해 봐요. 그래도 반영은 했어요.`]);
+    {const key=code||hash(bodyStr);const i=subs.findIndex(x=>x.key===key);const rec={key,ok:codeOk,j};if(i>=0)subs[i]=rec;else subs.push(rec)}
     if(j.newItem){msgs.push(['info',`${esc(j.target)}: 새 항목 초안이에요. 진행 현황에는 안 들어가요. (판정: ${esc(j.newItem.decision)})`]);return}
     const t=TARGETS.find(x=>x.label===j.target&&!x.isNew);if(!t){msgs.push(['err',`${esc(j.target)}: 앱 항목을 찾지 못했어요.`]);return}
     const cur=new Set(claimsFor(t).map(c=>c.text));const rec=all[t.id]=all[t.id]||{};let ok=0,bad=0,gone=0;
@@ -415,7 +423,8 @@ function renderSubs(){
       <div class="note">확인 ${esc(j.checkedBy)} · ${esc(j.date)} · 확인 끝 ${nOk} · 고칠 문장 ${nFix}${ok?'':' · <span style="color:var(--red)">검사코드 안 맞음</span>'}${j.memo?` · 메모: ${esc(j.memo)}`:''}</div>
       ${j.newItem?`<div class="issue ${/가능/.test(j.newItem.decision)?'ok':'err'}">새 항목 판정: ${esc(j.newItem.decision)}${(j.newItem.foods||[]).length?' · 초안 이름: '+j.newItem.foods.map(f=>esc(f.word)).join(', '):''}</div>`:''}
       ${rs.map(r=>`<div style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><span class="pr ${good(r.grade)?'l':r.grade==='반대 근거 있음'?'h':'m'}">${esc(r.grade)}</span> <span class="tag">${esc(r.type||'')}</span>${esc(r.claim)}
-        ${(r.links||[]).filter(l=>l.quote||l.verdict).map(l=>`<div class="link" style="margin:6px 0 0"><div class="note">${esc(l.verdict||'')}${l.population?' · 대상 '+esc(l.population):''}${l.where?' · '+esc(l.where):''}${l.rechecked?' · 검수 ✓':''}</div>${l.quote?`<div style="font-size:13px;margin:4px 0;border-left:3px solid var(--line);padding-left:8px">"${esc(l.quote)}"</div>`:''}<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title||l.url)}</a> <span class="note">${esc(l.tier||'')}</span></div>`).join('')}
+        ${(r.links||[]).filter(l=>l.quote||l.verdict).map(l=>`<div class="link" style="margin:6px 0 0"><div class="note">${esc(l.verdict||'')}${l.population?' · 대상 '+esc(l.population):''}${l.where?' · '+esc(l.where):''}${l.opened==='제목 다름'?' · <span style="color:var(--amb)">⚠️ 제목 다름: '+esc(l.realTitle||'')+'</span>':l.opened==='안 열림'?' · 안 열림':''}${l.rechecked?' · 검수 ✓':''}</div>${l.quote?`<div style="font-size:13px;margin:4px 0;border-left:3px solid var(--line);padding-left:8px">"${esc(l.quote)}"</div>`:''}${noteHtml(j.target,r.claim,l)}<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title||l.url)}</a> <span class="note">${esc(l.tier||'')}</span>
+        ${l.quote?`<div class="row" style="margin-top:6px"><a class="btn sm ghost" style="text-decoration:none" target="_blank" rel="noopener noreferrer" href="${esc(fragUrl(l.url,l.quote))}">🔎 원문에서 이 문장 보기</a>${/[a-zA-Z]{4,}/.test(l.quote)?`<a class="btn sm ghost" style="text-decoration:none" target="_blank" rel="noopener noreferrer" href="https://translate.google.com/?sl=auto&tl=ko&op=translate&text=${encodeURIComponent(String(l.quote).slice(0,4000))}">🌐 번역 보기</a>`:''}</div>`:''}</div>`).join('')}
         ${r.notFound?`<div class="note">AI가 못 찾음: ${esc(r.notFound)}</div>`:''}
         <div class="seg" style="margin-top:6px"><button data-rk="${rk(r)}" data-v="ok" class="${myRev[rk(r)]==='ok'?'on':''}">검수 OK</button><button data-rk="${rk(r)}" data-v="fix" class="${myRev[rk(r)]==='fix'?'on':''}">고치기</button></div></div>`).join('')}</div>`}).join('');
   const allR=subs.flatMap(({j})=>(j.results||[]).map(r=>[j,r]));const mr=store.get('myRev',{});const nRev=allR.filter(([j,r])=>mr[hash(j.target+'|'+r.claim+'|'+(r.links||[]).map(l=>l.quote).join('|'))]).length;
@@ -434,6 +443,21 @@ if(document.getElementById('mkDone'))document.getElementById('mkDone').onclick=(
   try{dl.href=URL.createObjectURL(new Blob([r.text],{type:'text/javascript'}));dl.style.display='inline-block'}catch(e){}
   document.getElementById('cpDone').style.display='inline-block';document.getElementById('cpDone').onclick=()=>copy(r.text,'copiedDone');
   document.getElementById('doneMsg').textContent=`완료 문장 ${r.n}개 (이번에 새로 ${r.add}개). 내려받은 done.js를 GitHub에 덮어써요. 내려받기가 막히면 "복사"해서 GitHub에서 done.js를 열어 붙여 넣어요.`};
+
+// 원문에서 이 문장 보기: 크롬·엣지·사파리는 주소 끝 #:~:text= 로 그 문장에 바로 노란 표시를 해 줘요 (PDF는 안 돼요)
+function fragUrl(url,quote){const w=String(quote||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);if(w.length<3)return url;
+  const base=String(url).split('#')[0];const enc=x=>encodeURIComponent(x).replace(/-/g,'%2D').replace(/,/g,'%2C').replace(/&/g,'%26');
+  const start=w.slice(0,Math.min(6,w.length)).join(' ');const end=w.length>12?w.slice(-5).join(' '):'';
+  return base+'#:~:text='+enc(start)+(end?','+enc(end):'')}
+// Claude 검수 의견 (번역·판정·확인할 점): Claude가 만든 notes를 붙여 넣으면 문장 아래에 보여요
+function noteKey(target,claim,url){return hash(String(target)+'|'+String(claim)+'|'+String(url))}
+function noteHtml(target,claim,l){const n=(store.get('notes',{})||{})[noteKey(target,claim,l.url)];if(!n)return '';
+  const col=/같은 말|뒷받침/.test(n.opinion||'')?'ok':/다른 말|반대/.test(n.opinion||'')?'err':'warn';
+  return `<div class="issue ${col}" style="margin:6px 0;font-size:12.5px">${n.ko?`<b>번역</b> ${esc(n.ko)}<br>`:''}${n.opinion?`<b>Claude 의견</b> ${esc(n.opinion)}<br>`:''}${n.source?`<b>출처</b> ${esc(n.source)}<br>`:''}${n.check?`<b>성곤이 볼 것</b> ${esc(n.check)}`:''}</div>`}
+function importNotes(raw){const out=document.getElementById('notesOut');let j;try{const t=String(raw);j=JSON.parse(t.slice(t.indexOf('{'),t.lastIndexOf('}')+1))}catch(e){out.innerHTML='<div class="issue err">형식이 깨졌어요. Claude가 준 내용을 통째로 붙여 주세요.</div>';return}
+  const all=store.get('notes',{});let n=0;(j.notes||[]).forEach(x=>{if(!x.target||!x.claim||!x.url)return;all[noteKey(x.target,x.claim,x.url)]={ko:x.ko||'',opinion:x.opinion||'',source:x.source||'',check:x.check||''};n++});
+  store.set('notes',all);out.innerHTML=`<div class="issue ok">Claude 의견 ${n}개를 붙였어요. 아래 문장마다 번역·의견이 보여요.</div>`;renderSubs()}
+if(document.getElementById('notesBtn'))document.getElementById('notesBtn').onclick=()=>importNotes(document.getElementById('notesBox').value);
 
 // ---- 출처 교체 표 ----
 const URGENT=/민원|뉴스|오래된|건강 정보 매체|블로그/;
@@ -673,7 +697,7 @@ function addLink(id,url,title){url=String(url||'').trim();if(!/^https?:\/\/\S+\.
 document.getElementById('clearAi').onclick=()=>{document.getElementById('aiInput').value='';S.ai='';S.parsed=null;S.conf={};S.rev={};save();renderCheck()};
 
 // ---- ④ 문서 확인 ----
-const VERDICTS=['','뒷받침','반대','애매','문장 없음'];const VLABEL={'':'', '뒷받침':'뒷받침','반대':'반대','애매':'잘 모르겠음 (성곤이 판단)','문장 없음':'문장 없음'};const VLABEL_NEW={'':'', '뒷받침':'답이 있음','반대':'반대·다른 내용','애매':'잘 모르겠음 (성곤이 판단)','문장 없음':'문장 없음'};const TARGETS_POP=['','성인','아이','환자','일반'];
+const VERDICTS=['','뒷받침','반대','애매','문장 없음'];const VLABEL={'':'', '뒷받침':'네, 같은 말이에요 (뒷받침)','반대':'아니요, 다른 말이에요 (반대)','애매':'잘 모르겠어요 (성곤이 판단)','문장 없음':'문장을 못 찾았어요'};const VLABEL_NEW={'':'', '뒷받침':'네, 답이 있어요','반대':'다른 내용이에요','애매':'잘 모르겠어요 (성곤이 판단)','문장 없음':'문장을 못 찾았어요'};const TARGETS_POP=['','성인','아이','환자','일반'];
 const nums=s=>(String(s).match(/\d[\d,.]*/g)||[]).map(x=>x.replace(/,/g,'')).filter(x=>x.length);
 function quoteWarn(claim,q){const ns=nums(claim);const qn=String(q).replace(/,/g,'');const miss=ns.filter(n=>!qn.includes(n));return miss.length&&q?`앱 문장의 숫자 ${miss.join(', ')}이(가) 붙인 문장에 없어요. 다른 문장인지, 앱 숫자가 틀렸는지 확인해 주세요.`:''}
 function renderConfirm(){
@@ -685,18 +709,26 @@ function renderConfirm(){
       <div class="note">${esc([l.publisher,l.year,l.type,l.free?'':'유료'].filter(Boolean).join(' · '))}</div>
       ${l.hint?`<div class="note">📍 AI가 짐작한 위치(참고용): ${esc(l.hint)}</div>`:''}${/\.pdf(\?|#|$)|\/pdf\/|[?&](download|type)=pdf|flDownload/i.test(l.url)?'<div class="note">📄 PDF예요. Ctrl+F로 단어를 찾고 쪽 번호를 적어요.</div>':''}
       <div style="margin:6px 0">${l.keywords.map(x=>`<span class="kw">${esc(x.word)}${x.ko?` <small>(${esc(x.ko)})</small>`:''}</span>`).join('')||'<span class="note">찾을 단어 없음</span>'}</div>
-      <label class="chk"><input type="checkbox" data-f="opened" ${v.opened?'checked':''}><span>열어 봤고, <b>제목이 위와 같다</b></span></label>
+      <div class="note" style="margin-top:4px">링크를 열어 봤더니</div>
+      <label class="chk"><input type="radio" name="op_${k}" data-f="opened" value="same" ${openState(v)==='same'?'checked':''}><span><b>제목이 위와 같아요</b></span></label>
+      <label class="chk"><input type="radio" name="op_${k}" data-f="opened" value="diff" ${openState(v)==='diff'?'checked':''}><span><b>제목이 달라요</b> (실제 제목을 적어요)</span></label>
+      <div class="rt" style="display:${openState(v)==='diff'?'block':'none'};margin:0 0 6px 26px"><input type="text" data-f="realTitle" value="${esc(v.realTitle||'')}" placeholder="열린 문서의 실제 제목을 복사해 붙여요"></div>
+      <label class="chk"><input type="radio" name="op_${k}" data-f="opened" value="fail" ${openState(v)==='fail'?'checked':''}><span><b>안 열려요</b> (오류·로그인·유료 화면)</span></label>
       <div class="note">찾은 문장 (원문 그대로 복사)</div><textarea data-f="quote" rows="3">${esc(v.quote||'')}</textarea>
       <div class="grid2" style="margin-top:6px"><div><div class="note">위치 (쪽·섹션·제목)</div><input type="text" data-f="where" value="${esc(v.where||'')}"></div>
       <div><div class="note">이 문장의 대상</div><select data-f="pop">${TARGETS_POP.map(x=>`<option ${v.pop===x?'selected':''} value="${x}">${x||'선택'}</option>`).join('')}</select></div></div>
-      <div class="note" style="margin-top:6px">${T.isNew?'질문과 비교하면':'앱 문장과 비교하면'}</div><select data-f="verdict">${VERDICTS.map(x=>`<option ${v.verdict===x?'selected':''} value="${x}">${(T.isNew?VLABEL_NEW[x]:VLABEL[x])||'선택'}</option>`).join('')}</select>
+      <div class="note" style="margin-top:6px"><b>${T.isNew?'찾은 문장에 질문의 답이 들어 있나요?':'찾은 문장이 앱 문장과 같은 말인가요?'}</b></div><select data-f="verdict">${VERDICTS.map(x=>`<option ${v.verdict===x?'selected':''} value="${x}">${(T.isNew?VLABEL_NEW[x]:VLABEL[x])||'선택'}</option>`).join('')}</select>
       ${T.isNew?`<div class="note" style="margin-top:6px">문장에 나온 음식·재료·성분 이름 (원문 표기 그대로, 쉼표로. 없으면 비워요)</div><input type="text" data-f="foods" value="${esc(v.foods||'')}" placeholder="예: kiwifruit, gold kiwi">`:''}
       <div class="qw"></div></div>`}).join(''):`<div class="issue info">아직 링크가 없어요${c.notFound?' (AI: '+esc(c.notFound)+')':''}. 그대로 두면 "못 찾음"이 돼요.</div>`}
     <details style="margin-top:8px"><summary class="note" style="cursor:pointer">+ 링크 직접 추가</summary><div style="margin-top:6px"><input type="text" class="addUrl" data-id="${c.id}" placeholder="https://..."><input type="text" class="addTitle" data-id="${c.id}" placeholder="문서 제목 (선택)" style="margin-top:4px"><div class="row" style="margin-top:4px"><button class="btn sm ghost addBtn" data-id="${c.id}">추가</button><span class="note addMsg" data-id="${c.id}"></span></div></div></details></div>`).join('');
   document.querySelectorAll('#confirmList .addBtn').forEach(b=>b.onclick=()=>{const id=b.dataset.id;const q=x=>document.querySelector(`#confirmList ${x}[data-id="${id}"]`);const m=addLink(id,q('.addUrl').value,q('.addTitle').value);if(m)q('.addMsg').textContent=m});
-  document.querySelectorAll('#confirmList .link').forEach(el=>{const k=el.dataset.k;el.querySelectorAll('[data-f]').forEach(inp=>{const h=()=>{S.conf[k]=S.conf[k]||{};S.conf[k][inp.dataset.f]=inp.type==='checkbox'?inp.checked:inp.value;save();warnLink(el,k);renderReview()};inp.oninput=h;inp.onchange=h});warnLink(el,k)});
+  document.querySelectorAll('#confirmList .link').forEach(el=>{const k=el.dataset.k;el.querySelectorAll('[data-f]').forEach(inp=>{const h=()=>{S.conf[k]=S.conf[k]||{};if(inp.type==='radio'&&!inp.checked)return;S.conf[k][inp.dataset.f]=inp.type==='checkbox'?inp.checked:inp.value;
+    if(inp.dataset.f==='opened'){el.querySelector('.rt').style.display=inp.value==='diff'?'block':'none';if(inp.value==='fail'){S.conf[k].verdict='문장 없음';const vs=el.querySelector('[data-f=verdict]');if(vs)vs.value='문장 없음'}}
+    save();warnLink(el,k);renderReview()};inp.oninput=h;inp.onchange=h});warnLink(el,k)});
 }
 function warnLink(el,k){const [id]=k.split('_');const c=S.parsed.find(x=>x.id===id);const v=S.conf[k]||{};const ws=[];
+  if(openState(v)==='diff')ws.push(String(v.realTitle||'').trim()?'제목이 달라도 같은 주제의 문서면 계속 진행해요. 전혀 다른 주제의 문서면 판정을 "문장을 못 찾았어요"으로 골라요.':'실제 제목을 적어야 다음으로 넘어가요.');
+  if(openState(v)==='fail')ws.push('"문장을 못 찾았어요"으로 처리돼요. 다른 링크가 있으면 그 링크로 확인하고, 없으면 "+ 링크 직접 추가"로 다른 문서를 넣어도 돼요.');
   if(v.verdict&&v.verdict!=='문장 없음'&&!String(v.quote||'').trim())ws.push('판정을 고르려면 찾은 문장을 붙여야 해요.');
   if(v.quote&&String(v.quote).trim().length>1500)ws.push('너무 길어요. 찾은 단어가 있는 문장 앞뒤 3문장 정도로 줄여 주세요. (문단이 하나뿐이면 그대로 둬도 돼요)');
   if(v.quote&&String(v.quote).trim().length<15)ws.push('문장이 너무 짧아요. 앞뒤 문맥이 보이게 한 문장 이상 복사해 주세요.');
@@ -708,7 +740,9 @@ function warnLink(el,k){const [id]=k.split('_');const c=S.parsed.find(x=>x.id===
 document.getElementById('who1').oninput=e=>{store.set('who1',e.target.value);S.who1=e.target.value;save();renderReview()};
 
 // ---- ⑤ 검수·제출 ----
-function linkDone(k){const v=S.conf[k]||{};return v.opened&&v.verdict&&(v.verdict==='문장 없음'||String(v.quote||'').trim().length>=15)}
+function openState(v){return v.opened===true?'same':(v.opened||'')}
+function linkDone(k){const v=S.conf[k]||{};const o=openState(v);if(!o)return false;if(o==='fail')return true;if(o==='diff'&&!String(v.realTitle||'').trim())return false;
+  return !!v.verdict&&(v.verdict==='문장 없음'||String(v.quote||'').trim().length>=15)}
 function gradeOf(c){const ls=c.links.map((l,i)=>({l,v:S.conf[c.id+'_'+i]||{},r:true}));
   if(ls.some(x=>x.v.verdict==='반대'&&x.r))return '반대 근거 있음';
   const sup=ls.filter(x=>x.v.verdict==='뒷받침'&&x.r);
@@ -739,7 +773,7 @@ function buildOut(){
   if(miss.length){ob.style.display='block';ob.textContent='아직 남은 것: '+miss.join(', ');out.value='';btn.disabled=true;document.getElementById('sendForm').disabled=true;return}
   ob.style.display='none';
   const d=new Date(),date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  const res={target:T.label,checkedBy:w1,reviewedBy:'',date,memo:(S.memo||'').trim(),results:S.parsed.map(c=>({id:c.id,type:c.type,claim:c.claim,grade:gradeOf(c),notFound:c.notFound||undefined,links:c.links.map((l,i)=>{const v=S.conf[c.id+'_'+i]||{};return {url:l.url,title:l.title,publisher:l.publisher,year:l.year,tier:TIER_TXT[l.tier],verdict:v.verdict,quote:v.quote||'',where:v.where||'',population:v.pop||''}})}))};
+  const res={target:T.label,checkedBy:w1,reviewedBy:'',date,memo:(S.memo||'').trim(),results:S.parsed.map(c=>({id:c.id,type:c.type,claim:c.claim,grade:gradeOf(c),notFound:c.notFound||undefined,links:c.links.map((l,i)=>{const v=S.conf[c.id+'_'+i]||{};return {url:l.url,title:l.title,publisher:l.publisher,year:l.year,tier:TIER_TXT[l.tier],verdict:openState(v)==='fail'?'문장 없음':v.verdict,quote:v.quote||'',where:v.where||'',population:v.pop||'',opened:openState(v)==='same'?'제목 같음':openState(v)==='diff'?'제목 다름':openState(v)==='fail'?'안 열림':'',realTitle:openState(v)==='diff'?String(v.realTitle||''):undefined}})}))};
   if(T.isNew){const nd=newDraft();res.newItem={name:T.label,kind:T.kind,decision:nd.decision,core:nd.core,foods:nd.foods,
       note:'초안이에요. 앱 문장·음식 목록은 이 인용만 보고 따로 쓰고, 다시 ①로 문장 확인을 해요.'+(T.kind==='기저질환'?' 수치 기준은 의료진 상담 안내로만 넣어요.':'')}}
   const body=JSON.stringify(res,null,1);
