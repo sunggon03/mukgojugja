@@ -131,7 +131,7 @@ const allergyMapping = {
             '거위알': ['거위알 없이 조리(대체 어려움)']
         },
         tips: '계란이 들어간 모든 음식 피하기, 성분표 확인 필수. ⚠️ 아쿠아파바·바나나·요구르트는 "베이킹에서 반죽을 뭉치는 역할"만 대체 가능 - 계란국·계란찜처럼 계란 자체가 주재료인 요리는 마땅한 대체품이 없어 다른 메뉴를 고르는 게 나을 수 있음. 게맛살(크래미)·레이디핑거처럼 이름에 계란이 없어도 계란이 들어 있는 재료가 있으니 성분표를 꼭 확인',
-        source: "https://www.amc.seoul.kr/asan/mobile/healthinfo/mealtherapy/mealTherapyDetail.do?mtId=73"
+        source: "https://my.clevelandclinic.org/health/diseases/25086-egg-allergy"
     },
     '밀가루': {
         name: '글루텐 불내증',
@@ -150,7 +150,7 @@ const allergyMapping = {
         avoidFoods: ['땅콩', '땅콩버터', '땅콩기름', '땅콩과자'],
         safeFoods: ['해바라기씨버터', '두유', '씨앗류'],
         tips: '아나필락시스(전신 알레르기 쇼크) 위험이 높은 대표 알레르겐. 가공식품 성분표의 땅콩 함유 여부 반드시 확인',
-        source: "https://www.sidae.com/article/2017053009448023036"
+        source: "https://www.aaaai.org/Tools-for-the-Public/Conditions-Library/Allergies/peanut-allergy"
     },
     '견과류': {
         name: '견과류 알레르기',
