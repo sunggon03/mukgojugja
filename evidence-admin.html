@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="app-build" content="202611030403">
+<meta name="app-build" content="202611040010">
 <script>(function(){var B="202611030403",path=location.pathname,last=0;
 function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}}
 function bar(nb){if(document.getElementById('freshBar'))return;var d=document.createElement('div');d.id='freshBar';d.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#1F5FA8;color:#fff;border-radius:12px;padding:12px 14px;font:600 14px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;gap:10px;align-items:center;justify-content:space-between';
@@ -131,6 +131,7 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
 <details class="card" id="srcCard">
   <summary style="font-weight:700;font-size:16px;cursor:pointer">🔁 출처 교체가 필요한 항목 표 <span class="note" id="srcCount"></span></summary>
   <p class="note" style="margin:8px 0">앱의 기본 설명이 기댄 출처가 약한 항목이에요. 해당 항목을 찾아 <b>기본 설명 문장</b>을 확인하면서 공공기관·학회·최근 논문 자료로 바꿔요. 바꾸면 체크해 두세요. 항목 이름을 누르면 바로 찾아져요.</p>
+  <div class="row" style="margin:0 0 6px"><button class="btn sm" id="srcAsk">📋 출처 교체 요청 복사 (Claude용)</button><span class="note" id="srcAskMsg">조원이 ⭐ 추천했거나 성곤이 ☆로 고른 링크 중 [검수 OK]인 것만 들어가요. 이미 확인 끝난 문장의 링크는 📥 모아 보기에서 "확인 끝만"을 누르면 ☆ 버튼이 보여요.</span></div>
   <table id="srcTable"></table>
 </details>
 
@@ -465,7 +466,7 @@ function importResults(raw){
     const codeOk=codeMatches(j,bodyStr,code);
     if(!code)msgs.push(['warn',`${esc(j.target)}: 검사코드 줄이 없어요. 맨 윗줄(// 근거 확인 결과 …)까지 복사됐는지 봐 주세요. 그래도 반영은 했어요.`]);
     else if(!codeOk)msgs.push(['warn',`${esc(j.target)} (${esc(j.checkedBy||'')}): 검사코드가 안 맞아요. 줄바꿈·띄어쓰기 차이는 무시하고 비교했는데도 달라서, <b>내용(인용·판정)이 손으로 바뀌었거나 일부가 잘렸을</b> 수 있어요. 원래 제출 내용과 비교해 봐요. 그래도 반영은 했어요.`]);
-    {const key=code||hash(bodyStr);const i=subs.findIndex(x=>x.key===key);const rec={key,ok:codeOk,j};if(i>=0)subs[i]=rec;else subs.push(rec)}
+    {const key=code||hash(bodyStr);const i=subs.findIndex(x=>x.key===key);const rec={key,ok:codeOk,hadCode:!!code,j};if(i>=0)subs[i]=rec;else subs.push(rec)}
     if(j.newItem){msgs.push(['info',`${esc(j.target)}: 새 항목 초안이에요. 진행 현황에는 안 들어가요. (판정: ${esc(j.newItem.decision)})`]);return}
     const t=TARGETS.find(x=>x.label===j.target&&!x.isNew);if(!t){msgs.push(['err',`${esc(j.target)}: 앱 항목을 찾지 못했어요.`]);return}
     const cur=new Set(claimsFor(t).map(c=>c.text));const rec=all[t.id]=all[t.id]||{};let ok=0,bad=0,gone=0;
@@ -488,7 +489,7 @@ if(document.getElementById('importUndo'))document.getElementById('importUndo').o
 
 // ---- 조원 검수 결과 모아 보기 ----
 // ---- 💾 검수 기록 백업: 내려받기·불러오기(합치기)·시트에 안 간 검수 보내기 ----
-const BK_KEYS=['subs','myRev','results','notes','srcDone','newTargets'];
+const BK_KEYS=['subs','myRev','results','notes','srcDone','newTargets','baseMark'];
 function bkCount(d){const sub=(d.subs||[]).length,rev=Object.keys(d.myRev||{}).length,nt=Object.keys(d.notes||{}).length;return `조원 제출 ${sub}건 · 검수 ${rev}개 · Claude 의견 ${nt}개`}
 function bkMsg(h){const m=document.getElementById('bkMsg');if(m)m.innerHTML=h}
 if(document.getElementById('bkSave'))document.getElementById('bkSave').onclick=()=>{const data={};BK_KEYS.forEach(k=>data[k]=store.get(k,k==='subs'?[]:{}));
@@ -503,6 +504,7 @@ function bkMerge(data){const out={add:0,rev:0,notes:0};
   const nt=store.get('notes',{});Object.entries(data.notes||{}).forEach(([k,v])=>{if(!nt[k]){nt[k]=v;out.notes++}});store.set('notes',nt);
   const rs=store.get('results',{});Object.entries(data.results||{}).forEach(([t,o])=>{rs[t]=Object.assign({},o,rs[t]||{})});store.set('results',rs);
   const sd=store.get('srcDone',{});store.set('srcDone',Object.assign({},data.srcDone||{},sd));
+  {const bm=store.get('baseMark',{});store.set('baseMark',Object.assign({},data.baseMark||{},bm))}
   const nw=store.get('newTargets',{});if(Array.isArray(nw)||Array.isArray(data.newTargets)){const a=[].concat(nw||[]);(data.newTargets||[]).forEach(x=>{if(!a.some(y=>JSON.stringify(y)===JSON.stringify(x)))a.push(x)});store.set('newTargets',a)}else store.set('newTargets',Object.assign({},data.newTargets||{},nw));
   return out}
 if(document.getElementById('bkFile'))document.getElementById('bkFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{e.target.value='';
@@ -522,7 +524,9 @@ if(document.getElementById('bkResend'))document.getElementById('bkResend').oncli
 function revOf(j,r){const m=store.get('myRev',{});const k=hash(j.target+'|'+r.claim+'|'+(r.links||[]).map(l=>l.quote).join('|'));if(m[k])return m[k];
   const st=(typeof liveState==='function')?liveState(j.target,r.claim):null;return st&&st.st==='done'?'ok':st&&st.st==='fix'?'fix':undefined}
 function reviewAsk(n,what){return `프로젝트 문서 \`claude/근거검수-채팅-안내.md\`대로 검수해 줘. ${what} (문장 ${n}개, 이미 검수한 문장은 뺐어)\n\n`}
-function subText(j,results){const jj=Object.assign({},j,{results});return `// 근거 확인 결과 · ${j.target} · 확인: ${j.checkedBy||''} · 검수 전 · ${j.date||''}\n`+JSON.stringify(jj,null,1)}
+// Claude에게 보낼 때는 일부 문장만 다시 만들어서 원래 검사코드로는 다시 계산할 수 없어요 → 불러올 때 성곤 화면에서 한 비교 결과를 머리줄에 적어 보내요
+function codeNote(rec){if(!rec)return '';if(rec.ok)return ` · 검사코드 확인: 맞음(${rec.key})`;if(rec.hadCode===false)return ' · 검사코드 확인: 없음(원래 제출에 코드 줄이 없었어요)';if(rec.hadCode===true)return ' · 검사코드 확인: 안 맞음(손으로 바뀌었거나 잘렸을 수 있어요)';return ' · 검사코드 확인: 안 맞음 또는 없음(예전에 불러온 제출이라 구분 못 함)'}
+function subText(j,results,rec){const jj=Object.assign({},j,{results});return `// 근거 확인 결과 · ${j.target} · 확인: ${j.checkedBy||''} · 검수 전 · ${j.date||''}${codeNote(rec)}\n`+JSON.stringify(jj,null,1)}
 // 공유 시트에서 "아직 안 불러온 제출"만 골라 불러오기 (이미 불러온 건 검사코드로 걸러요)
 function importNew(text,quiet){const subs=store.get('subs',[]);const have=new Set(subs.map(x=>x.key));
   const parts=splitSubmissions(text).map(x=>x.trim()).filter(x=>/^\/\/ 근거 확인 결과/.test(x));
@@ -537,7 +541,7 @@ async function autoImport(quiet){const u=liveUrl();if(!u||!document.getElementBy
   try{const r=await fetch(u+(u.includes('?')?'&':'?')+'t='+Date.now(),{cache:'no-store'});const t=await r.text();if(!r.ok||/<html/i.test(t.slice(0,300)))throw new Error('시트 공유가 "링크가 있는 모든 사용자: 뷰어"인지 봐 주세요');importNew(t,quiet)}
   catch(e){const am=document.getElementById('autoMsg');if(am){am.style.display='block';am.className='issue warn';am.textContent='공유 시트를 못 읽었어요: '+(e.message||e)+' · 그동안은 CSV 내려받기로 해요.'}}}
 if(document.getElementById('copyTodo'))document.getElementById('copyTodo').onclick=()=>{const subs=store.get('subs',[]);const out=[];let n=0;
-  subs.forEach(({j})=>{if(j.newItem){out.push(subText(j,j.results||[]));return}const rs=(j.results||[]).filter(r=>!revOf(j,r));if(!rs.length)return;n+=rs.length;out.push(subText(j,rs))});
+  subs.forEach(rec=>{const j=rec.j;if(j.newItem){out.push(subText(j,j.results||[],rec));return}const rs=(j.results||[]).filter(r=>!revOf(j,r));if(!rs.length)return;n+=rs.length;out.push(subText(j,rs,rec))});
   const m=document.getElementById('copyTodoMsg');if(!out.length){m.textContent='검수 안 한 문장이 없어요.';return}
   const txt=reviewAsk(n,`검수 전 제출 ${out.length}건이야.`)+'// 아래는 아직 검수 안 한 문장만 모은 거예요 (이미 검수한 건 뺐어요)\n\n'+out.join('\n\n');
   navigator.clipboard.writeText(txt).then(()=>{m.textContent=`검수 전 문장 ${n}개(${out.length}건)를 복사했어요. 검수 채팅에 붙여 넣으세요.`},()=>{m.textContent='복사가 막혔어요.'})};
@@ -559,15 +563,16 @@ function renderSubs(){
       <div class="note">확인 ${esc(j.checkedBy)} · ${esc(j.date)} · 확인 끝 ${nOk} · 고칠 문장 ${nFix}${ok?'':' · <span style="color:var(--red)">검사코드 안 맞음</span>'}${j.memo?` · 메모: ${esc(j.memo)}`:''}</div>
       ${j.newItem?`<div class="issue ${/가능/.test(j.newItem.decision)?'ok':'err'}">새 항목 판정: ${esc(j.newItem.decision)}${(j.newItem.foods||[]).length?' · 초안 이름: '+j.newItem.foods.map(f=>esc(f.word)).join(', '):''}</div>`:''}
       ${rs.map(r=>`<div style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><span class="pr ${good(r.grade)?'l':r.grade==='반대 근거 있음'?'h':'m'}">${esc(r.grade)}</span> <span class="tag">${esc(r.type||'')}</span>${esc(r.claim)}
-        ${(r.links||[]).filter(l=>l.quote||l.verdict).map(l=>`<div class="link" style="margin:6px 0 0"><div class="note">${esc(l.verdict||'')}${l.population?' · 대상 '+esc(l.population):''}${l.where?' · '+esc(l.where):''}${l.opened==='제목 다름'?' · <span style="color:var(--amb)">⚠️ 제목 다름: '+esc(l.realTitle||'')+'</span>':l.opened==='안 열림'?' · 안 열림':''}${l.rechecked?' · 검수 ✓':''}</div>${l.part?`<div class="note">🎯 찾으려던 부분: ${esc(l.part)}</div>`:''}${l.kwHit===false?`<div class="issue warn" style="margin:4px 0">⚠️ 찾을 단어(${esc((l.keywords||[]).join(', '))})가 인용에 하나도 없어요. 주제가 다른 문서인지 먼저 봐요.</div>`:''}${l.quote?`<div style="font-size:13px;margin:4px 0;border-left:3px solid var(--line);padding-left:8px">"${esc(l.quote)}"</div>`:''}${noteHtml(j.target,r.claim,l)}<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title||l.url)}</a> <span class="note">${esc(l.tier||'')}</span>
+        ${(r.links||[]).filter(l=>l.quote||l.verdict).map(l=>`<div class="link" style="margin:6px 0 0"><div class="note">${esc(l.verdict||'')}${l.population?' · 대상 '+esc(l.population):''}${l.where?' · '+esc(l.where):''}${l.opened==='제목 다름'?' · <span style="color:var(--amb)">⚠️ 제목 다름: '+esc(l.realTitle||'')+'</span>':l.opened==='안 열림'?' · 안 열림':''}${l.rechecked?' · 검수 ✓':''}${l.baseSuggest?' · <b style="color:var(--amb)">⭐ 기본 출처 추천</b>':''}</div>${baseBtn(j,l)}${l.part?`<div class="note">🎯 찾으려던 부분: ${esc(l.part)}</div>`:''}${l.kwHit===false?`<div class="issue warn" style="margin:4px 0">⚠️ 찾을 단어(${esc((l.keywords||[]).join(', '))})가 인용에 하나도 없어요. 주제가 다른 문서인지 먼저 봐요.</div>`:''}${l.quote?`<div style="font-size:13px;margin:4px 0;border-left:3px solid var(--line);padding-left:8px">"${esc(l.quote)}"</div>`:''}${noteHtml(j.target,r.claim,l)}<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.title||l.url)}</a> <span class="note">${esc(l.tier||'')}</span>
         ${l.quote?`<div class="row" style="margin-top:6px"><a class="btn sm ghost" style="text-decoration:none" target="_blank" rel="noopener noreferrer" href="${esc(fragUrl(l.url,l.quote))}">🔎 원문에서 이 문장 보기</a>${/[a-zA-Z]{4,}/.test(l.quote)?`<a class="btn sm ghost" style="text-decoration:none" target="_blank" rel="noopener noreferrer" href="https://translate.google.com/?sl=auto&tl=ko&op=translate&text=${encodeURIComponent(String(l.quote).slice(0,4000))}">🌐 번역 보기</a>`:''}</div>`:''}</div>`).join('')}
         ${r.notFound?`<div class="note">AI가 못 찾음: ${esc(r.notFound)}</div>`:''}
         <div class="seg" style="margin-top:6px"><button data-rk="${rk(r)}" data-v="ok" class="${myRev[rk(r)]==='ok'?'on':''}">검수 OK</button><button data-rk="${rk(r)}" data-v="fix" class="${myRev[rk(r)]==='fix'?'on':''}">고치기</button></div></div>`).join('')}</div>`}).join('');
   const allR=subs.flatMap(({j})=>(j.results||[]).map(r=>[j,r]));const mr=store.get('myRev',{});const nRev=allR.filter(([j,r])=>mr[hash(j.target+'|'+r.claim+'|'+(r.links||[]).map(l=>l.quote).join('|'))]).length;
   document.getElementById('subsCount').textContent=`· ${subs.length}건 · 문장 ${allR.length}개 중 검수 ${nRev}개`;
+  setTimeout(()=>document.querySelectorAll('#subsList .baseMk').forEach(b=>b.onclick=()=>{const m=store.get('baseMark',{});if(m[b.dataset.bk])delete m[b.dataset.bk];else m[b.dataset.bk]=1;store.set('baseMark',m);renderSubs();try{renderSrc()}catch(e){}}),0);
   setTimeout(()=>document.querySelectorAll('#subsList .cpOne').forEach(b=>b.onclick=()=>{const rec=store.get('subs',[]).find(x=>x.key===b.dataset.key);if(!rec)return;const j=rec.j;
     const todo=(j.results||[]).filter(r=>!revOf(j,r));const rs=j.newItem||!todo.length?(j.results||[]):todo;
-    const txt=reviewAsk(rs.length,`이번엔 ${j.checkedBy||''}의 ${j.target} 제출 1건만이야.`).replace(todo.length&&!j.newItem?'':', 이미 검수한 문장은 뺐어','')+subText(j,rs);
+    const txt=reviewAsk(rs.length,`이번엔 ${j.checkedBy||''}의 ${j.target} 제출 1건만이야.`).replace(todo.length&&!j.newItem?'':', 이미 검수한 문장은 뺐어','')+subText(j,rs,rec);
     const m=document.querySelector(`#subsList .cpOneMsg[data-key="${CSS.escape(b.dataset.key)}"]`);
     navigator.clipboard.writeText(txt).then(()=>{if(m)m.textContent=`복사했어요 (${j.target} · 문장 ${rs.length}개${todo.length&&todo.length<(j.results||[]).length?' · 검수한 문장 빼고':''}). 검수 채팅에 붙여 넣으세요.`},()=>{if(m)m.textContent='복사가 막혔어요.'})}),0);
   document.getElementById('subsList').innerHTML=html||'<div class="note">'+(subs.length?'이 조건에 맞는 문장이 없어요.':'아직 모은 결과가 없어요. 📊 진행 현황의 "결과 모으기"에 구글 시트 CSV나 제출 내용을 붙여 주세요.')+'</div>';
@@ -603,6 +608,22 @@ function importNotes(raw){const out=document.getElementById('notesOut');let j;tr
 if(document.getElementById('notesBtn'))document.getElementById('notesBtn').onclick=()=>importNotes(document.getElementById('notesBox').value);
 
 // ---- 출처 교체 표 ----
+// 성곤이 모아 보기에서 직접 고른 기본 출처(이미 확인 끝난 문장의 링크도 가능)
+function baseKey(target,url){return hash(String(target)+'|'+String(url))}
+function baseBtn(j,l){const t=TARGETS.find(x=>x.label===j.target&&!x.isNew);if(!t||!sourceIssue(t.obj.source)||l.verdict!=='뒷받침'||/받지 않는/.test(l.tier||''))return '';
+  const on=!!store.get('baseMark',{})[baseKey(j.target,l.url)];return `<div style="margin-top:4px"><button type="button" class="btn sm ${on?'':'ghost'} baseMk" data-bk="${baseKey(j.target,l.url)}">${on?'⭐ 앱 기본 출처로 골랐어요 (누르면 취소)':'☆ 이 링크를 앱 기본 출처로 쓰기'}</button></div>`}
+// 조원이 ④에서 ⭐ 기본 출처로 추천한 링크 모으기 (+ 성곤이 고른 것)
+function baseCands(label){const out=[];store.get('subs',[]).forEach(rec=>{const j=rec.j;if(!j||j.target!==label)return;const bm=store.get('baseMark',{});(j.results||[]).forEach(r=>(r.links||[]).forEach(l=>{const mine=!!bm[baseKey(j.target,l.url)];if(l.baseSuggest||mine)out.push({j,r,l,mine,rev:(typeof revOf==='function'?revOf(j,r):undefined)})}))});return out}
+function candHtml(label){const cs=baseCands(label);if(!cs.length)return '<span class="note">아직 없음</span>';
+  return cs.map(x=>`<div style="margin:2px 0"><a href="${esc(x.l.url)}" target="_blank" rel="noopener noreferrer">${esc(x.l.title||host(x.l.url))}</a> <span class="note">${x.mine?'<b>성곤 ⭐</b> · ':'조원 ⭐ · '}${esc([x.l.tier,x.l.verdict,x.j.checkedBy].filter(Boolean).join(' · '))} · ${x.rev==='ok'?'✅ 검수 OK':x.rev==='fix'?'🔁 고치기':'⏳ 검수 전'}</span></div>`).join('')}
+if(document.getElementById('srcAsk'))document.getElementById('srcAsk').onclick=()=>{const m=document.getElementById('srcAskMsg');const rows=[];let all=0,wait=0;
+  TARGETS.filter(t=>!t.isNew&&sourceIssue(t.obj.source)).forEach(t=>baseCands(t.label).forEach(x=>{all++;if(x.l.verdict!=='뒷받침'||/받지 않는/.test(x.l.tier||''))return;if(x.rev!=='ok'){wait++;return}
+    rows.push({by:x.mine?'성곤':'조원',target:t.label,now:t.obj.source,why:sourceIssue(t.obj.source),url:x.l.url,title:x.l.title,publisher:x.l.publisher,year:x.l.year,tier:x.l.tier,claim:x.r.claim,quote:x.l.quote,checkedBy:x.j.checkedBy})}));
+  if(!rows.length){m.textContent=all?`⭐ 추천 ${all}개 중 넣을 수 있는 게 없어요 (검수 전 ${wait}개 · 판정이 뒷받침이 아니거나 받지 않는 출처인 것 제외).`:'아직 ⭐ 후보가 없어요. 📥 모아 보기의 "확인 끝만"에서 ☆ 버튼으로 고를 수 있어요.';return}
+  const d=new Date(),date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const txt=`프로젝트 문서 \`claude/근거검수-채팅-안내.md\`의 "출처 교체 요청" 순서대로 diet-data.js 기본 출처를 바꿔 줘. (${rows.length}개)\n\n// 출처 교체 요청 · ${date}\n`+JSON.stringify({swaps:rows},null,1);
+  navigator.clipboard.writeText(txt).then(()=>{m.textContent=`✅ ${rows.length}개를 복사했어요${wait?` (검수 전이라 뺀 것 ${wait}개)`:''}. Claude 채팅에 붙여 넣으세요.`},()=>{m.textContent='복사가 막혔어요.'})};
+if(document.getElementById('srcCard'))document.getElementById('srcCard').addEventListener('toggle',()=>{try{renderSrc()}catch(e){}});
 const URGENT=/민원|뉴스|오래된|건강 정보 매체|블로그/;
 function renderSrc(){
   if(!document.getElementById('srcTable'))return;
@@ -610,7 +631,7 @@ function renderSrc(){
   const rows=TARGETS.filter(t=>!me()||whoOf(t.label)===me()).map(t=>({t,si:sourceIssue(t.obj.source)})).filter(x=>x.si).sort((a,b)=>(URGENT.test(b.si)-URGENT.test(a.si)));
   const left=rows.filter(r=>!done[r.t.id]).length;
   document.getElementById('srcCount').textContent=`· 남은 ${left}개 / ${rows.length}개`;
-  document.getElementById('srcTable').innerHTML='<tr><th>바꿈</th><th>항목</th><th>지금 출처 · 약한 이유</th></tr>'+rows.map(({t,si})=>`<tr><td class="ck"><input type="checkbox" data-id="${esc(t.id)}" ${done[t.id]?'checked':''}></td><td><button class="lk" data-id="${esc(t.id)}">${esc(t.label.replace(/ 알레르기$/,''))}</button>${whoBadge(t.label)}${t.kind==='기저질환'?'<div class="why">기저질환</div>':''}</td><td><span class="pr ${URGENT.test(si)?'h':'m'}">${URGENT.test(si)?'급함':'보통'}</span> ${esc(si)}<div class="why"><a href="${esc(t.obj.source)}" target="_blank" rel="noopener noreferrer" style="color:var(--bl)">${esc(host(t.obj.source))}</a></div></td></tr>`).join('');
+  document.getElementById('srcTable').innerHTML='<tr><th>바꿈</th><th>항목</th><th>지금 출처 · 약한 이유</th><th>⭐ 조원 추천 후보</th></tr>'+rows.map(({t,si})=>`<tr><td class="ck"><input type="checkbox" data-id="${esc(t.id)}" ${done[t.id]?'checked':''}></td><td><button class="lk" data-id="${esc(t.id)}">${esc(t.label.replace(/ 알레르기$/,''))}</button>${whoBadge(t.label)}${t.kind==='기저질환'?'<div class="why">기저질환</div>':''}</td><td><span class="pr ${URGENT.test(si)?'h':'m'}">${URGENT.test(si)?'급함':'보통'}</span> ${esc(si)}<div class="why"><a href="${esc(t.obj.source)}" target="_blank" rel="noopener noreferrer" style="color:var(--bl)">${esc(host(t.obj.source))}</a></div></td><td>${candHtml(t.label)}</td></tr>`).join('');
   document.querySelectorAll('#srcTable input').forEach(cb=>cb.onchange=()=>{const d=store.get('srcDone',{});if(cb.checked)d[cb.dataset.id]=1;else delete d[cb.dataset.id];store.set('srcDone',d);renderSrc();renderProg()});
   document.querySelectorAll('#srcTable .lk').forEach(b=>b.onclick=()=>{const t=TARGETS.find(x=>x.id===b.dataset.id);document.getElementById('q').value=t.label;doFind(t.label);showTab('p1');document.getElementById('srcCard').open=false;document.getElementById('findResult').scrollIntoView({block:'center'})});
 }
@@ -735,6 +756,9 @@ function confirm2(msgEl,key){if(msgEl.dataset.again===key){msgEl.dataset.again='
 function renderForm(){const c=formCfg();if(!c)return;document.getElementById('sendForm').style.display='inline-block';document.getElementById('formLink').href=c.view;document.getElementById('formNote').style.display='block'}
 function renderTools(){const cur=curTool();document.getElementById('toolSeg').innerHTML=Object.entries(TOOLS).map(([k,v])=>`<button data-k="${k}" class="${k===cur?'on':''}">${v.name}</button>`).join('');
   document.getElementById('toolTip').innerHTML=TOOLS[cur].tip;document.querySelectorAll('#toolSeg button').forEach(b=>b.onclick=()=>{store.set('tool',b.dataset.k);renderTools();renderPrompt()})}
+// 기본 출처 교체: 출처가 약한 항목의 '기본 설명' 문장은 앱의 대표 출처를 바꾸는 문장으로 다뤄요
+function swapOf(c){if(!T||T.isNew||!c||c.type!=='기본 설명')return null;const cc=CLAIMS.find(x=>x.id===c.id)||c;return cc&&cc.weakSrc?{now:String(T.obj.source||''),why:cc.weakSrc}:null}
+function swapNote(c){const s=swapOf(c);return s?` ← [기본 출처 교체] 지금 앱 출처(${s.now||'없음'})는 "${s.why}"라서 바꾸려고 해. 이 문장의 링크는 ${T.label} 전체(무엇인지·증상·피하는 법)를 설명하는 개요 페이지를 1순위로 찾아 줘. 지금 출처 주소는 다시 주지 마.`:''}
 function buildPrompt(){
   const list=CLAIMS.filter(c=>S.picked.includes(c.id));
   const NW=!!T.isNew,LBL=NW?'찾을 질문':'확인할 문장';
@@ -758,7 +782,7 @@ ${TOOLS[curTool()].rule}
 7. ${NW?'질문':'문장'}에 내용이 두 개 이상이면(예: "면역 과민반응" + "피부·소화기·호흡기 증상") 링크들을 합쳐서 모든 부분을 덮어 줘. 링크마다 part에 ${NW?'질문':'앱 문장'} 중 어느 부분을 찾으려는 링크인지 ${NW?'질문':'앱 문장'}의 말 그대로 짧게 적어(예: "면역 과민반응", "아나필락시스"). 문서 내용을 설명하지 마.
 8. 같은 내용이면 PDF보다 웹페이지를 먼저 줘.
 9. 기관 첫 화면·검색 결과 페이지 말고, 그 내용이 있는 페이지 주소를 줘. StatPearls는 statpearls.com 말고 ncbi.nlm.nih.gov/books/ 주소로 줘.
-10. 다른 글을 옮겨 온 포털·게시판 글이면 원래 문서를 찾아 그 링크를 줘.
+10. 다른 글을 옮겨 온 포털·게시판 글이면 원래 문서를 찾아 그 링크를 줘.${list.some(c=>swapOf(c))?`\n11. [기본 출처 교체]가 붙은 문장은 앱 화면에 '출처'로 걸어 둘 대표 문서를 찾는 거야. 한 가지 내용만 다루는 논문보다, 그 항목 전체를 다루는 정부·공공기관·학회 환자 안내 페이지를 먼저 줘. 한국어 공공기관·학회 페이지가 있으면 꼭 같이 줘.`:''}
 
 [칸 쓰는 규칙]
 - title: 페이지에 보이는 제목을 원래 언어 그대로 복사해. 번역하거나 줄이지 마.
@@ -784,7 +808,7 @@ ${TOOLS[curTool()].rule}
 }
 
 ${NW?`[찾을 질문] (${T.kind}: ${T.label}, 먹고죽자! 앱에 아직 없는 새 항목)`:`[확인할 문장] (${T.kind}: ${T.label}, 먹고죽자! 앱에 지금 들어 있는 문장)`}
-${list.map(c=>`${c.id}. [${c.type}] ${c.text}`).join('\n')}
+${list.map(c=>`${c.id}. [${c.type}] ${c.text}${swapNote(c)}`).join('\n')}
 (id에는 위 번호(${list.map(c=>c.id).join(', ')})를 그대로 적어.)`;
 }
 function renderPrompt(){
@@ -900,6 +924,7 @@ function renderConfirm(){
       <div class="sb"><div class="grid2"><div><div class="note">위치 (쪽·섹션 제목)</div><input type="text" data-f="where" value="${esc(v.where||'')}" placeholder="${pdf?'예: 5쪽':'예: Symptoms'}"></div>
       <div><div class="note">이 문장의 대상</div><select data-f="pop">${TARGETS_POP.map(x=>`<option ${v.pop===x?'selected':''} value="${x}">${x||'선택'}</option>`).join('')}</select></div></div>
       <div class="note" style="margin-top:6px"><b>${T.isNew?'찾은 문장에 질문의 답이 들어 있나요?':'붙인 문장이 위 🎯 문장과 같은 말인가요?'}</b></div><select data-f="verdict">${VERDICTS.map(x=>`<option ${v.verdict===x?'selected':''} value="${x}">${(T.isNew?VLABEL_NEW[x]:VLABEL[x])||'선택'}</option>`).join('')}</select>
+      ${swapOf(c)?`<label class="chk" style="margin-top:8px;background:var(--al);border-radius:8px;padding:6px 8px"><input type="checkbox" data-f="baseSuggest" ${v.baseSuggest?'checked':''}><span><b>⭐ 이 문서를 앱의 새 기본 출처로 추천해요</b><br><small>이 항목 전체(무엇인지·증상·피하는 법)를 설명하는 공공기관·학회 페이지이고, 판정이 "네, 같은 말이에요"일 때만 골라요. 지금 출처가 약한 이유: ${esc(swapOf(c).why)}</small></span></label>`:''}
       ${T.isNew?`<div class="note" style="margin-top:6px">문장에 나온 음식·재료·성분 이름 (원문 표기 그대로, 쉼표로. 없으면 비워요)</div><input type="text" data-f="foods" value="${esc(v.foods||'')}" placeholder="예: kiwifruit, gold kiwi">`:''}</div>
       <div class="qw"></div></div>`}).join(''):`<div class="issue info">아직 링크가 없어요${c.notFound?' (AI: '+esc(c.notFound)+')':''}. 그대로 두면 "못 찾음"이 돼요.</div>`}
     <details style="margin-top:8px"><summary class="note" style="cursor:pointer">+ 링크 직접 추가</summary><div style="margin-top:6px"><input type="text" class="addUrl" data-id="${c.id}" placeholder="https://..."><input type="text" class="addTitle" data-id="${c.id}" placeholder="문서 제목 (선택)" style="margin-top:4px"><div class="row" style="margin-top:4px"><button class="btn sm ghost addBtn" data-id="${c.id}">추가</button><span class="note addMsg" data-id="${c.id}"></span></div></div></details></div>`).join('');
@@ -922,6 +947,8 @@ function warnLink(el,k){const [id]=k.split('_');const c=S.parsed.find(x=>x.id===
   if(T.isNew&&v.foods){const ql=String(v.quote||'').toLowerCase();const miss=String(v.foods).split(/[,，、]/).map(x=>x.trim()).filter(Boolean).filter(f=>!ql.includes(f.toLowerCase()));if(miss.length)ws.push(`인용한 문장에 없는 이름이에요: ${miss.join(', ')}. 원문 표기 그대로 적어 주세요(번역은 나중에 해요).`)}
   if(T.isNew&&v.foods&&v.verdict&&v.verdict!=='뒷받침')ws.push('음식 이름은 "답이 있음"일 때만 초안에 들어가요.');
   if(v.verdict==='뒷받침'&&v.pop==='성인'&&/아이|아기|영아|세 미만|어린/.test(c.claim))ws.push('앱 문장은 아이에 대한 내용인데 문서는 성인 대상이에요. 그대로 적용해도 되는지 메모에 적어 주세요.');
+  if(v.baseSuggest&&v.verdict!=='뒷받침')ws.push('⭐ 기본 출처 추천은 판정이 "네, 같은 말이에요"일 때만 반영돼요.');
+  if(v.baseSuggest&&li&&li.tier==='X')ws.push('받지 않는 출처(기사·블로그 등)라 기본 출처로 추천할 수 없어요.');
   el.querySelector('.qw').innerHTML=ws.map(w=>`<div class="issue warn">⚠️ ${esc(w)}</div>`).join('');}
 document.getElementById('who1').oninput=e=>{store.set('who1',e.target.value);S.who1=e.target.value;save();renderReview()};
 
@@ -959,7 +986,7 @@ function buildOut(){
   if(miss.length){ob.style.display='block';ob.textContent='아직 남은 것: '+miss.join(', ');out.value='';btn.disabled=true;document.getElementById('sendForm').disabled=true;return}
   ob.style.display='none';
   const d=new Date(),date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  const res={target:T.label,checkedBy:w1,reviewedBy:'',date,memo:(S.memo||'').trim(),results:S.parsed.map(c=>({id:c.id,type:c.type,claim:c.claim,grade:gradeOf(c),notFound:c.notFound||undefined,links:c.links.map((l,i)=>{const v=S.conf[c.id+'_'+i]||{};const kh=kwHit(l.keywords,v.quote);return {url:l.url,title:l.title,publisher:l.publisher,year:l.year,tier:TIER_TXT[l.tier],part:l.part||undefined,keywords:l.keywords.length?l.keywords.map(x=>x.word):undefined,kwHit:kh===null?undefined:kh,verdict:openState(v)==='fail'?'문장 없음':v.verdict,quote:v.quote||'',where:v.where||'',population:v.pop||'',opened:openState(v)==='same'?'제목 같음':openState(v)==='diff'?'제목 다름':openState(v)==='fail'?'안 열림':'',realTitle:openState(v)==='diff'?String(v.realTitle||''):undefined}})}))};
+  const res={target:T.label,checkedBy:w1,reviewedBy:'',date,memo:(S.memo||'').trim(),results:S.parsed.map(c=>({id:c.id,type:c.type,claim:c.claim,grade:gradeOf(c),notFound:c.notFound||undefined,sourceSwap:swapOf(c)||undefined,links:c.links.map((l,i)=>{const v=S.conf[c.id+'_'+i]||{};const kh=kwHit(l.keywords,v.quote);return {url:l.url,title:l.title,publisher:l.publisher,year:l.year,tier:TIER_TXT[l.tier],part:l.part||undefined,keywords:l.keywords.length?l.keywords.map(x=>x.word):undefined,kwHit:kh===null?undefined:kh,verdict:openState(v)==='fail'?'문장 없음':v.verdict,quote:v.quote||'',where:v.where||'',population:v.pop||'',opened:openState(v)==='same'?'제목 같음':openState(v)==='diff'?'제목 다름':openState(v)==='fail'?'안 열림':'',realTitle:openState(v)==='diff'?String(v.realTitle||''):undefined,baseSuggest:(v.baseSuggest&&openState(v)!=='fail'&&l.tier!=='X')?true:undefined}})}))};
   if(T.isNew){const nd=newDraft();res.newItem={name:T.label,kind:T.kind,decision:nd.decision,core:nd.core,foods:nd.foods,
       note:'초안이에요. 앱 문장·음식 목록은 이 인용만 보고 따로 쓰고, 다시 ①로 문장 확인을 해요.'+(T.kind==='기저질환'?' 수치 기준은 의료진 상담 안내로만 넣어요.':'')}}
   const body=JSON.stringify(res,null,1);

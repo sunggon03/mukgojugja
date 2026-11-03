@@ -271,7 +271,7 @@ const allergyMapping = {
             '케첩': ['비트·당근 소스(토마토 없는 소스, 맛 차이 있음)']
         },
         tips: '토마토소스·페이스트·케첩 같은 가공식품에도 들어가요. 토마토가 주재료인 요리는 대체가 어려워 다른 메뉴를 고르는 게 나을 수 있어요. 식약처 알레르기 표시 의무 대상이니 성분표 확인',
-        source: "https://110.go.kr/data/counselView.do?curPage=23&num=B03_668837&scCate1=&scCate2=&scIntt=&scText=&scType="
+        source: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9031248/"
     },
     '닭고기': {
         name: '닭고기 알레르기',
@@ -314,7 +314,7 @@ const allergyMapping = {
             '화이트와인': ['물 + 레몬즙 소량(와인 대용)'],
             '레드와인': ['무가당 포도즙(레드와인 대용, 단맛이 있어요)']
         },
-        tips: '이산화황이 최종 제품 1kg당 10mg 이상 남은 경우에만 표시 대상이에요. 성분표의 "이산화황 함유" 표시를 확인하세요',
+        tips: '아황산류를 넣어 만든 제품에서 최종 제품에 이산화황이 1kg당 10mg 이상 남은 경우에만 표시 대상이에요. 성분표의 "이산화황 함유" 표시를 확인하세요',
         source: "https://110.go.kr/data/counselView.do?curPage=23&num=B03_668837&scCate1=&scCate2=&scIntt=&scText=&scType="
     },
 };
