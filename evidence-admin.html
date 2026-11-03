@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="app-build" content="202611030337">
-<script>(function(){var B="202611030337",path=location.pathname,last=0;
+<meta name="app-build" content="202611030403">
+<script>(function(){var B="202611030403",path=location.pathname,last=0;
 function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}}
 function bar(nb){if(document.getElementById('freshBar'))return;var d=document.createElement('div');d.id='freshBar';d.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#1F5FA8;color:#fff;border-radius:12px;padding:12px 14px;font:600 14px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;gap:10px;align-items:center;justify-content:space-between';
 d.innerHTML='<span>새 버전이 나왔어요. 입력한 내용은 저장돼 있어요.</span>';var b=document.createElement('button');b.textContent='새로고침';b.style.cssText='background:#fff;color:#1F5FA8;border:0;border-radius:8px;padding:6px 12px;font:700 13px sans-serif;cursor:pointer';b.onclick=function(){location.replace(path+'?v='+nb+location.hash)};d.appendChild(b);(document.body||document.documentElement).appendChild(d)}
@@ -119,6 +119,9 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
   <div class="row" style="margin:6px 0"><button class="btn sm ghost" id="copyTodo">검수 전 문장만 복사 (Claude 검수 채팅용)</button><span class="note" id="copyTodoMsg"></span></div>
   <div style="margin:8px 0;padding:10px;border:1px dashed var(--line);border-radius:10px"><b style="font-size:14px">🤖 Claude 검수 의견 불러오기</b><div class="note">구글 시트 CSV를 Claude에게 주면, 인용마다 <b>한국어 번역 · 앱 문장과 같은 말인지 의견 · 출처가 믿을 만한지 · 성곤이 볼 것</b>을 만들어 줘요. 그걸 여기 붙이면 문장 아래에 보여요.</div>
   <textarea class="code" id="notesBox" style="min-height:60px;margin-top:6px" placeholder='{"notes":[...]}'></textarea><div class="row"><button class="btn sm" id="notesBtn">의견 붙이기</button></div><div id="notesOut"></div></div>
+  <div style="margin:8px 0;padding:10px;border:1px dashed var(--line);border-radius:10px"><b style="font-size:14px">💾 검수 기록 백업</b><div class="note">[검수 OK]·[고치기], 불러온 조원 결과, Claude 의견은 <b>이 브라우저에만</b> 저장돼요. 다른 컴퓨터로 옮기거나 브라우저 기록을 지우기 전에 내려받아 두세요.</div>
+    <div class="row" style="margin-top:6px"><button class="btn sm" id="bkSave">검수 기록 내려받기</button><label class="btn sm ghost" style="cursor:pointer">백업 파일 불러오기<input type="file" id="bkFile" accept=".json,application/json" style="display:none"></label><button class="btn sm ghost" id="bkResend">시트에 안 간 검수 보내기</button></div>
+    <div class="note" id="bkMsg" style="margin-top:4px"></div></div>
   <div style="margin:8px 0;padding:10px;border:1px dashed var(--line);border-radius:10px"><b style="font-size:14px">✅ 완료 목록 만들기 (done.js)</b><div class="note">[검수 OK]를 누른 문장 중 근거 있음·제한적인 것을 완료 목록으로 만들어요. GitHub에 <b>done.js</b>로 덮어쓰면 조원 화면에서 그 문장은 체크가 막혀요.</div>
   <div class="row"><button class="btn sm" id="mkDone">완료 목록 만들기</button><a class="btn sm ghost" id="dlDone" style="display:none;text-decoration:none" download="done.js">done.js 내려받기</a><button class="btn sm ghost" id="cpDone" style="display:none">복사</button><span class="copied" id="copiedDone"></span></div><div id="doneMsg" class="note"></div></div>
   <div id="revSendMsg" class="note" style="margin:4px 0"></div>
@@ -484,9 +487,41 @@ if(document.getElementById('importBtn'))document.getElementById('importBtn').onc
 if(document.getElementById('importUndo'))document.getElementById('importUndo').onclick=()=>{const prev=store.get('results_prev',null);if(!prev){document.getElementById('importOut').innerHTML='<div class="issue info">되돌릴 내용이 없어요.</div>';return}store.set('results',prev);store.set('results_prev',null);store.set('subs',store.get('subs_prev',[]));store.set('subs_prev',null);renderSubs();document.getElementById('importOut').innerHTML='<div class="issue ok">마지막 반영을 되돌렸어요.</div>';renderProg();if(T){CLAIMS=claimsFor(T);renderTable()}};
 
 // ---- 조원 검수 결과 모아 보기 ----
+// ---- 💾 검수 기록 백업: 내려받기·불러오기(합치기)·시트에 안 간 검수 보내기 ----
+const BK_KEYS=['subs','myRev','results','notes','srcDone','newTargets'];
+function bkCount(d){const sub=(d.subs||[]).length,rev=Object.keys(d.myRev||{}).length,nt=Object.keys(d.notes||{}).length;return `조원 제출 ${sub}건 · 검수 ${rev}개 · Claude 의견 ${nt}개`}
+function bkMsg(h){const m=document.getElementById('bkMsg');if(m)m.innerHTML=h}
+if(document.getElementById('bkSave'))document.getElementById('bkSave').onclick=()=>{const data={};BK_KEYS.forEach(k=>data[k]=store.get(k,k==='subs'?[]:{}));
+  const d=new Date(),p2=n=>String(n).padStart(2,'0'),stamp=`${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}`;
+  const body=JSON.stringify({app:'mukgojugja-evidence-admin',v:1,at:d.toISOString(),data},null,1);
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([body],{type:'application/json'}));a.download=`review-backup-${stamp}.json`;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{a.remove()},3000);
+    bkMsg(`✅ 내려받았어요: review-backup-${stamp}.json (${bkCount(data)}). 구글 드라이브나 카톡 나에게 보내기에 올려 두면 안전해요.`)}
+  catch(e){bkMsg('<span style="color:var(--red)">내려받기가 막혔어요. 다른 브라우저(크롬)로 해 주세요.</span>')}};
+function bkMerge(data){const out={add:0,rev:0,notes:0};
+  const subs=store.get('subs',[]);const have=new Set(subs.map(x=>x.key));(data.subs||[]).forEach(x=>{if(x&&x.key&&x.j&&!have.has(x.key)){subs.push(x);have.add(x.key);out.add++}});store.set('subs',subs);
+  const mr=store.get('myRev',{});Object.entries(data.myRev||{}).forEach(([k,v])=>{if(!mr[k]&&(v==='ok'||v==='fix')){mr[k]=v;out.rev++}});store.set('myRev',mr);
+  const nt=store.get('notes',{});Object.entries(data.notes||{}).forEach(([k,v])=>{if(!nt[k]){nt[k]=v;out.notes++}});store.set('notes',nt);
+  const rs=store.get('results',{});Object.entries(data.results||{}).forEach(([t,o])=>{rs[t]=Object.assign({},o,rs[t]||{})});store.set('results',rs);
+  const sd=store.get('srcDone',{});store.set('srcDone',Object.assign({},data.srcDone||{},sd));
+  const nw=store.get('newTargets',{});if(Array.isArray(nw)||Array.isArray(data.newTargets)){const a=[].concat(nw||[]);(data.newTargets||[]).forEach(x=>{if(!a.some(y=>JSON.stringify(y)===JSON.stringify(x)))a.push(x)});store.set('newTargets',a)}else store.set('newTargets',Object.assign({},data.newTargets||{},nw));
+  return out}
+if(document.getElementById('bkFile'))document.getElementById('bkFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{e.target.value='';
+  let j;try{j=JSON.parse(String(r.result))}catch(x){bkMsg('<span style="color:var(--red)">백업 파일이 아니에요(형식이 깨졌어요).</span>');return}
+  if(!j||j.app!=='mukgojugja-evidence-admin'||!j.data){bkMsg('<span style="color:var(--red)">이 화면에서 내려받은 "review-backup-….json" 파일만 불러올 수 있어요.</span>');return}
+  const o=bkMerge(j.data);renderSubs();try{renderProg();renderSrc()}catch(x){}if(typeof T!=='undefined'&&T){CLAIMS=claimsFor(T);renderTable()}
+  const miss=bkUnsent().length;
+  bkMsg(`✅ 합쳤어요 (${String(j.at||'').slice(0,16).replace('T',' ')} 백업): 새 조원 제출 ${o.add}건 · 새 검수 ${o.rev}개 · 새 Claude 의견 ${o.notes}개. 이 브라우저에 있던 기록은 그대로 뒀어요.`+(miss?` <b>조원 화면에 아직 안 간 검수 ${miss}개</b>가 있어요 → "시트에 안 간 검수 보내기"를 눌러요.`:''))};r.readAsText(f)};
+// 내 브라우저에는 [검수 OK]/[고치기]가 있는데 공유 시트에는 없는 것 (공유 현황을 켜기 전에 눌렀거나, 다른 컴퓨터에서 가져온 것)
+function bkUnsent(){const mr=store.get('myRev',{});const out=[];store.get('subs',[]).forEach(({j})=>{if(j.newItem)return;(j.results||[]).forEach(r=>{const k=hash(j.target+'|'+r.claim+'|'+(r.links||[]).map(l=>l.quote).join('|'));const v=mr[k];if(!v)return;
+  const st=(typeof liveState==='function')?liveState(j.target,r.claim):null;const sv=st&&st.st==='done'?'ok':st&&st.st==='fix'?'fix':'';if(sv!==v)out.push([j,r,v])})});return out}
+if(document.getElementById('bkResend'))document.getElementById('bkResend').onclick=async()=>{if(!liveUrl()){bkMsg('team.js에 liveSheet(공유 시트 주소)가 없어서 보낼 곳이 없어요.');return}
+  await loadLive();const list=bkUnsent();if(!list.length){bkMsg('✅ 시트에 안 간 검수가 없어요. 조원 화면과 같아요.');return}
+  bkMsg(`보내는 중… (${list.length}개)`);for(const [j,r,v] of list){await sendReview(j.target,r.claim,r.grade,v);await new Promise(x=>setTimeout(x,400))}
+  bkMsg(`✅ 검수 ${list.length}개를 시트로 보냈어요. 조원 화면에는 1~2분 안에 보여요.`)};
 // 검수했는지: 이 기기에서 누른 기록, 없으면 공유 시트에 들어간 "검수 결과"(다른 기기에서 눌렀어도)
 function revOf(j,r){const m=store.get('myRev',{});const k=hash(j.target+'|'+r.claim+'|'+(r.links||[]).map(l=>l.quote).join('|'));if(m[k])return m[k];
   const st=(typeof liveState==='function')?liveState(j.target,r.claim):null;return st&&st.st==='done'?'ok':st&&st.st==='fix'?'fix':undefined}
+function reviewAsk(n,what){return `프로젝트 문서 \`claude/근거검수-채팅-안내.md\`대로 검수해 줘. ${what} (문장 ${n}개, 이미 검수한 문장은 뺐어)\n\n`}
 function subText(j,results){const jj=Object.assign({},j,{results});return `// 근거 확인 결과 · ${j.target} · 확인: ${j.checkedBy||''} · 검수 전 · ${j.date||''}\n`+JSON.stringify(jj,null,1)}
 // 공유 시트에서 "아직 안 불러온 제출"만 골라 불러오기 (이미 불러온 건 검사코드로 걸러요)
 function importNew(text,quiet){const subs=store.get('subs',[]);const have=new Set(subs.map(x=>x.key));
@@ -504,7 +539,7 @@ async function autoImport(quiet){const u=liveUrl();if(!u||!document.getElementBy
 if(document.getElementById('copyTodo'))document.getElementById('copyTodo').onclick=()=>{const subs=store.get('subs',[]);const out=[];let n=0;
   subs.forEach(({j})=>{if(j.newItem){out.push(subText(j,j.results||[]));return}const rs=(j.results||[]).filter(r=>!revOf(j,r));if(!rs.length)return;n+=rs.length;out.push(subText(j,rs))});
   const m=document.getElementById('copyTodoMsg');if(!out.length){m.textContent='검수 안 한 문장이 없어요.';return}
-  const txt='// 아래는 아직 검수 안 한 문장만 모은 거예요 (이미 검수한 건 뺐어요)\n\n'+out.join('\n\n');
+  const txt=reviewAsk(n,`검수 전 제출 ${out.length}건이야.`)+'// 아래는 아직 검수 안 한 문장만 모은 거예요 (이미 검수한 건 뺐어요)\n\n'+out.join('\n\n');
   navigator.clipboard.writeText(txt).then(()=>{m.textContent=`검수 전 문장 ${n}개(${out.length}건)를 복사했어요. 검수 채팅에 붙여 넣으세요.`},()=>{m.textContent='복사가 막혔어요.'})};
 function renderSubs(){
   if(!document.getElementById('subsList'))return;
@@ -520,7 +555,7 @@ function renderSubs(){
     const myRev=new Proxy(myRev0,{get:(o,k)=>{if(o[k])return o[k];const r=(j.results||[]).find(x=>rk(x)===k);return r?revOf(j,r):undefined}});
     const rs=(j.results||[]).filter(r=>fv==='all'||(fv==='todo'?!myRev[rk(r)]:fv==='fix'?(!good(r.grade)||myRev[rk(r)]==='fix'):(good(r.grade)&&myRev[rk(r)]!=='fix')));if(!rs.length&&!j.newItem)return '';
     const nOk=(j.results||[]).filter(r=>good(r.grade)).length,nFix=(j.results||[]).length-nOk;
-    return `<div class="claim"><div class="ct">${newKeys.has(key)?'<span class="tag" style="background:var(--al);color:var(--amb)">🆕 새로 들어옴</span>':''}${esc(j.target)}${whoBadge(j.target)}${j.newItem?' <span class="tag">새 항목</span>':''}</div>
+    return `<div class="claim"><div class="row" style="margin:0 0 6px;justify-content:space-between"><span></span><span><button class="btn sm ghost cpOne" data-key="${esc(key)}" title="이 제출만 Claude 검수 채팅에 물어보기">🤖 이 제출만 Claude 검수용 복사</button></span></div><div class="note cpOneMsg" data-key="${esc(key)}" style="text-align:right"></div><div class="ct">${newKeys.has(key)?'<span class="tag" style="background:var(--al);color:var(--amb)">🆕 새로 들어옴</span>':''}${esc(j.target)}${whoBadge(j.target)}${j.newItem?' <span class="tag">새 항목</span>':''}</div>
       <div class="note">확인 ${esc(j.checkedBy)} · ${esc(j.date)} · 확인 끝 ${nOk} · 고칠 문장 ${nFix}${ok?'':' · <span style="color:var(--red)">검사코드 안 맞음</span>'}${j.memo?` · 메모: ${esc(j.memo)}`:''}</div>
       ${j.newItem?`<div class="issue ${/가능/.test(j.newItem.decision)?'ok':'err'}">새 항목 판정: ${esc(j.newItem.decision)}${(j.newItem.foods||[]).length?' · 초안 이름: '+j.newItem.foods.map(f=>esc(f.word)).join(', '):''}</div>`:''}
       ${rs.map(r=>`<div style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><span class="pr ${good(r.grade)?'l':r.grade==='반대 근거 있음'?'h':'m'}">${esc(r.grade)}</span> <span class="tag">${esc(r.type||'')}</span>${esc(r.claim)}
@@ -530,6 +565,11 @@ function renderSubs(){
         <div class="seg" style="margin-top:6px"><button data-rk="${rk(r)}" data-v="ok" class="${myRev[rk(r)]==='ok'?'on':''}">검수 OK</button><button data-rk="${rk(r)}" data-v="fix" class="${myRev[rk(r)]==='fix'?'on':''}">고치기</button></div></div>`).join('')}</div>`}).join('');
   const allR=subs.flatMap(({j})=>(j.results||[]).map(r=>[j,r]));const mr=store.get('myRev',{});const nRev=allR.filter(([j,r])=>mr[hash(j.target+'|'+r.claim+'|'+(r.links||[]).map(l=>l.quote).join('|'))]).length;
   document.getElementById('subsCount').textContent=`· ${subs.length}건 · 문장 ${allR.length}개 중 검수 ${nRev}개`;
+  setTimeout(()=>document.querySelectorAll('#subsList .cpOne').forEach(b=>b.onclick=()=>{const rec=store.get('subs',[]).find(x=>x.key===b.dataset.key);if(!rec)return;const j=rec.j;
+    const todo=(j.results||[]).filter(r=>!revOf(j,r));const rs=j.newItem||!todo.length?(j.results||[]):todo;
+    const txt=reviewAsk(rs.length,`이번엔 ${j.checkedBy||''}의 ${j.target} 제출 1건만이야.`).replace(todo.length&&!j.newItem?'':', 이미 검수한 문장은 뺐어','')+subText(j,rs);
+    const m=document.querySelector(`#subsList .cpOneMsg[data-key="${CSS.escape(b.dataset.key)}"]`);
+    navigator.clipboard.writeText(txt).then(()=>{if(m)m.textContent=`복사했어요 (${j.target} · 문장 ${rs.length}개${todo.length&&todo.length<(j.results||[]).length?' · 검수한 문장 빼고':''}). 검수 채팅에 붙여 넣으세요.`},()=>{if(m)m.textContent='복사가 막혔어요.'})}),0);
   document.getElementById('subsList').innerHTML=html||'<div class="note">'+(subs.length?'이 조건에 맞는 문장이 없어요.':'아직 모은 결과가 없어요. 📊 진행 현황의 "결과 모으기"에 구글 시트 CSV나 제출 내용을 붙여 주세요.')+'</div>';
   document.querySelectorAll('#subsList button[data-rk]').forEach(b=>b.onclick=()=>{const m=store.get('myRev',{});const rkv=b.dataset.rk;let nv;if(m[rkv]===b.dataset.v){delete m[rkv];nv='clear'}else{m[rkv]=b.dataset.v;nv=b.dataset.v}store.set('myRev',m);
     const hit=subs.flatMap(({j})=>(j.results||[]).map(r=>[j,r])).find(([j,r])=>hash(j.target+'|'+r.claim+'|'+(r.links||[]).map(l=>l.quote).join('|'))===rkv);
