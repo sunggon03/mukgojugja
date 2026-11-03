@@ -306,7 +306,7 @@ const allergyMapping = {
     '아황산류': {
         name: '아황산류 과민',
         type: 'intolerance',
-        reason: '보존·표백 목적으로 쓰이는 아황산류에 과민하게 반응해 두드러기·복통·호흡기 증상 등을 보일 수 있음',
+        reason: '식품 보존에 쓰이는 아황산류에 과민하게 반응해 두드러기·복통·호흡기 증상 등을 보일 수 있음',
         avoidFoods: ['와인', '화이트와인', '레드와인'],
         safeFoods: ['물 + 레몬즙 소량(와인 대용)'],
         substitutes: {
@@ -315,7 +315,7 @@ const allergyMapping = {
             '레드와인': ['무가당 포도즙(레드와인 대용, 단맛이 있어요)']
         },
         tips: '아황산류를 넣어 만든 제품에서 최종 제품에 이산화황이 1kg당 10mg 이상 남은 경우에만 표시 대상이에요. 성분표의 "이산화황 함유" 표시를 확인하세요',
-        source: "https://110.go.kr/data/counselView.do?curPage=23&num=B03_668837&scCate1=&scCate2=&scIntt=&scText=&scType="
+        source: "https://www.mfds.go.kr/brd/m_580/view.do?seq=131"
     },
 };
 
