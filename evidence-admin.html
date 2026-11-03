@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="app-build" content="202611040010">
+<meta name="app-build" content="202611040020">
 <script>(function(){var B=((document.querySelector('meta[name="app-build"]')||{}).content||""),path=location.pathname,last=0;
 function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}}
 function bar(nb){if(document.getElementById('freshBar'))return;var d=document.createElement('div');d.id='freshBar';d.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99;background:#1F5FA8;color:#fff;border-radius:12px;padding:12px 14px;font:600 14px/1.5 sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.2);display:flex;gap:10px;align-items:center;justify-content:space-between';
@@ -111,6 +111,13 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
   <div class="row"><button class="btn sm" id="importBtn">결과 반영</button><button class="btn sm ghost" id="importUndo">마지막 반영 되돌리기</button></div><div id="importOut"></div></div>
 </details>
 
+<details class="card" id="srcCard" open style="border:2px solid var(--amb)">
+  <summary style="font-weight:700;font-size:16px;cursor:pointer">🔁 출처 교체 (앱 기본 출처 바꾸기) <span class="note" id="srcCount"></span></summary>
+  <div class="issue info" style="margin:8px 0"><b>출처 바꾸는 순서</b> ① 아래 표의 ⭐ 후보 칸에 링크가 생기면(조원 ⭐ 추천, 또는 📥 모아 보기의 "☆ 이 링크를 앱 기본 출처로 쓰기") ② 그 문장에 [검수 OK] ③ <b>📋 출처 교체 요청 복사</b> → Claude 검수 채팅에 붙이기 → 받은 diet-data.js·index.html을 GitHub에 올리기</div><p class="note" style="margin:8px 0">앱의 기본 설명이 기댄 출처가 약한 항목이에요. 해당 항목을 찾아 <b>기본 설명 문장</b>을 확인하면서 공공기관·학회·최근 논문 자료로 바꿔요. 바꾸면 체크해 두세요. 항목 이름을 누르면 바로 찾아져요.</p>
+  <div class="row" style="margin:0 0 6px"><button class="btn" id="srcAsk">📋 출처 교체 요청 복사 (Claude용)</button><span class="note" id="srcAskMsg">조원이 ⭐ 추천했거나 성곤이 ☆로 고른 링크 중 [검수 OK]인 것만 들어가요. 이미 확인 끝난 문장의 링크는 📥 모아 보기에서 "확인 끝만"을 누르면 ☆ 버튼이 보여요.</span></div>
+  <table id="srcTable"></table>
+</details>
+
 <details class="card" id="subsCard" open>
   <summary style="font-weight:700;font-size:16px;cursor:pointer">📥 조원 결과 모아 보기 · 성곤 검수 <span class="note" id="subsCount"></span></summary>
   <p class="note" style="margin:8px 0">"결과 모으기"에 붙인 제출 내용이 모두 여기 쌓여요. 링크를 열어 붙인 문장이 정말 있는지 보고 <b>"검수 OK"</b> 또는 <b>"고치기"</b>를 눌러요. 문장마다 판정, 붙인 원문, 링크, 확인·검수한 사람이 보여요.</p>
@@ -128,12 +135,7 @@ ol.rules{padding-left:20px;margin:6px 0;font-size:14px}
   <div id="subsList"></div>
 </details>
 
-<details class="card" id="srcCard">
-  <summary style="font-weight:700;font-size:16px;cursor:pointer">🔁 출처 교체가 필요한 항목 표 <span class="note" id="srcCount"></span></summary>
-  <p class="note" style="margin:8px 0">앱의 기본 설명이 기댄 출처가 약한 항목이에요. 해당 항목을 찾아 <b>기본 설명 문장</b>을 확인하면서 공공기관·학회·최근 논문 자료로 바꿔요. 바꾸면 체크해 두세요. 항목 이름을 누르면 바로 찾아져요.</p>
-  <div class="row" style="margin:0 0 6px"><button class="btn sm" id="srcAsk">📋 출처 교체 요청 복사 (Claude용)</button><span class="note" id="srcAskMsg">조원이 ⭐ 추천했거나 성곤이 ☆로 고른 링크 중 [검수 OK]인 것만 들어가요. 이미 확인 끝난 문장의 링크는 📥 모아 보기에서 "확인 끝만"을 누르면 ☆ 버튼이 보여요.</span></div>
-  <table id="srcTable"></table>
-</details>
+
 
 <div class="tabs">
   <button data-t="p1" class="on">①고르기</button>
@@ -292,7 +294,7 @@ async function loadLive(quiet){const u=liveUrl();if(!u){renderLiveNote();return}
   finally{LIVE.busy=false}
   liveRefreshViews()}
 function liveRefreshViews(){let dropped=0;
-  if(typeof T!=='undefined'&&T&&!T.isNew){const before=(S&&S.picked||[]).length;CLAIMS=claimsFor(T);renderTable();dropped=before-(S&&S.picked||[]).length;try{renderPrompt()}catch(e){}}
+  if(typeof T!=='undefined'&&T&&!T.isNew){const before=(S&&S.picked||[]).length;CLAIMS=claimsFor(T);try{renderSwapBox()}catch(e){}renderTable();dropped=before-(S&&S.picked||[]).length;try{renderPrompt()}catch(e){}}
   try{if(document.getElementById('progTable'))renderProg()}catch(e){}
   renderLiveNote(dropped)}
 function renderLiveNote(dropped){const el=document.getElementById('liveNote');if(!el)return;if(!liveUrl()){el.innerHTML='';return}
@@ -630,7 +632,7 @@ function renderSrc(){
   const done=store.get('srcDone',{});
   const rows=TARGETS.filter(t=>!me()||whoOf(t.label)===me()).map(t=>({t,si:sourceIssue(t.obj.source)})).filter(x=>x.si).sort((a,b)=>(URGENT.test(b.si)-URGENT.test(a.si)));
   const left=rows.filter(r=>!done[r.t.id]).length;
-  document.getElementById('srcCount').textContent=`· 남은 ${left}개 / ${rows.length}개`;
+  {const nc=rows.filter(r=>baseCands(r.t.label).length).length;document.getElementById('srcCount').textContent=`· 바꿀 항목 ${left}개 남음 / ${rows.length}개 · ⭐ 후보 있는 항목 ${nc}개`}
   document.getElementById('srcTable').innerHTML='<tr><th>바꿈</th><th>항목</th><th>지금 출처 · 약한 이유</th><th>⭐ 조원 추천 후보</th></tr>'+rows.map(({t,si})=>`<tr><td class="ck"><input type="checkbox" data-id="${esc(t.id)}" ${done[t.id]?'checked':''}></td><td><button class="lk" data-id="${esc(t.id)}">${esc(t.label.replace(/ 알레르기$/,''))}</button>${whoBadge(t.label)}${t.kind==='기저질환'?'<div class="why">기저질환</div>':''}</td><td><span class="pr ${URGENT.test(si)?'h':'m'}">${URGENT.test(si)?'급함':'보통'}</span> ${esc(si)}<div class="why"><a href="${esc(t.obj.source)}" target="_blank" rel="noopener noreferrer" style="color:var(--bl)">${esc(host(t.obj.source))}</a></div></td><td>${candHtml(t.label)}</td></tr>`).join('');
   document.querySelectorAll('#srcTable input').forEach(cb=>cb.onchange=()=>{const d=store.get('srcDone',{});if(cb.checked)d[cb.dataset.id]=1;else delete d[cb.dataset.id];store.set('srcDone',d);renderSrc();renderProg()});
   document.querySelectorAll('#srcTable .lk').forEach(b=>b.onclick=()=>{const t=TARGETS.find(x=>x.id===b.dataset.id);document.getElementById('q').value=t.label;doFind(t.label);showTab('p1');document.getElementById('srcCard').open=false;document.getElementById('findResult').scrollIntoView({block:'center'})});
@@ -708,15 +710,23 @@ function pickTarget(id){
   CLAIMS=claimsFor(T);loadState();
   {const si=sourceIssue(T.obj.source);const ti=document.getElementById('targetInfo');if(ti&&T.isNew)ti.innerHTML=`<b style="color:var(--ink)">${esc(T.label)}</b> · 새 항목 · ${esc(T.kind)} · 찾을 질문 ${CLAIMS.length}개`;else if(ti)ti.innerHTML=`<b style="color:var(--ink)">${esc(T.label)}</b>${whoBadge(T.label)} · `+esc(`${T.kind} · 지금 기본 출처: ${host(T.obj.source)||'없음'}${si?' · ⚠️ '+si:''} · 확인할 문장 ${CLAIMS.length}개`);}
   document.getElementById('aiInput').value=S.ai||'';document.getElementById('memo').value=S.memo||'';
+  renderSwapBox();
   renderTable();renderPrompt();renderCheck();renderConfirm();renderReview();
 }
+// 출처 교체가 필요한 항목이면 눈에 띄게 안내
+function renderSwapBox(){const old=document.getElementById('swapBox');if(old)old.remove();const ti=document.getElementById('targetInfo');if(!T||T.isNew||!ti)return;
+  const si=sourceIssue(T.obj.source);if(!si)return;const bc=CLAIMS.find(c=>c.type==='기본 설명');if(!bc)return;
+  const html=bc.locked?`<div id="swapBox" class="issue info" style="margin-top:8px;border:2px solid var(--amb)"><b>🔁 이 항목은 앱 기본 출처를 바꿔야 해요</b> (지금 출처: ${esc(si)})<br>기본 설명 문장은 이미 확인이 끝났어요. 출처는 성곤이 검수 화면에서 바꿔요. 이 항목에서 더 할 일은 없어요.</div>`
+   :`<div id="swapBox" class="issue warn" style="margin-top:8px;border:2px solid var(--amb)"><b>🔁 이 항목은 앱 기본 출처를 바꿔야 해요</b> (지금 출처: ${esc(si)})<br>① 아래 버튼으로 <b>기본 설명</b> 문장을 골라요 ② ②프롬프트를 AI에 붙여요 ③ ④에서 링크를 확인하고, 항목 전체를 설명하는 공공기관·학회 페이지면 <b>⭐ 새 기본 출처로 추천</b>에 체크해요<div class="row" style="margin-top:6px"><button class="btn sm" id="swapPick">🔁 기본 설명 문장 고르고 ②프롬프트로 가기</button></div></div>`;
+  ti.insertAdjacentHTML('afterend',html);const b=document.getElementById('swapPick');
+  if(b)b.onclick=()=>{if(!S.picked.includes(bc.id))S.picked=[bc.id].concat(S.picked);save();renderTable();renderPrompt();showTab('p2');const pt=document.getElementById('promptText');if(pt&&pt.scrollIntoView)pt.scrollIntoView({block:'start'})}}
 
 function renderTable(){
   if(T&&S&&S.picked){const lk=new Set(CLAIMS.filter(c=>c.locked).map(c=>c.id));const np=S.picked.filter(id=>!lk.has(id));if(np.length!==S.picked.length){S.picked=np;save()}}
   document.getElementById('claimEmpty').style.display=T?'none':'block';document.getElementById('claimArea').style.display=T?'block':'none';if(!T)return;
   const P={h:['높음','h'],m:['보통','m'],l:['낮음','l']};
   const showAll=T.isNew||store.get('showAll',false);const shown=CLAIMS.filter(c=>showAll||c.p==='h'||S.picked.includes(c.id));const hid=CLAIMS.length-shown.length;
-  document.getElementById('claimTable').innerHTML='<tr><th></th><th>우선</th><th>'+(T.isNew?'찾을 질문 (새 항목이라 앱 문장 대신 질문이에요)':'확인할 문장')+'</th></tr>'+(shown.length?'':'<tr><td colspan="3" class="note">높음 문장이 없어요. 이 항목은 높음 문장 확인이 끝났거나 해당이 없어요.</td></tr>')+shown.map(c=>`<tr${c.locked?' style="opacity:.55"':''}><td class="ck">${c.locked?(c.pending?'<span title="제출됨 · 검수 기다리는 중">⏳</span>':'<span title="확인 끝">✅</span>'):`<input type="checkbox" data-id="${c.id}" ${S.picked.includes(c.id)?'checked':''}>`}</td><td><span class="pr ${P[c.p][1]}">${P[c.p][0]}</span></td><td><span class="tag ${c.done?'done':''}">${esc(c.type)}</span>${esc(c.text)}${c.why?`<div class="why"${c.fix?' style="color:var(--red)"':''}>${esc(c.why)}</div>`:''}</td></tr>`).join('')+(T.isNew?'':`<tr><td colspan="3"><button class="btn sm ghost" id="toggleAll">${showAll?'높음만 보기':`보통·낮음 문장도 보기 (${hid}개)`}</button></td></tr>`);
+  document.getElementById('claimTable').innerHTML='<tr><th></th><th>우선</th><th>'+(T.isNew?'찾을 질문 (새 항목이라 앱 문장 대신 질문이에요)':'확인할 문장')+'</th></tr>'+(shown.length?'':'<tr><td colspan="3" class="note">높음 문장이 없어요. 이 항목은 높음 문장 확인이 끝났거나 해당이 없어요.</td></tr>')+shown.map(c=>`<tr${c.locked?' style="opacity:.55"':''}><td class="ck">${c.locked?(c.pending?'<span title="제출됨 · 검수 기다리는 중">⏳</span>':'<span title="확인 끝">✅</span>'):`<input type="checkbox" data-id="${c.id}" ${S.picked.includes(c.id)?'checked':''}>`}</td><td><span class="pr ${P[c.p][1]}">${P[c.p][0]}</span></td><td><span class="tag ${c.done?'done':''}">${esc(c.type)}</span>${c.weakSrc&&c.type==='기본 설명'&&!T.isNew?'<span class="tag" style="background:var(--al);color:var(--amb);font-weight:700">🔁 출처 교체</span>':''}${esc(c.text)}${c.why?`<div class="why"${c.fix?' style="color:var(--red)"':''}>${esc(c.why)}</div>`:''}</td></tr>`).join('')+(T.isNew?'':`<tr><td colspan="3"><button class="btn sm ghost" id="toggleAll">${showAll?'높음만 보기':`보통·낮음 문장도 보기 (${hid}개)`}</button></td></tr>`);
   const ta=document.getElementById('toggleAll');if(ta)ta.onclick=()=>{store.set('showAll',!showAll);renderTable()};
   document.querySelectorAll('#claimTable input').forEach(cb=>cb.onchange=()=>{S.picked=[...document.querySelectorAll('#claimTable input:checked')].map(x=>x.dataset.id);save();renderPrompt();countSel()});
   countSel();
@@ -999,7 +1009,7 @@ document.getElementById('copyOut').onclick=()=>copy(document.getElementById('out
 
 loadLive().then(()=>autoImport(true));setInterval(()=>{if(!document.hidden)loadLive(true).then(()=>autoImport(true))},120000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-LIVE.at>45000)loadLive(true)});
 renderTools();renderForm();renderTeam();renderSrc();renderNewList();renderProg();renderSubs();clearTarget();{const q=store.get('q','');if(q){document.getElementById('q').value=q;doFind(q)}}
-try{document.getElementById('srcCard').open=store.get('srcOpen',false);document.getElementById('srcCard').addEventListener('toggle',e=>store.set('srcOpen',e.target.open))}catch(e){}
+try{document.getElementById('srcCard').open=store.get('srcOpen2',true);document.getElementById('srcCard').addEventListener('toggle',e=>store.set('srcOpen2',e.target.open))}catch(e){}
 showTab(store.get('tab','p1'));
 </script>
 <script>try{fetch('index.html',{cache:'no-store'}).then(function(r){return r.text()}).then(function(h){var m=h.match(/diet-data\.js\?v=([\w-]+)/);document.getElementById('dataVer').textContent='웹사이트 데이터와 연동됨'+(m?' · 지금 웹사이트 버전 '+m[1]:'')}).catch(function(){document.getElementById('dataVer').textContent='웹사이트 데이터와 연동됨'})}catch(e){}</script>
