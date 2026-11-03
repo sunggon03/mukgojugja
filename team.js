@@ -3,7 +3,7 @@
 const TEAM = {
   // 공유 현황: 구글 폼 "응답 시트" 주소를 붙여 넣으면(시트 공유: 링크가 있는 모든 사용자 → 뷰어),
   // 조원 화면에 "⏳ 제출됨(검수 대기)"·"✅ 검수 끝"이 바로 반영돼서 같은 문장을 두 번 하지 않아요. 비워 두면 꺼져요.
-  liveSheet: '',
+  liveSheet: 'https://docs.google.com/spreadsheets/d/1wYZKO_ILLH4JKRjPBD2UsrAQ81DifbW8v8Lx_a4ezGg/edit?usp=sharing',
   reviewer: '김성곤',  // 이 이름으로 온 "검수 결과"만 반영해요
   names: { A: '유보경', B: '김문성', C: '이동희', D: '김강민', E: '변성진' },  // 11/01 무작위 배정
   // 구글 폼 "미리 채워진 링크" (질문 4개: KIND, NAME, ITEM, CONTENT)
